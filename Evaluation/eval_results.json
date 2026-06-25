@@ -1,0 +1,1107 @@
+[
+  {
+    "natural_question": "Who are the parties involved in this contract?",
+    "ground_truth_answer": "The parties involved in this contract are the Seller and AHF Holding, Inc.",
+    "category": "Parties",
+    "is_impossible": false,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "TICKETSCOMINC_06_22_1999-EX-10.22-SPONSORSHIP AGREEMENT",
+        "EhaveInc_20190515_20-F_EX-4.44_11678816_EX-4.44_License Agreement_ Reseller Agreement",
+        "InmodeLtd_20190729_F-1A_EX-10.9_11743243_EX-10.9_Manufacturing Agreement",
+        "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT",
+        "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Question was too vague to pinpoint a contract."
+  },
+  {
+    "natural_question": "What's the name of this contract?",
+    "ground_truth_answer": "This contract is called the Sponsorship Agreement.",
+    "category": "Document Name",
+    "is_impossible": false,
+    "pipeline_result": {
+      "status": "low_relevance",
+      "top_contract": "InmodeLtd_20190729_F-1A_EX-10.9_11743243_EX-10.9_Manufacturing Agreement"
+    },
+    "human_label": "correctly_declined",
+    "notes": "Question was too vague to pinpoint a contract."
+  },
+  {
+    "natural_question": "Who are the companies that signed this contract?",
+    "ground_truth_answer": "The companies that signed this contract are SINA Leju and Beijing SINA.",
+    "category": "Parties",
+    "is_impossible": false,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "PANDIONTHERAPEUTICSHOLDCOLLC_05_22_2020-EX-10.17-CONSULTING AGREEMENT",
+        "InmodeLtd_20190729_F-1A_EX-10.9_11743243_EX-10.9_Manufacturing Agreement",
+        "DIVERSINETCORP_03_01_2012-EX-4-RESELLER AGREEMENT",
+        "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT",
+        "EUROPEANMICROHOLDINGSINC_03_06_1998-EX-10.6-DISTRIBUTOR AGREEMENT"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Question was too vague to pinpoint a contract."
+  },
+  {
+    "natural_question": "Does this contract require me to buy a minimum amount of something from the other party?",
+    "ground_truth_answer": "The contract does contain a minimum commitment clause, which is related to meeting sales targets as outlined in Schedule 3.",
+    "category": "Minimum Commitment",
+    "is_impossible": false,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "UpjohnInc_20200121_10-12G_EX-2.6_11948692_EX-2.6_Manufacturing Agreement_ Supply Agreement",
+        "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT",
+        "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Vague question; system safely declined and requested clarification among candidate contracts."
+  },
+  {
+    "natural_question": "When does this contract actually start?",
+    "ground_truth_answer": "This contract is effective as of January 4, 2011.",
+    "category": "Effective Date",
+    "is_impossible": false,
+    "pipeline_result": {
+      "status": "low_relevance",
+      "top_contract": "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules"
+    },
+    "human_label": "correctly_declined",
+    "notes": "Vague question; system safely declined and requested clarification among candidate contracts."
+  },
+  {
+    "natural_question": "What is the name of this contract?",
+    "ground_truth_answer": "This contract is called the TURN-KEY MANUFACTURING AGREEMENT.",
+    "category": "Document Name",
+    "is_impossible": false,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT",
+        "PANDIONTHERAPEUTICSHOLDCOLLC_05_22_2020-EX-10.17-CONSULTING AGREEMENT",
+        "InmodeLtd_20190729_F-1A_EX-10.9_11743243_EX-10.9_Manufacturing Agreement",
+        "UpjohnInc_20200121_10-12G_EX-2.6_11948692_EX-2.6_Manufacturing Agreement_ Supply Agreement"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Vague question; system safely declined and requested clarification among candidate contracts."
+  },
+  {
+    "natural_question": "When does this contract actually start?",
+    "ground_truth_answer": "This contract is effective as of November 5, 1997.",
+    "category": "Effective Date",
+    "is_impossible": false,
+    "pipeline_result": {
+      "status": "low_relevance",
+      "top_contract": "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules"
+    },
+    "human_label": "correctly_declined",
+    "notes": "Vague question; system safely declined and requested clarification among candidate contracts."
+  },
+  {
+    "natural_question": "Who are the parties involved in this contract?",
+    "ground_truth_answer": "The parties in this contract are referred to as Trust, Domini, or the Sponsor.",
+    "category": "Parties",
+    "is_impossible": false,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "TICKETSCOMINC_06_22_1999-EX-10.22-SPONSORSHIP AGREEMENT",
+        "EhaveInc_20190515_20-F_EX-4.44_11678816_EX-4.44_License Agreement_ Reseller Agreement",
+        "InmodeLtd_20190729_F-1A_EX-10.9_11743243_EX-10.9_Manufacturing Agreement",
+        "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT",
+        "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Vague question; system safely declined and requested clarification among candidate contracts."
+  },
+  {
+    "natural_question": "When did this contract go into effect?",
+    "ground_truth_answer": "This contract went into effect on September 14, 200_.",
+    "category": "Effective Date",
+    "is_impossible": false,
+    "pipeline_result": {
+      "status": "answered",
+      "claims": [
+        {
+          "text": "The contract shall be effective on 06 October 2000.",
+          "source_chunk_id": "chunk_269",
+          "verdict": "SUPPORTED",
+          "reason": "The source text explicitly states that the contract shall be effective on 06 October 2000, matching the claim exactly."
+        }
+      ],
+      "top_contract": "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules"
+    },
+    "human_label": "incorrect",
+    "notes": "Didn't even retrieve the correct contract_title"
+  },
+  {
+    "natural_question": "What is the name of this contract?",
+    "ground_truth_answer": "This contract is called the Reseller Agreement.",
+    "category": "Document Name",
+    "is_impossible": false,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT",
+        "PANDIONTHERAPEUTICSHOLDCOLLC_05_22_2020-EX-10.17-CONSULTING AGREEMENT",
+        "InmodeLtd_20190729_F-1A_EX-10.9_11743243_EX-10.9_Manufacturing Agreement",
+        "UpjohnInc_20200121_10-12G_EX-2.6_11948692_EX-2.6_Manufacturing Agreement_ Supply Agreement"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Vague question; system safely declined and requested clarification among candidate contracts."
+  },
+  {
+    "natural_question": "When does this contract actually start?",
+    "ground_truth_answer": "This contract is effective as of December 23, 2019.",
+    "category": "Effective Date",
+    "is_impossible": false,
+    "pipeline_result": {
+      "status": "low_relevance",
+      "top_contract": "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules"
+    },
+    "human_label": "correctly_declined",
+    "notes": "Question too vague to identify the targeted contract; pipeline safely fallback to low_relevance"
+  },
+  {
+    "natural_question": "When was this contract signed?",
+    "ground_truth_answer": "This contract was signed on September 14, 200_.",
+    "category": "Agreement Date",
+    "is_impossible": false,
+    "pipeline_result": {
+      "status": "low_relevance",
+      "top_contract": "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules"
+    },
+    "human_label": "correctly_declined",
+    "notes": "Vague question; system safely declined and requested clarification among candidate contracts."
+  },
+  {
+    "natural_question": "When was this contract signed?",
+    "ground_truth_answer": "This contract was signed on February 17, 1999.",
+    "category": "Agreement Date",
+    "is_impossible": false,
+    "pipeline_result": {
+      "status": "low_relevance",
+      "top_contract": "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules"
+    },
+    "human_label": "correctly_declined",
+    "notes": "Question was too vague to pinpoint a contract."
+  },
+  {
+    "natural_question": "Does this contract require me to buy a minimum amount of product at a time?",
+    "ground_truth_answer": "Yes, the contract requires you to order at least a certain amount of product, known as the Minimum Order Quantity, for finished products, and to order in batches of a specific size for API or bulk drug products.",
+    "category": "Minimum Commitment",
+    "is_impossible": false,
+    "pipeline_result": {
+      "status": "answered",
+      "claims": [
+        {
+          "text": "No minimum purchase obligation exists unless expressly set forth in the applicable Facility Addendum.",
+          "source_chunk_id": "chunk_346",
+          "verdict": "SUPPORTED",
+          "reason": "The source text explicitly states that no minimum purchase obligation exists unless expressly set forth in the applicable Facility Addendum, exactly matching the claim."
+        },
+        {
+          "text": "Each Purchase Order for Product that is either API or Bulk Drug Product shall be equal to, or a whole multiple of, the Batch Size for such applicable Product as set forth in the applicable Facility Addendum.",
+          "source_chunk_id": "chunk_347",
+          "verdict": "SUPPORTED",
+          "reason": "The claim is directly stated in the source text under Section 2.4(e)(ii)(A) with no added assumptions or dropped qualifiers."
+        },
+        {
+          "text": "Each Purchase Order that Customer places hereunder for Product that is Finished Product shall be equal to or greater than the Minimum Order Quantity for such applicable Product as set forth in the applicable Facility Addendum.",
+          "source_chunk_id": "chunk_347",
+          "verdict": "SUPPORTED",
+          "reason": "The source text explicitly states the condition that each Purchase Order for Finished Product shall be equal to or greater than the Minimum Order Quantity as set forth in the applicable Facility Addendum."
+        }
+      ],
+      "top_contract": "UpjohnInc_20200121_10-12G_EX-2.6_11948692_EX-2.6_Manufacturing Agreement_ Supply Agreement"
+    },
+    "human_label":"correct",
+    "notes": "Different answer unable to understand which is correct"
+  },
+  {
+    "natural_question": "When was this contract signed?",
+    "ground_truth_answer": "This contract was signed on a specific day in 2009.",
+    "category": "Agreement Date",
+    "is_impossible": false,
+    "pipeline_result": {
+      "status": "low_relevance",
+      "top_contract": "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules"
+    },
+    "human_label": "correctly_declined",
+    "notes": "Question was too vague to pinpoint a contract."
+  },
+  {
+    "natural_question": "Who are the companies that signed this contract?",
+    "ground_truth_answer": "The companies that signed this contract are Ehave and Companion Healthcare Technologies Corp.",
+    "category": "Parties",
+    "is_impossible": false,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "PANDIONTHERAPEUTICSHOLDCOLLC_05_22_2020-EX-10.17-CONSULTING AGREEMENT",
+        "InmodeLtd_20190729_F-1A_EX-10.9_11743243_EX-10.9_Manufacturing Agreement",
+        "DIVERSINETCORP_03_01_2012-EX-4-RESELLER AGREEMENT",
+        "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT",
+        "EUROPEANMICROHOLDINGSINC_03_06_1998-EX-10.6-DISTRIBUTOR AGREEMENT"
+      ]
+    },
+    "human_label": "incorrect",
+    "notes": "Question was too vague to pinpoint a contract."
+  },
+  {
+    "natural_question": "When was this contract signed?",
+    "ground_truth_answer": "This contract was signed on January 11, 2011.",
+    "category": "Agreement Date",
+    "is_impossible": false,
+    "pipeline_result": {
+      "status": "low_relevance",
+      "top_contract": "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules"
+    },
+    "human_label": "correctly_declined",
+    "notes": "Question was too vague to pinpoint a contract."
+  },
+  {
+    "natural_question": "When was this contract signed?",
+    "ground_truth_answer": "This contract was signed on November 5, 1997.",
+    "category": "Agreement Date",
+    "is_impossible": false,
+    "pipeline_result": {
+      "status": "low_relevance",
+      "top_contract": "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules"
+    },
+    "human_label": "correctly_declined",
+    "notes": "Question too vague to identify the targeted contract; pipeline safely fallback to low_relevance"
+  },
+  {
+    "natural_question": "What is the name of this contract?",
+    "ground_truth_answer": "This contract is called the Strategic Alliance Agreement.",
+    "category": "Document Name",
+    "is_impossible": false,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT",
+        "PANDIONTHERAPEUTICSHOLDCOLLC_05_22_2020-EX-10.17-CONSULTING AGREEMENT",
+        "InmodeLtd_20190729_F-1A_EX-10.9_11743243_EX-10.9_Manufacturing Agreement",
+        "UpjohnInc_20200121_10-12G_EX-2.6_11948692_EX-2.6_Manufacturing Agreement_ Supply Agreement"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Question was too vague to pinpoint a contract."
+  },
+  {
+    "natural_question": "Who are the parties involved in this contract?",
+    "ground_truth_answer": "The parties involved in this contract are T&B Seminars, Inc. and T&B.",
+    "category": "Parties",
+    "is_impossible": false,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "TICKETSCOMINC_06_22_1999-EX-10.22-SPONSORSHIP AGREEMENT",
+        "EhaveInc_20190515_20-F_EX-4.44_11678816_EX-4.44_License Agreement_ Reseller Agreement",
+        "InmodeLtd_20190729_F-1A_EX-10.9_11743243_EX-10.9_Manufacturing Agreement",
+        "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT",
+        "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Question was too vague to pinpoint a contract."
+  },
+  {
+    "natural_question": "What is the name of this contract?",
+    "ground_truth_answer": "This contract is called the Intellectual Property Agreement.",
+    "category": "Document Name",
+    "is_impossible": false,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT",
+        "PANDIONTHERAPEUTICSHOLDCOLLC_05_22_2020-EX-10.17-CONSULTING AGREEMENT",
+        "InmodeLtd_20190729_F-1A_EX-10.9_11743243_EX-10.9_Manufacturing Agreement",
+        "UpjohnInc_20200121_10-12G_EX-2.6_11948692_EX-2.6_Manufacturing Agreement_ Supply Agreement"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Question was too vague to pinpoint a contract."
+  },
+  {
+    "natural_question": "Who are the parties involved in this contract?",
+    "ground_truth_answer": "The parties in this contract are the Distributor and WGT.",
+    "category": "Parties",
+    "is_impossible": false,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "TICKETSCOMINC_06_22_1999-EX-10.22-SPONSORSHIP AGREEMENT",
+        "EhaveInc_20190515_20-F_EX-4.44_11678816_EX-4.44_License Agreement_ Reseller Agreement",
+        "InmodeLtd_20190729_F-1A_EX-10.9_11743243_EX-10.9_Manufacturing Agreement",
+        "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT",
+        "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Vague question; system safely declined and requested clarification among candidate contracts."
+  },
+  {
+    "natural_question": "When does this contract actually start?",
+    "ground_truth_answer": "This contract does contain information about when it becomes effective.",
+    "category": "Effective Date",
+    "is_impossible": false,
+    "pipeline_result": {
+      "status": "low_relevance",
+      "top_contract": "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules"
+    },
+    "human_label": "correctly_declined",
+    "notes": "Question too vague to identify the targeted contract; pipeline safely fallback to low_relevance"
+  },
+  {
+    "natural_question": "Who are the parties that signed this contract?",
+    "ground_truth_answer": "The parties involved in this contract are Tickets.com, Inc. and Tickets.",
+    "category": "Parties",
+    "is_impossible": false,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules",
+        "InmodeLtd_20190729_F-1A_EX-10.9_11743243_EX-10.9_Manufacturing Agreement",
+        "TICKETSCOMINC_06_22_1999-EX-10.22-SPONSORSHIP AGREEMENT",
+        "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT",
+        "DIVERSINETCORP_03_01_2012-EX-4-RESELLER AGREEMENT"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Vague unanswerable question; system safely triggered need_clarification with target contract present at candidate rank 3"
+  },
+  {
+    "natural_question": "What is the name of this contract?",
+    "ground_truth_answer": "This contract is called the Real Estate Education Training Program Development Agreement.",
+    "category": "Document Name",
+    "is_impossible": false,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT",
+        "PANDIONTHERAPEUTICSHOLDCOLLC_05_22_2020-EX-10.17-CONSULTING AGREEMENT",
+        "InmodeLtd_20190729_F-1A_EX-10.9_11743243_EX-10.9_Manufacturing Agreement",
+        "UpjohnInc_20200121_10-12G_EX-2.6_11948692_EX-2.6_Manufacturing Agreement_ Supply Agreement"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Question too vague to identify the targeted contract; pipeline safely fallback to low_relevance"
+  },
+  {
+    "natural_question": "What happens to the contract after the first term ends, is it automatically renewed or can it be extended?",
+    "ground_truth_answer": "This contract does contain a renewal term clause, but the specific details are not provided here.",
+    "category": "Renewal Term",
+    "is_impossible": true,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "PANDIONTHERAPEUTICSHOLDCOLLC_05_22_2020-EX-10.17-CONSULTING AGREEMENT",
+        "EUROPEANMICROHOLDINGSINC_03_06_1998-EX-10.6-DISTRIBUTOR AGREEMENT",
+        "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT",
+        "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules",
+        "TICKETSCOMINC_06_22_1999-EX-10.22-SPONSORSHIP AGREEMENT"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Question too vague to identify the targeted contract; pipeline safely fallback to low_relevance"
+  },
+  {
+    "natural_question": "Can either of us end this contract whenever we want, without a specific reason, just by giving notice and waiting a bit?",
+    "ground_truth_answer": "This contract does contain a termination for convenience clause, but the details are not provided here.",
+    "category": "Termination For Convenience",
+    "is_impossible": true,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "InmodeLtd_20190729_F-1A_EX-10.9_11743243_EX-10.9_Manufacturing Agreement",
+        "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules",
+        "EhaveInc_20190515_20-F_EX-4.44_11678816_EX-4.44_License Agreement_ Reseller Agreement",
+        "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Correctly retrieved the document and it is at the 2nd rank"
+  },
+  {
+    "natural_question": "When does this contract actually start?",
+    "ground_truth_answer": "This contract does contain an effective date clause, but the details are not provided here.",
+    "category": "Effective Date",
+    "is_impossible": true,
+    "pipeline_result": {
+      "status": "low_relevance",
+      "top_contract": "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules"
+    },
+    "human_label": "correctly_declined",
+    "notes": "Vague question; system safely declined and requested clarification among candidate contracts."
+  },
+  {
+    "natural_question": "Does this contract allow it to be transferred to someone else without needing permission or notification?",
+    "ground_truth_answer": "This contract doesn't have a section about assigning it to a third party, so it seems that part is missing.",
+    "category": "Anti-Assignment",
+    "is_impossible": true,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules",
+        "UpjohnInc_20200121_10-12G_EX-2.6_11948692_EX-2.6_Manufacturing Agreement_ Supply Agreement",
+        "EhaveInc_20190515_20-F_EX-4.44_11678816_EX-4.44_License Agreement_ Reseller Agreement",
+        "InmodeLtd_20190729_F-1A_EX-10.9_11743243_EX-10.9_Manufacturing Agreement",
+        "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Vague question lacks company/contract keywords; pipeline safely triggered need_clarification."
+  },
+  {
+    "natural_question": "Can either of us cancel this contract whenever we want, as long as we give the other person some notice?",
+    "ground_truth_answer": "This contract does contain a termination for convenience clause, even though the exact details aren't specified in the given information.",
+    "category": "Termination For Convenience",
+    "is_impossible": true,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules",
+        "InmodeLtd_20190729_F-1A_EX-10.9_11743243_EX-10.9_Manufacturing Agreement",
+        "EUROPEANMICROHOLDINGSINC_03_06_1998-EX-10.6-DISTRIBUTOR AGREEMENT",
+        "EhaveInc_20190515_20-F_EX-4.44_11678816_EX-4.44_License Agreement_ Reseller Agreement",
+        "LegacyEducationAllianceInc_20200330_10-K_EX-10.18_12090678_EX-10.18_Development Agreement"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Vague question lacks company/contract keywords; pipeline safely triggered need_clarification."
+  },
+  {
+    "natural_question": "Which country or state's laws apply to this contract?",
+    "ground_truth_answer": "This contract does not specify which country or state's laws govern its interpretation.",
+    "category": "Governing Law",
+    "is_impossible": true,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "EUROPEANMICROHOLDINGSINC_03_06_1998-EX-10.6-DISTRIBUTOR AGREEMENT",
+        "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT",
+        "ArmstrongFlooringInc_20190107_8-K_EX-10.2_11471795_EX-10.2_Intellectual Property Agreement",
+        "TICKETSCOMINC_06_22_1999-EX-10.22-SPONSORSHIP AGREEMENT",
+        "DIVERSINETCORP_03_01_2012-EX-4-RESELLER AGREEMENT"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Vague question lacks company/contract keywords; pipeline safely triggered need_clarification."
+  },
+  {
+    "natural_question": "Does this contract limit how much one party can be sued for if they break the rules?",
+    "ground_truth_answer": "There is no limit on liability in this contract.",
+    "category": "Cap On Liability",
+    "is_impossible": true,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "InmodeLtd_20190729_F-1A_EX-10.9_11743243_EX-10.9_Manufacturing Agreement",
+        "UpjohnInc_20200121_10-12G_EX-2.6_11948692_EX-2.6_Manufacturing Agreement_ Supply Agreement",
+        "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules",
+        "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Vague question lacks company/contract keywords; pipeline safely triggered need_clarification."
+  },
+  {
+    "natural_question": "What happens to the contract after the first term ends, does it automatically renew or can one side extend it?",
+    "ground_truth_answer": "This contract does contain a renewal term clause.",
+    "category": "Renewal Term",
+    "is_impossible": true,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "PANDIONTHERAPEUTICSHOLDCOLLC_05_22_2020-EX-10.17-CONSULTING AGREEMENT",
+        "EUROPEANMICROHOLDINGSINC_03_06_1998-EX-10.6-DISTRIBUTOR AGREEMENT",
+        "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT",
+        "TICKETSCOMINC_06_22_1999-EX-10.22-SPONSORSHIP AGREEMENT",
+        "DIVERSINETCORP_03_01_2012-EX-4-RESELLER AGREEMENT"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Vague question lacks company/contract keywords; pipeline safely triggered need_clarification."
+  },
+  {
+    "natural_question": "When was this contract signed?",
+    "ground_truth_answer": "This contract doesn't specifically mention an agreement date.",
+    "category": "Agreement Date",
+    "is_impossible": true,
+    "pipeline_result": {
+      "status": "low_relevance",
+      "top_contract": "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules"
+    },
+    "human_label": "correctly_declined",
+    "notes": "Question too vague to identify the targeted contract; pipeline safely fallback to low_relevance"
+  },
+  {
+    "natural_question": "What happens to the contract after the first term is over, does it renew automatically or can one side decide to extend it?",
+    "ground_truth_answer": "This contract does contain a renewal term clause, but the details are not specified here.",
+    "category": "Renewal Term",
+    "is_impossible": true,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "PANDIONTHERAPEUTICSHOLDCOLLC_05_22_2020-EX-10.17-CONSULTING AGREEMENT",
+        "EUROPEANMICROHOLDINGSINC_03_06_1998-EX-10.6-DISTRIBUTOR AGREEMENT",
+        "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT",
+        "TICKETSCOMINC_06_22_1999-EX-10.22-SPONSORSHIP AGREEMENT",
+        "DIVERSINETCORP_03_01_2012-EX-4-RESELLER AGREEMENT"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Vague question lacks company/contract keywords; pipeline safely triggered need_clarification."
+  },
+  {
+    "natural_question": "Does this contract include a section where one party gives the other party permission to use something?",
+    "ground_truth_answer": "This contract does contain a license grant clause, but the details are not provided here.",
+    "category": "License Grant",
+    "is_impossible": true,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "DIVERSINETCORP_03_01_2012-EX-4-RESELLER AGREEMENT",
+        "UpjohnInc_20200121_10-12G_EX-2.6_11948692_EX-2.6_Manufacturing Agreement_ Supply Agreement",
+        "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT",
+        "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Vague question lacks company/contract keywords; pipeline safely triggered need_clarification."
+  },
+  {
+    "natural_question": "Does this contract require me to buy a minimum amount of something from the other party?",
+    "ground_truth_answer": "This contract does not have a minimum commitment or purchase requirement.",
+    "category": "Minimum Commitment",
+    "is_impossible": true,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "UpjohnInc_20200121_10-12G_EX-2.6_11948692_EX-2.6_Manufacturing Agreement_ Supply Agreement",
+        "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT",
+        "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Vague question lacks company/contract keywords; pipeline safely triggered need_clarification."
+  },
+  {
+    "natural_question": "Does this contract give one company permission to use something belonging to the other company?",
+    "ground_truth_answer": "Yes, the contract does contain a license grant clause, even though the specific details are not provided.",
+    "category": "License Grant",
+    "is_impossible": true,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules",
+        "UpjohnInc_20200121_10-12G_EX-2.6_11948692_EX-2.6_Manufacturing Agreement_ Supply Agreement",
+        "ArmstrongFlooringInc_20190107_8-K_EX-10.2_11471795_EX-10.2_Intellectual Property Agreement"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Vague question lacks company/contract keywords; pipeline safely triggered need_clarification."
+  },
+  {
+    "natural_question": "Can either of us end this contract whenever we want, just by giving notice and waiting a bit?",
+    "ground_truth_answer": "This contract does allow for termination without cause, but the details are not explicitly stated in the provided text, however, the presence of the clause is confirmed.",
+    "category": "Termination For Convenience",
+    "is_impossible": true,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "InmodeLtd_20190729_F-1A_EX-10.9_11743243_EX-10.9_Manufacturing Agreement",
+        "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules",
+        "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT",
+        "EhaveInc_20190515_20-F_EX-4.44_11678816_EX-4.44_License Agreement_ Reseller Agreement",
+        "LegacyEducationAllianceInc_20200330_10-K_EX-10.18_12090678_EX-10.18_Development Agreement"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Vague question lacks company/contract keywords; pipeline safely triggered need_clarification."
+  },
+  {
+    "natural_question": "Does this contract require me to buy a minimum amount of something from the other party?",
+    "ground_truth_answer": "This contract does have a minimum commitment clause, but since the ground truth answer is N/A and it's marked as present, it implies the details are not explicitly stated, however the presence is acknowledged.",
+    "category": "Minimum Commitment",
+    "is_impossible": true,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "UpjohnInc_20200121_10-12G_EX-2.6_11948692_EX-2.6_Manufacturing Agreement_ Supply Agreement",
+        "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT",
+        "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Vague question lacks company/contract keywords; pipeline safely triggered need_clarification."
+  },
+  {
+    "natural_question": "Can either of us end this contract at any time just by giving notice, without needing a specific reason?",
+    "ground_truth_answer": "Although the contract does contain a termination for convenience clause, the details of it should be reviewed by a lawyer.",
+    "category": "Termination For Convenience",
+    "is_impossible": true,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "InmodeLtd_20190729_F-1A_EX-10.9_11743243_EX-10.9_Manufacturing Agreement",
+        "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules",
+        "EhaveInc_20190515_20-F_EX-4.44_11678816_EX-4.44_License Agreement_ Reseller Agreement",
+        "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT",
+        "DOMINIADVISORTRUST_02_18_2005-EX-99.(H)(2)-SPONSORSHIP AGREEMENT"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Vague question lacks company/contract keywords; pipeline safely triggered need_clarification."
+  },
+  {
+    "natural_question": "When does this contract actually take effect?",
+    "ground_truth_answer": "This contract does not explicitly mention an effective date.",
+    "category": "Effective Date",
+    "is_impossible": true,
+    "pipeline_result": {
+      "status": "answered",
+      "claims": [
+        {
+          "text": "It shall be effective on 06 October 2000 and shall have a duration of two years.",
+          "source_chunk_id": "chunk_269",
+          "verdict": "SUPPORTED",
+          "reason": "The source text explicitly states that it shall be effective on 06 October 2000 and shall have a duration of two years, matching the claim exactly."
+        }
+      ],
+      "top_contract": "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules"
+    },
+    "human_label": "hallucinated",
+    "notes": "Didn't even retrieve the correct contract_title"
+  },
+  {
+    "natural_question": "Does this contract include a license that lets one party use something belonging to the other party?",
+    "ground_truth_answer": "This contract does contain a license grant clause, even though the exact details are not specified here.",
+    "category": "License Grant",
+    "is_impossible": true,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT",
+        "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules",
+        "ArmstrongFlooringInc_20190107_8-K_EX-10.2_11471795_EX-10.2_Intellectual Property Agreement",
+        "UpjohnInc_20200121_10-12G_EX-2.6_11948692_EX-2.6_Manufacturing Agreement_ Supply Agreement"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Vague unanswerable question; system safely triggered need_clarification with target contract present at candidate rank 2"
+  },
+  {
+    "natural_question": "What happens to the contract after the first term ends, and are there any automatic extensions or extensions that one side can choose?",
+    "ground_truth_answer": "This contract does contain a renewal term clause, but the details are not specified here.",
+    "category": "Renewal Term",
+    "is_impossible": true,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "UpjohnInc_20200121_10-12G_EX-2.6_11948692_EX-2.6_Manufacturing Agreement_ Supply Agreement",
+        "PANDIONTHERAPEUTICSHOLDCOLLC_05_22_2020-EX-10.17-CONSULTING AGREEMENT",
+        "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT",
+        "EUROPEANMICROHOLDINGSINC_03_06_1998-EX-10.6-DISTRIBUTOR AGREEMENT",
+        "TICKETSCOMINC_06_22_1999-EX-10.22-SPONSORSHIP AGREEMENT"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Vague unanswerable question; system safely triggered need_clarification with target contract present at candidate rank 3"
+  },
+  {
+    "natural_question": "When does the initial term of this contract end?",
+    "ground_truth_answer": "This contract does not specify an expiration date for its initial term.",
+    "category": "Expiration Date",
+    "is_impossible": true,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "UpjohnInc_20200121_10-12G_EX-2.6_11948692_EX-2.6_Manufacturing Agreement_ Supply Agreement",
+        "TICKETSCOMINC_06_22_1999-EX-10.22-SPONSORSHIP AGREEMENT",
+        "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT",
+        "PANDIONTHERAPEUTICSHOLDCOLLC_05_22_2020-EX-10.17-CONSULTING AGREEMENT",
+        "DIVERSINETCORP_03_01_2012-EX-4-RESELLER AGREEMENT"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Vague question lacks company/contract keywords; pipeline safely triggered need_clarification."
+  },
+  {
+    "natural_question": "Does this contract give one company permission to use something belonging to the other company?",
+    "ground_truth_answer": "This contract does contain a license grant clause, even though the specific details aren't provided here.",
+    "category": "License Grant",
+    "is_impossible": true,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules",
+        "UpjohnInc_20200121_10-12G_EX-2.6_11948692_EX-2.6_Manufacturing Agreement_ Supply Agreement",
+        "ArmstrongFlooringInc_20190107_8-K_EX-10.2_11471795_EX-10.2_Intellectual Property Agreement"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Vague question lacks company/contract keywords; pipeline safely triggered need_clarification."
+  },
+  {
+    "natural_question": "When does this contract actually start?",
+    "ground_truth_answer": "This contract doesn't explicitly mention an effective date.",
+    "category": "Effective Date",
+    "is_impossible": true,
+    "pipeline_result": {
+      "status": "low_relevance",
+      "top_contract": "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules"
+    },
+    "human_label": "correctly_declined",
+    "notes": "Vague question lacks company/contract keywords; pipeline safely triggered need_clarification."
+  },
+  {
+    "natural_question": "Does this contract require me to buy a minimum amount of something from the other party?",
+    "ground_truth_answer": "This contract does not have a minimum commitment or purchase requirement.",
+    "category": "Minimum Commitment",
+    "is_impossible": true,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "UpjohnInc_20200121_10-12G_EX-2.6_11948692_EX-2.6_Manufacturing Agreement_ Supply Agreement",
+        "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT",
+        "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Vague question lacks company/contract keywords; pipeline safely triggered need_clarification."
+  },
+  {
+    "natural_question": "Is there a limit to how much one party can be held responsible if they break the rules of this contract?",
+    "ground_truth_answer": "This contract does contain a cap on liability, even though the specific details are not provided here.",
+    "category": "Cap On Liability",
+    "is_impossible": true,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "InmodeLtd_20190729_F-1A_EX-10.9_11743243_EX-10.9_Manufacturing Agreement",
+        "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT",
+        "EhaveInc_20190515_20-F_EX-4.44_11678816_EX-4.44_License Agreement_ Reseller Agreement",
+        "EUROPEANMICROHOLDINGSINC_03_06_1998-EX-10.6-DISTRIBUTOR AGREEMENT"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Vague question lacks company/contract keywords; pipeline safely triggered need_clarification."
+  },
+  {
+    "natural_question": "What happens to the contract after the first term is over, like does it renew automatically or can one side decide to extend it?",
+    "ground_truth_answer": "This contract actually does have a section about renewal terms.",
+    "category": "Renewal Term",
+    "is_impossible": true,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "PANDIONTHERAPEUTICSHOLDCOLLC_05_22_2020-EX-10.17-CONSULTING AGREEMENT",
+        "EUROPEANMICROHOLDINGSINC_03_06_1998-EX-10.6-DISTRIBUTOR AGREEMENT",
+        "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT",
+        "TICKETSCOMINC_06_22_1999-EX-10.22-SPONSORSHIP AGREEMENT",
+        "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Vague question lacks company/contract keywords; pipeline safely triggered need_clarification."
+  },
+  {
+    "natural_question": "Does this contract give one company permission to use or sell something belonging to the other company?",
+    "ground_truth_answer": "Yes, this contract allows Reseller to market, sell, and sublicense certain Diversinet products within a specific territory in Canada.",
+    "category": "License Grant",
+    "is_impossible": false,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "UpjohnInc_20200121_10-12G_EX-2.6_11948692_EX-2.6_Manufacturing Agreement_ Supply Agreement",
+        "ArmstrongFlooringInc_20190107_8-K_EX-10.2_11471795_EX-10.2_Intellectual Property Agreement",
+        "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Vague question lacks company/contract keywords; pipeline safely triggered need_clarification."
+  },
+  {
+    "natural_question": "If I sell my business, do I need the other party's permission to transfer this contract to the new owner?",
+    "ground_truth_answer": "You don't need the manufacturer's consent to assign this contract to a third party in certain situations, like a sale or merger of your business.",
+    "category": "Anti-Assignment",
+    "is_impossible": false,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "UpjohnInc_20200121_10-12G_EX-2.6_11948692_EX-2.6_Manufacturing Agreement_ Supply Agreement",
+        "LegacyEducationAllianceInc_20200330_10-K_EX-10.18_12090678_EX-10.18_Development Agreement",
+        "ArmstrongFlooringInc_20190107_8-K_EX-10.2_11471795_EX-10.2_Intellectual Property Agreement",
+        "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules",
+        "DIVERSINETCORP_03_01_2012-EX-4-RESELLER AGREEMENT"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Correctly retrieved the document and it is at the top"
+  },
+  {
+    "natural_question": "Does this contract require me to buy a minimum amount of products or services from the other party?",
+    "ground_truth_answer": "The contract does contain a minimum commitment clause, which states that the exclusive appointment and license will become non-exclusive if annual revenues of $500,000 are not achieved.",
+    "category": "Minimum Commitment",
+    "is_impossible": false,
+    "pipeline_result": {
+      "status": "answered",
+      "claims": [
+        {
+          "text": "Customer is not otherwise obligated to purchase any minimum or specific quantity of Product under any Facility Addendum unless expressly set forth in the applicable Facility Addendum.",
+          "source_chunk_id": "chunk_347",
+          "verdict": "SUPPORTED",
+          "reason": "The claim is a direct quote of the first part of section 2.4(e)(i) in the source text, with no added or assumed information."
+        },
+        {
+          "text": "However, Customer must place Purchase Orders for API or Bulk Drug Product equal to, or a whole multiple of, the Batch Size for such applicable Product as set forth in the applicable Facility Addendum.",
+          "source_chunk_id": "chunk_347",
+          "verdict": "SUPPORTED",
+          "reason": "The source text explicitly states that each Purchase Order for API or Bulk Drug Product shall be equal to, or a whole multiple of, the Batch Size for such applicable Product as set forth in the applicable Facility Addendum."
+        },
+        {
+          "text": "For Finished Product, each Purchase Order that Customer places hereunder must be equal to or greater than the Minimum Order Quantity for such applicable Product as set forth in the applicable Facility Addendum.",
+          "source_chunk_id": "chunk_347",
+          "verdict": "SUPPORTED",
+          "reason": "The source text explicitly states that each Purchase Order for Finished Product shall be equal to or greater than the Minimum Order Quantity as set forth in the applicable Facility Addendum."
+        }
+      ],
+      "top_contract": "UpjohnInc_20200121_10-12G_EX-2.6_11948692_EX-2.6_Manufacturing Agreement_ Supply Agreement"
+    },
+    "human_label": "incorrect",
+    "notes": "Wrong contract retrieved. Gave a valid answer for Upjohn Inc instead of the ground truth contract."
+  },
+  {
+    "natural_question": "When does the initial part of this contract end?",
+    "ground_truth_answer": "The contract's initial term lasts for five years and starts on the effective date.",
+    "category": "Expiration Date",
+    "is_impossible": false,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "TICKETSCOMINC_06_22_1999-EX-10.22-SPONSORSHIP AGREEMENT",
+        "UpjohnInc_20200121_10-12G_EX-2.6_11948692_EX-2.6_Manufacturing Agreement_ Supply Agreement",
+        "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules",
+        "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Vague question; system safely declined and requested clarification among candidate contracts."
+  },
+  {
+    "natural_question": "Which state's laws apply to this contract?",
+    "ground_truth_answer": "This contract is governed by the laws of New York.",
+    "category": "Governing Law",
+    "is_impossible": false,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "TICKETSCOMINC_06_22_1999-EX-10.22-SPONSORSHIP AGREEMENT",
+        "ArmstrongFlooringInc_20190107_8-K_EX-10.2_11471795_EX-10.2_Intellectual Property Agreement",
+        "DIVERSINETCORP_03_01_2012-EX-4-RESELLER AGREEMENT",
+        "InmodeLtd_20190729_F-1A_EX-10.9_11743243_EX-10.9_Manufacturing Agreement",
+        "CHERRYHILLMORTGAGEINVESTMENTCORP_09_26_2013-EX-10.1-Strategic Alliance Agreement"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Vague question caused low confidence across candidates; pipeline safely triggered need_clarification despite target document being present at rank 5."
+  },
+  {
+    "natural_question": "Can either of us transfer our responsibilities in this contract to someone else, and if so, do we need to get permission first?",
+    "ground_truth_answer": "You need to get the other party's written permission before assigning your rights or obligations to someone else in this contract.",
+    "category": "Anti-Assignment",
+    "is_impossible": false,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "UpjohnInc_20200121_10-12G_EX-2.6_11948692_EX-2.6_Manufacturing Agreement_ Supply Agreement",
+        "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules",
+        "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Vague question; system safely declined and requested clarification among candidate contracts."
+  },
+  {
+    "natural_question": "When does this contract officially start?",
+    "ground_truth_answer": "This contract is effective starting from February 4, 2005, as stated at the beginning of the agreement.",
+    "category": "Effective Date",
+    "is_impossible": false,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "PANDIONTHERAPEUTICSHOLDCOLLC_05_22_2020-EX-10.17-CONSULTING AGREEMENT",
+        "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules",
+        "UpjohnInc_20200121_10-12G_EX-2.6_11948692_EX-2.6_Manufacturing Agreement_ Supply Agreement",
+        "DIVERSINETCORP_03_01_2012-EX-4-RESELLER AGREEMENT",
+        "LegacyEducationAllianceInc_20200330_10-K_EX-10.18_12090678_EX-10.18_Development Agreement"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Vague question; system safely declined and requested clarification among candidate contracts."
+  },
+  {
+    "natural_question": "Does this contract require me to buy a minimum amount of products from the other party?",
+    "ground_truth_answer": "This contract does require meeting certain sales quotas, which are considered essential to the agreement.",
+    "category": "Minimum Commitment",
+    "is_impossible": false,
+    "pipeline_result": {
+      "status": "answered",
+      "claims": [
+        {
+          "text": "Customer is not otherwise obligated to purchase any minimum or specific quantity of Product under any Facility Addendum unless expressly set forth in the applicable Facility Addendum.",
+          "source_chunk_id": "chunk_347",
+          "verdict": "SUPPORTED",
+          "reason": "The source text explicitly states that the customer is not otherwise obligated to purchase any minimum or specific quantity of Product under any Facility Addendum unless expressly set forth in the applicable Facility Addendum."
+        },
+        {
+          "text": "However, Customer must place Purchase Orders equal to or a whole multiple of the Batch Size for API or Bulk Drug Products and at least the Minimum Order Quantity for Finished Products as specified in the applicable Facility Addendum.",
+          "source_chunk_id": "chunk_347",
+          "verdict": "SUPPORTED",
+          "reason": "The source text explicitly states the conditions for Purchase Orders of API, Bulk Drug Products, and Finished Products, matching the claim's requirements."
+        }
+      ],
+      "top_contract": "UpjohnInc_20200121_10-12G_EX-2.6_11948692_EX-2.6_Manufacturing Agreement_ Supply Agreement"
+    },
+    "human_label": "incorrect",
+    "notes": "Wrong contract retrieved. Handled the Upjohn Inc document correctly but missed the sales quota contract entirely due to a vague prompt."
+  },
+  {
+    "natural_question": "What happens to my maintenance and support contract after the first two years are up?",
+    "ground_truth_answer": "The contract automatically renews for one year at a time unless one of the parties cancels it in writing at least six weeks beforehand.",
+    "category": "Renewal Term",
+    "is_impossible": false,
+    "pipeline_result": {
+      "status": "answered",
+      "claims": [
+        {
+          "text": "After the initial period of two years, the maintenance and support contract shall be automatically renewed for a period of one year on each renewal date.",
+          "source_chunk_id": "chunk_269",
+          "verdict": "SUPPORTED",
+          "reason": "The source text explicitly states the claim with no added assumptions or dropped qualifiers."
+        }
+      ],
+      "top_contract": "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules"
+    },
+    "human_label": "correct",
+    "notes": ""
+  },
+  {
+    "natural_question": "Does this contract allow either party to use something belonging to the other party?",
+    "ground_truth_answer": "Yes, the contract includes licenses that let both parties use certain materials and trademarks belonging to each other under specific conditions.",
+    "category": "License Grant",
+    "is_impossible": false,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT",
+        "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules",
+        "DIVERSINETCORP_03_01_2012-EX-4-RESELLER AGREEMENT",
+        "InmodeLtd_20190729_F-1A_EX-10.9_11743243_EX-10.9_Manufacturing Agreement"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Vague question; system safely declined and requested clarification among candidate contracts."
+  },
+  {
+    "natural_question": "Which state's laws apply to this contract if something goes wrong?",
+    "ground_truth_answer": "This contract is governed by the laws of Massachusetts.",
+    "category": "Governing Law",
+    "is_impossible": false,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "ArmstrongFlooringInc_20190107_8-K_EX-10.2_11471795_EX-10.2_Intellectual Property Agreement",
+        "InmodeLtd_20190729_F-1A_EX-10.9_11743243_EX-10.9_Manufacturing Agreement",
+        "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules",
+        "DIVERSINETCORP_03_01_2012-EX-4-RESELLER AGREEMENT",
+        "EUROPEANMICROHOLDINGSINC_03_06_1998-EX-10.6-DISTRIBUTOR AGREEMENT"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Vague question; system safely declined and requested clarification among candidate contracts."
+  },
+  {
+    "natural_question": "Can either of us cancel this contract for no reason, just by giving notice and waiting a bit?",
+    "ground_truth_answer": "Yes, one party can terminate the contract without cause by giving 30 business days' notice, but they have to pay a termination fee.",
+    "category": "Termination For Convenience",
+    "is_impossible": false,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules",
+        "InmodeLtd_20190729_F-1A_EX-10.9_11743243_EX-10.9_Manufacturing Agreement",
+        "EUROPEANMICROHOLDINGSINC_03_06_1998-EX-10.6-DISTRIBUTOR AGREEMENT",
+        "UpjohnInc_20200121_10-12G_EX-2.6_11948692_EX-2.6_Manufacturing Agreement_ Supply Agreement"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Vague question; system safely declined and requested clarification among candidate contracts."
+  },
+  {
+    "natural_question": "When does the initial term of this contract end?",
+    "ground_truth_answer": "The contract's initial term expires on September 30, 1997, as specified in Exhibit A.",
+    "category": "Expiration Date",
+    "is_impossible": false,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "UpjohnInc_20200121_10-12G_EX-2.6_11948692_EX-2.6_Manufacturing Agreement_ Supply Agreement",
+        "TICKETSCOMINC_06_22_1999-EX-10.22-SPONSORSHIP AGREEMENT",
+        "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT",
+        "PANDIONTHERAPEUTICSHOLDCOLLC_05_22_2020-EX-10.17-CONSULTING AGREEMENT",
+        "DIVERSINETCORP_03_01_2012-EX-4-RESELLER AGREEMENT"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Vague question; system safely declined and requested clarification among candidate contracts."
+  },
+  {
+    "natural_question": "Which state's laws apply to this contract?",
+    "ground_truth_answer": "This contract is governed by the laws of the State of New York.",
+    "category": "Governing Law",
+    "is_impossible": false,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "TICKETSCOMINC_06_22_1999-EX-10.22-SPONSORSHIP AGREEMENT",
+        "ArmstrongFlooringInc_20190107_8-K_EX-10.2_11471795_EX-10.2_Intellectual Property Agreement",
+        "DIVERSINETCORP_03_01_2012-EX-4-RESELLER AGREEMENT",
+        "InmodeLtd_20190729_F-1A_EX-10.9_11743243_EX-10.9_Manufacturing Agreement",
+        "CHERRYHILLMORTGAGEINVESTMENTCORP_09_26_2013-EX-10.1-Strategic Alliance Agreement"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Vague question; system safely declined and requested clarification among candidate contracts."
+  },
+  {
+    "natural_question": "What happens to my contract after the first 4 years are up, can it be automatically extended or renewed?",
+    "ground_truth_answer": "The contract can be extended for up to three more years in 12-month periods if the customer gives the manufacturer at least a year's notice before the initial term or any extension period ends.",
+    "category": "Renewal Term",
+    "is_impossible": false,
+    "pipeline_result": {
+      "status": "need_clarification",
+      "candidate_contracts": [
+        "PANDIONTHERAPEUTICSHOLDCOLLC_05_22_2020-EX-10.17-CONSULTING AGREEMENT",
+        "EUROPEANMICROHOLDINGSINC_03_06_1998-EX-10.6-DISTRIBUTOR AGREEMENT",
+        "UpjohnInc_20200121_10-12G_EX-2.6_11948692_EX-2.6_Manufacturing Agreement_ Supply Agreement",
+        "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules",
+        "TICKETSCOMINC_06_22_1999-EX-10.22-SPONSORSHIP AGREEMENT"
+      ]
+    },
+    "human_label": "correctly_declined",
+    "notes": "Vague question; system safely declined and requested clarification among candidate contracts."
+  }
+]

@@ -1,0 +1,782 @@
+[
+  {
+    "contract_title": "ArmstrongFlooringInc_20190107_8-K_EX-10.2_11471795_EX-10.2_Intellectual Property Agreement",
+    "category": "Parties",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Parties\" that should be reviewed by a lawyer. Details: The two or more parties who signed the contract",
+    "ground_truth_answer": [
+      "Seller",
+      "AHF Holding, Inc.",
+      "\"Licensing\" and together with Seller, \"Arizona\")",
+      "AFI Licensing LLC",
+      "formerly known as Tarzan HoldCo, Inc.)",
+      "Armstrong Hardwood Flooring Company",
+      "(the \"Company\" and together with Buyer the \"Buyer Entities\"",
+      "Buyer",
+      "Armstrong Flooring, Inc.",
+      "each of Arizona on the one hand and the Buyer Entities on the other hand, a \"Party\" and collectively, the \"Parties\")."
+    ],
+    "is_impossible": false,
+    "natural_question": "Who are the parties involved in this contract?",
+    "natural_answer": "The parties involved in this contract are the Seller and AHF Holding, Inc.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "DOMINIADVISORTRUST_02_18_2005-EX-99.(H)(2)-SPONSORSHIP AGREEMENT",
+    "category": "Document Name",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Document Name\" that should be reviewed by a lawyer. Details: The name of the contract",
+    "ground_truth_answer": [
+      "SPONSORSHIP AGREEMENT"
+    ],
+    "is_impossible": false,
+    "natural_question": "What's the name of this contract?",
+    "natural_answer": "This contract is called the Sponsorship Agreement.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "LejuHoldingsLtd_20140121_DRS (on F-1)_EX-10.26_8473102_EX-10.26_Content License Agreement2",
+    "category": "Parties",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Parties\" that should be reviewed by a lawyer. Details: The two or more parties who signed the contract",
+    "ground_truth_answer": [
+      "SINA Leju",
+      "Beijing SINA",
+      "Shanghai SINA Leju Information Technology Co. Ltd.",
+      "Beijing SINA Internet Information Service Co."
+    ],
+    "is_impossible": false,
+    "natural_question": "Who are the companies that signed this contract?",
+    "natural_answer": "The companies that signed this contract are SINA Leju and Beijing SINA.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "DIVERSINETCORP_03_01_2012-EX-4-RESELLER AGREEMENT",
+    "category": "Minimum Commitment",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Minimum Commitment\" that should be reviewed by a lawyer. Details: Is there a minimum order size or minimum amount or units per-time period that one party must buy from the counterparty under the contract?",
+    "ground_truth_answer": [
+      "Either Party may terminate this Agreement:",
+      "(iii) upon providing thirty (30) days' written notice to Reseller if Reseller terminates the provisions of the Annual Minimum Commitment  and fails to meet the sales targets as set out in Schedule 3.",
+      "During the Term of the Agreement, Reseller shall pay to Diversinet  an Annual Minimum Commitment, payable as follows:    a) A total of four hundred thousand ($400,000) dollars shall be paid by Reseller to Diversinet as of the Effective Date.  b) A total of seven hundred thousand ($700,000) dollars shall be paid by Reseller in quarterly instalments of $175,000 to Diversinet on each of  December 1, 2011, March 1, 2012, June 1, 2012 and September 1, 2012.  c) A total of one million ($1,000,000) dollars shall be paid by Reseller in quarterly instalments of $250,000 to Diversinet on each of December 1,  2012, March 1, 2013, June 1, 2013 and September 1, 2013.  d) A total of one million three hundred thousand ($1,300,000) dollars shall be paid by Reseller in quarterly instalments of $325,000 to Diversinet  on each of December 1, 2013, March 1, 2014, June 1, 2014 and September 1, 2014.  e) A total of one million six hundred thousand ($1,600,000) dollars shall be paid by Reseller in quarterly instalments of $400,000 to Diversinet on  each of December 1, 2014, March 1, 2015, June 1, 2015 and September 1, 2015.",
+      "Any annual renewal would be subject to the payment, if  applicable, of the AMC as agreed to by the parties, however such AMC will not be less than the previous year AMC times 115%, payable in  applicable quarterly instalments."
+    ],
+    "is_impossible": false,
+    "natural_question": "Does this contract require me to buy a minimum amount of something from the other party?",
+    "natural_answer": "The contract does contain a minimum commitment clause, which is related to meeting sales targets as outlined in Schedule 3.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "InmodeLtd_20190729_F-1A_EX-10.9_11743243_EX-10.9_Manufacturing Agreement",
+    "category": "Effective Date",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Effective Date\" that should be reviewed by a lawyer. Details: The date when the contract is effective\u00a0",
+    "ground_truth_answer": [
+      "1.4.2011"
+    ],
+    "is_impossible": false,
+    "natural_question": "When does this contract actually start?",
+    "natural_answer": "This contract is effective as of January 4, 2011.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "InmodeLtd_20190729_F-1A_EX-10.9_11743243_EX-10.9_Manufacturing Agreement",
+    "category": "Document Name",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Document Name\" that should be reviewed by a lawyer. Details: The name of the contract",
+    "ground_truth_answer": [
+      "TURN - KEY MANUFACTURING AGREEMENT"
+    ],
+    "is_impossible": false,
+    "natural_question": "What is the name of this contract?",
+    "natural_answer": "This contract is called the TURN-KEY MANUFACTURING AGREEMENT.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "EUROPEANMICROHOLDINGSINC_03_06_1998-EX-10.6-DISTRIBUTOR AGREEMENT",
+    "category": "Effective Date",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Effective Date\" that should be reviewed by a lawyer. Details: The date when the contract is effective\u00a0",
+    "ground_truth_answer": [
+      "November 5, 1997"
+    ],
+    "is_impossible": false,
+    "natural_question": "When does this contract actually start?",
+    "natural_answer": "This contract is effective as of November 5, 1997.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "DOMINIADVISORTRUST_02_18_2005-EX-99.(H)(2)-SPONSORSHIP AGREEMENT",
+    "category": "Parties",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Parties\" that should be reviewed by a lawyer. Details: The two or more parties who signed the contract",
+    "ground_truth_answer": [
+      "Trust",
+      "\"Domini\" or the \"Sponsor\"",
+      "Domini Advisor Trust",
+      "Domini Social Investments LLC"
+    ],
+    "is_impossible": false,
+    "natural_question": "Who are the parties involved in this contract?",
+    "natural_answer": "The parties in this contract are referred to as Trust, Domini, or the Sponsor.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT",
+    "category": "Effective Date",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Effective Date\" that should be reviewed by a lawyer. Details: The date when the contract is effective\u00a0",
+    "ground_truth_answer": [
+      "14 day of SEPTEMBER, 200_"
+    ],
+    "is_impossible": false,
+    "natural_question": "When did this contract go into effect?",
+    "natural_answer": "This contract went into effect on September 14, 200_.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "DIVERSINETCORP_03_01_2012-EX-4-RESELLER AGREEMENT",
+    "category": "Document Name",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Document Name\" that should be reviewed by a lawyer. Details: The name of the contract",
+    "ground_truth_answer": [
+      "RESELLER AGREEMENT"
+    ],
+    "is_impossible": false,
+    "natural_question": "What is the name of this contract?",
+    "natural_answer": "This contract is called the Reseller Agreement.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "LegacyEducationAllianceInc_20200330_10-K_EX-10.18_12090678_EX-10.18_Development Agreement",
+    "category": "Effective Date",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Effective Date\" that should be reviewed by a lawyer. Details: The date when the contract is effective\u00a0",
+    "ground_truth_answer": [
+      "12-23-2019"
+    ],
+    "is_impossible": false,
+    "natural_question": "When does this contract actually start?",
+    "natural_answer": "This contract is effective as of December 23, 2019.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT",
+    "category": "Agreement Date",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Agreement Date\" that should be reviewed by a lawyer. Details: The date of the contract",
+    "ground_truth_answer": [
+      "14 day of SEPTEMBER, 200_"
+    ],
+    "is_impossible": false,
+    "natural_question": "When was this contract signed?",
+    "natural_answer": "This contract was signed on September 14, 200_.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "TICKETSCOMINC_06_22_1999-EX-10.22-SPONSORSHIP AGREEMENT",
+    "category": "Agreement Date",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Agreement Date\" that should be reviewed by a lawyer. Details: The date of the contract",
+    "ground_truth_answer": [
+      "February 17, 1999"
+    ],
+    "is_impossible": false,
+    "natural_question": "When was this contract signed?",
+    "natural_answer": "This contract was signed on February 17, 1999.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "UpjohnInc_20200121_10-12G_EX-2.6_11948692_EX-2.6_Manufacturing Agreement_ Supply Agreement",
+    "category": "Minimum Commitment",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Minimum Commitment\" that should be reviewed by a lawyer. Details: Is there a minimum order size or minimum amount or units per-time period that one party must buy from the counterparty under the contract?",
+    "ground_truth_answer": [
+      "Customer shall be required to order",
+      "Notwithstanding Section 2.4(e)(i), Customer acknowledges and agrees that (A) each Purchase Order Customer places hereunder for Product that is either API or Bulk Drug Product shall be equal to, or a whole multiple of, the Batch Size for such applicable Product as set forth in the applicable Facility Addendum and (B) each Purchase Order that Customer places hereunder for Product that is Finished Product shall be equal to or greater than the Minimum Order Quantity for such applicable Product as set forth in the applicable Facility Addendum; provided that, where Customer places Purchase Orders under (B) above that exceed the applicable Minimum Order Quantity, Customer shall",
+      "pursuant to a Purchase Order at least the amount of Product set forth in the Firm Order for such Product in the applicable calendar month.",
+      "During the Exclusivity Period, on a Product SKU-by-Product SKU and country-by-country basis within the applicable Territory, Customer shall purchase from Manufacturer, in accordance with the terms and conditions of this Agreement, at least the Exclusive Purchase Requirement of its requirements for such Product SKU in such country; provided, however, that In-Flight or Shared Volume Products shall be excluded from the exclusivity requirements set forth in this Section 2.1(e)(i).",
+      "place such Purchase Orders for such excess quantities in Increments above the Minimum Order Quantity as specified in the applicable Facility Addendum."
+    ],
+    "is_impossible": false,
+    "natural_question": "Does this contract require me to buy a minimum amount of product at a time?",
+    "natural_answer": "Yes, the contract requires you to order at least a certain amount of product, known as the Minimum Order Quantity, for finished products, and to order in batches of a specific size for API or bulk drug products.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "LejuHoldingsLtd_20140121_DRS (on F-1)_EX-10.26_8473102_EX-10.26_Content License Agreement2",
+    "category": "Agreement Date",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Agreement Date\" that should be reviewed by a lawyer. Details: The date of the contract",
+    "ground_truth_answer": [
+      "day of , 2009"
+    ],
+    "is_impossible": false,
+    "natural_question": "When was this contract signed?",
+    "natural_answer": "This contract was signed on a specific day in 2009.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "EhaveInc_20190515_20-F_EX-4.44_11678816_EX-4.44_License Agreement_ Reseller Agreement",
+    "category": "Parties",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Parties\" that should be reviewed by a lawyer. Details: The two or more parties who signed the contract",
+    "ground_truth_answer": [
+      "Ehave",
+      "COMPANION HEALTHCARE TECHNOLOGIES CORP",
+      "EHAVE, INC.",
+      "CHT"
+    ],
+    "is_impossible": false,
+    "natural_question": "Who are the companies that signed this contract?",
+    "natural_answer": "The companies that signed this contract are Ehave and Companion Healthcare Technologies Corp.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "DIVERSINETCORP_03_01_2012-EX-4-RESELLER AGREEMENT",
+    "category": "Agreement Date",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Agreement Date\" that should be reviewed by a lawyer. Details: The date of the contract",
+    "ground_truth_answer": [
+      "January 11, 2011"
+    ],
+    "is_impossible": false,
+    "natural_question": "When was this contract signed?",
+    "natural_answer": "This contract was signed on January 11, 2011.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "EUROPEANMICROHOLDINGSINC_03_06_1998-EX-10.6-DISTRIBUTOR AGREEMENT",
+    "category": "Agreement Date",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Agreement Date\" that should be reviewed by a lawyer. Details: The date of the contract",
+    "ground_truth_answer": [
+      "November 5, 1997"
+    ],
+    "is_impossible": false,
+    "natural_question": "When was this contract signed?",
+    "natural_answer": "This contract was signed on November 5, 1997.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "CHERRYHILLMORTGAGEINVESTMENTCORP_09_26_2013-EX-10.1-Strategic Alliance Agreement",
+    "category": "Document Name",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Document Name\" that should be reviewed by a lawyer. Details: The name of the contract",
+    "ground_truth_answer": [
+      "Strategic Alliance Agreement"
+    ],
+    "is_impossible": false,
+    "natural_question": "What is the name of this contract?",
+    "natural_answer": "This contract is called the Strategic Alliance Agreement.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "LegacyEducationAllianceInc_20200330_10-K_EX-10.18_12090678_EX-10.18_Development Agreement",
+    "category": "Parties",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Parties\" that should be reviewed by a lawyer. Details: The two or more parties who signed the contract",
+    "ground_truth_answer": [
+      "T&B Seminars, Inc.",
+      "T&B",
+      "Legacy Education Alliance Holdings, Inc.",
+      "LEA"
+    ],
+    "is_impossible": false,
+    "natural_question": "Who are the parties involved in this contract?",
+    "natural_answer": "The parties involved in this contract are T&B Seminars, Inc. and T&B.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "ArmstrongFlooringInc_20190107_8-K_EX-10.2_11471795_EX-10.2_Intellectual Property Agreement",
+    "category": "Document Name",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Document Name\" that should be reviewed by a lawyer. Details: The name of the contract",
+    "ground_truth_answer": [
+      "INTELLECTUAL PROPERTY AGREEMENT"
+    ],
+    "is_impossible": false,
+    "natural_question": "What is the name of this contract?",
+    "natural_answer": "This contract is called the Intellectual Property Agreement.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "EUROPEANMICROHOLDINGSINC_03_06_1998-EX-10.6-DISTRIBUTOR AGREEMENT",
+    "category": "Parties",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Parties\" that should be reviewed by a lawyer. Details: The two or more parties who signed the contract",
+    "ground_truth_answer": [
+      "Distributor",
+      "WGT",
+      "European Micro",
+      "WatchGuard Technologies, Inc."
+    ],
+    "is_impossible": false,
+    "natural_question": "Who are the parties involved in this contract?",
+    "natural_answer": "The parties in this contract are the Distributor and WGT.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "UpjohnInc_20200121_10-12G_EX-2.6_11948692_EX-2.6_Manufacturing Agreement_ Supply Agreement",
+    "category": "Effective Date",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Effective Date\" that should be reviewed by a lawyer. Details: The date when the contract is effective\u00a0",
+    "ground_truth_answer": [
+      "[\u25cf]"
+    ],
+    "is_impossible": false,
+    "natural_question": "When does this contract actually start?",
+    "natural_answer": "This contract does contain information about when it becomes effective.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "TICKETSCOMINC_06_22_1999-EX-10.22-SPONSORSHIP AGREEMENT",
+    "category": "Parties",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Parties\" that should be reviewed by a lawyer. Details: The two or more parties who signed the contract",
+    "ground_truth_answer": [
+      "Tickets.com, Inc.,",
+      "Tickets",
+      "MP3.com",
+      "MP3.com, Inc.,"
+    ],
+    "is_impossible": false,
+    "natural_question": "Who are the parties that signed this contract?",
+    "natural_answer": "The parties involved in this contract are Tickets.com, Inc. and Tickets.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "LegacyEducationAllianceInc_20200330_10-K_EX-10.18_12090678_EX-10.18_Development Agreement",
+    "category": "Document Name",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Document Name\" that should be reviewed by a lawyer. Details: The name of the contract",
+    "ground_truth_answer": [
+      "REAL ESTATE EDUCATION TRAINING PROGRAM DEVELOPMENT AGREEMENT"
+    ],
+    "is_impossible": false,
+    "natural_question": "What is the name of this contract?",
+    "natural_answer": "This contract is called the Real Estate Education Training Program Development Agreement.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "CHERRYHILLMORTGAGEINVESTMENTCORP_09_26_2013-EX-10.1-Strategic Alliance Agreement",
+    "category": "Renewal Term",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Renewal Term\" that should be reviewed by a lawyer. Details: What is the renewal term after the initial term expires? This includes automatic extensions and unilateral extensions with prior notice.",
+    "ground_truth_answer": [],
+    "is_impossible": true,
+    "natural_question": "What happens to the contract after the first term ends, is it automatically renewed or can it be extended?",
+    "natural_answer": "This contract does contain a renewal term clause, but the specific details are not provided here.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules",
+    "category": "Termination For Convenience",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Termination For Convenience\" that should be reviewed by a lawyer. Details: Can a party terminate this\u00a0 contract without cause (solely by giving a notice and allowing a waiting\u00a0 period to expire)?",
+    "ground_truth_answer": [],
+    "is_impossible": true,
+    "natural_question": "Can either of us end this contract whenever we want, without a specific reason, just by giving notice and waiting a bit?",
+    "natural_answer": "This contract does contain a termination for convenience clause, but the details are not provided here.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "LejuHoldingsLtd_20140121_DRS (on F-1)_EX-10.26_8473102_EX-10.26_Content License Agreement2",
+    "category": "Effective Date",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Effective Date\" that should be reviewed by a lawyer. Details: The date when the contract is effective\u00a0",
+    "ground_truth_answer": [],
+    "is_impossible": true,
+    "natural_question": "When does this contract actually start?",
+    "natural_answer": "This contract does contain an effective date clause, but the details are not provided here.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "DOMINIADVISORTRUST_02_18_2005-EX-99.(H)(2)-SPONSORSHIP AGREEMENT",
+    "category": "Anti-Assignment",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Anti-Assignment\" that should be reviewed by a lawyer. Details: Is consent or notice required of a party if the contract is assigned to a third party?",
+    "ground_truth_answer": [],
+    "is_impossible": true,
+    "natural_question": "Does this contract allow it to be transferred to someone else without needing permission or notification?",
+    "natural_answer": "This contract doesn't have a section about assigning it to a third party, so it seems that part is missing.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "UpjohnInc_20200121_10-12G_EX-2.6_11948692_EX-2.6_Manufacturing Agreement_ Supply Agreement",
+    "category": "Termination For Convenience",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Termination For Convenience\" that should be reviewed by a lawyer. Details: Can a party terminate this\u00a0 contract without cause (solely by giving a notice and allowing a waiting\u00a0 period to expire)?",
+    "ground_truth_answer": [],
+    "is_impossible": true,
+    "natural_question": "Can either of us cancel this contract whenever we want, as long as we give the other person some notice?",
+    "natural_answer": "This contract does contain a termination for convenience clause, even though the exact details aren't specified in the given information.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "RgcResourcesInc_20151216_8-K_EX-10.3_9372751_EX-10.3_Franchise Agreement",
+    "category": "Governing Law",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Governing Law\" that should be reviewed by a lawyer. Details: Which state/country's law governs the interpretation of the contract?",
+    "ground_truth_answer": [],
+    "is_impossible": true,
+    "natural_question": "Which country or state's laws apply to this contract?",
+    "natural_answer": "This contract does not specify which country or state's laws govern its interpretation.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "CHERRYHILLMORTGAGEINVESTMENTCORP_09_26_2013-EX-10.1-Strategic Alliance Agreement",
+    "category": "Cap On Liability",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Cap On Liability\" that should be reviewed by a lawyer. Details: Does the contract include a cap on liability upon the breach of a party\u2019s obligation? This includes time limitation for the counterparty to bring claims or maximum amount for recovery.",
+    "ground_truth_answer": [],
+    "is_impossible": true,
+    "natural_question": "Does this contract limit how much one party can be sued for if they break the rules?",
+    "natural_answer": "There is no limit on liability in this contract.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "DOMINIADVISORTRUST_02_18_2005-EX-99.(H)(2)-SPONSORSHIP AGREEMENT",
+    "category": "Renewal Term",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Renewal Term\" that should be reviewed by a lawyer. Details: What is the renewal term after the initial term expires? This includes automatic extensions and unilateral extensions with prior notice.",
+    "ground_truth_answer": [],
+    "is_impossible": true,
+    "natural_question": "What happens to the contract after the first term ends, does it automatically renew or can one side extend it?",
+    "natural_answer": "This contract does contain a renewal term clause.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "InmodeLtd_20190729_F-1A_EX-10.9_11743243_EX-10.9_Manufacturing Agreement",
+    "category": "Agreement Date",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Agreement Date\" that should be reviewed by a lawyer. Details: The date of the contract",
+    "ground_truth_answer": [],
+    "is_impossible": true,
+    "natural_question": "When was this contract signed?",
+    "natural_answer": "This contract doesn't specifically mention an agreement date.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "EhaveInc_20190515_20-F_EX-4.44_11678816_EX-4.44_License Agreement_ Reseller Agreement",
+    "category": "Renewal Term",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Renewal Term\" that should be reviewed by a lawyer. Details: What is the renewal term after the initial term expires? This includes automatic extensions and unilateral extensions with prior notice.",
+    "ground_truth_answer": [],
+    "is_impossible": true,
+    "natural_question": "What happens to the contract after the first term is over, does it renew automatically or can one side decide to extend it?",
+    "natural_answer": "This contract does contain a renewal term clause, but the details are not specified here.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "LejuHoldingsLtd_20140121_DRS (on F-1)_EX-10.26_8473102_EX-10.26_Content License Agreement2",
+    "category": "License Grant",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"License Grant\" that should be reviewed by a lawyer. Details: Does the contract contain a license granted by one party to its counterparty?",
+    "ground_truth_answer": [],
+    "is_impossible": true,
+    "natural_question": "Does this contract include a section where one party gives the other party permission to use something?",
+    "natural_answer": "This contract does contain a license grant clause, but the details are not provided here.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "LejuHoldingsLtd_20140121_DRS (on F-1)_EX-10.26_8473102_EX-10.26_Content License Agreement2",
+    "category": "Minimum Commitment",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Minimum Commitment\" that should be reviewed by a lawyer. Details: Is there a minimum order size or minimum amount or units per-time period that one party must buy from the counterparty under the contract?",
+    "ground_truth_answer": [],
+    "is_impossible": true,
+    "natural_question": "Does this contract require me to buy a minimum amount of something from the other party?",
+    "natural_answer": "This contract does not have a minimum commitment or purchase requirement.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "DOMINIADVISORTRUST_02_18_2005-EX-99.(H)(2)-SPONSORSHIP AGREEMENT",
+    "category": "License Grant",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"License Grant\" that should be reviewed by a lawyer. Details: Does the contract contain a license granted by one party to its counterparty?",
+    "ground_truth_answer": [],
+    "is_impossible": true,
+    "natural_question": "Does this contract give one company permission to use something belonging to the other company?",
+    "natural_answer": "Yes, the contract does contain a license grant clause, even though the specific details are not provided.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "LejuHoldingsLtd_20140121_DRS (on F-1)_EX-10.26_8473102_EX-10.26_Content License Agreement2",
+    "category": "Termination For Convenience",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Termination For Convenience\" that should be reviewed by a lawyer. Details: Can a party terminate this\u00a0 contract without cause (solely by giving a notice and allowing a waiting\u00a0 period to expire)?",
+    "ground_truth_answer": [],
+    "is_impossible": true,
+    "natural_question": "Can either of us end this contract whenever we want, just by giving notice and waiting a bit?",
+    "natural_answer": "This contract does allow for termination without cause, but the details are not explicitly stated in the provided text, however, the presence of the clause is confirmed.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "DOMINIADVISORTRUST_02_18_2005-EX-99.(H)(2)-SPONSORSHIP AGREEMENT",
+    "category": "Minimum Commitment",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Minimum Commitment\" that should be reviewed by a lawyer. Details: Is there a minimum order size or minimum amount or units per-time period that one party must buy from the counterparty under the contract?",
+    "ground_truth_answer": [],
+    "is_impossible": true,
+    "natural_question": "Does this contract require me to buy a minimum amount of something from the other party?",
+    "natural_answer": "This contract does have a minimum commitment clause, but since the ground truth answer is N/A and it's marked as present, it implies the details are not explicitly stated, however the presence is acknowledged.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "CHERRYHILLMORTGAGEINVESTMENTCORP_09_26_2013-EX-10.1-Strategic Alliance Agreement",
+    "category": "Termination For Convenience",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Termination For Convenience\" that should be reviewed by a lawyer. Details: Can a party terminate this\u00a0 contract without cause (solely by giving a notice and allowing a waiting\u00a0 period to expire)?",
+    "ground_truth_answer": [],
+    "is_impossible": true,
+    "natural_question": "Can either of us end this contract at any time just by giving notice, without needing a specific reason?",
+    "natural_answer": "Although the contract does contain a termination for convenience clause, the details of it should be reviewed by a lawyer.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "PANDIONTHERAPEUTICSHOLDCOLLC_05_22_2020-EX-10.17-CONSULTING AGREEMENT",
+    "category": "Effective Date",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Effective Date\" that should be reviewed by a lawyer. Details: The date when the contract is effective\u00a0",
+    "ground_truth_answer": [],
+    "is_impossible": true,
+    "natural_question": "When does this contract actually take effect?",
+    "natural_answer": "This contract does not explicitly mention an effective date.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules",
+    "category": "License Grant",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"License Grant\" that should be reviewed by a lawyer. Details: Does the contract contain a license granted by one party to its counterparty?",
+    "ground_truth_answer": [],
+    "is_impossible": true,
+    "natural_question": "Does this contract include a license that lets one party use something belonging to the other party?",
+    "natural_answer": "This contract does contain a license grant clause, even though the exact details are not specified here.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT",
+    "category": "Renewal Term",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Renewal Term\" that should be reviewed by a lawyer. Details: What is the renewal term after the initial term expires? This includes automatic extensions and unilateral extensions with prior notice.",
+    "ground_truth_answer": [],
+    "is_impossible": true,
+    "natural_question": "What happens to the contract after the first term ends, and are there any automatic extensions or extensions that one side can choose?",
+    "natural_answer": "This contract does contain a renewal term clause, but the details are not specified here.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "LejuHoldingsLtd_20140121_DRS (on F-1)_EX-10.26_8473102_EX-10.26_Content License Agreement2",
+    "category": "Expiration Date",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Expiration Date\" that should be reviewed by a lawyer. Details: On what date will the contract's initial term expire?",
+    "ground_truth_answer": [],
+    "is_impossible": true,
+    "natural_question": "When does the initial term of this contract end?",
+    "natural_answer": "This contract does not specify an expiration date for its initial term.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "InmodeLtd_20190729_F-1A_EX-10.9_11743243_EX-10.9_Manufacturing Agreement",
+    "category": "License Grant",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"License Grant\" that should be reviewed by a lawyer. Details: Does the contract contain a license granted by one party to its counterparty?",
+    "ground_truth_answer": [],
+    "is_impossible": true,
+    "natural_question": "Does this contract give one company permission to use something belonging to the other company?",
+    "natural_answer": "This contract does contain a license grant clause, even though the specific details aren't provided here.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "CHERRYHILLMORTGAGEINVESTMENTCORP_09_26_2013-EX-10.1-Strategic Alliance Agreement",
+    "category": "Effective Date",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Effective Date\" that should be reviewed by a lawyer. Details: The date when the contract is effective\u00a0",
+    "ground_truth_answer": [],
+    "is_impossible": true,
+    "natural_question": "When does this contract actually start?",
+    "natural_answer": "This contract doesn't explicitly mention an effective date.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "PANDIONTHERAPEUTICSHOLDCOLLC_05_22_2020-EX-10.17-CONSULTING AGREEMENT",
+    "category": "Minimum Commitment",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Minimum Commitment\" that should be reviewed by a lawyer. Details: Is there a minimum order size or minimum amount or units per-time period that one party must buy from the counterparty under the contract?",
+    "ground_truth_answer": [],
+    "is_impossible": true,
+    "natural_question": "Does this contract require me to buy a minimum amount of something from the other party?",
+    "natural_answer": "This contract does not have a minimum commitment or purchase requirement.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "PANDIONTHERAPEUTICSHOLDCOLLC_05_22_2020-EX-10.17-CONSULTING AGREEMENT",
+    "category": "Cap On Liability",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Cap On Liability\" that should be reviewed by a lawyer. Details: Does the contract include a cap on liability upon the breach of a party\u2019s obligation? This includes time limitation for the counterparty to bring claims or maximum amount for recovery.",
+    "ground_truth_answer": [],
+    "is_impossible": true,
+    "natural_question": "Is there a limit to how much one party can be held responsible if they break the rules of this contract?",
+    "natural_answer": "This contract does contain a cap on liability, even though the specific details are not provided here.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "LejuHoldingsLtd_20140121_DRS (on F-1)_EX-10.26_8473102_EX-10.26_Content License Agreement2",
+    "category": "Renewal Term",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Renewal Term\" that should be reviewed by a lawyer. Details: What is the renewal term after the initial term expires? This includes automatic extensions and unilateral extensions with prior notice.",
+    "ground_truth_answer": [],
+    "is_impossible": true,
+    "natural_question": "What happens to the contract after the first term is over, like does it renew automatically or can one side decide to extend it?",
+    "natural_answer": "This contract actually does have a section about renewal terms.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "DIVERSINETCORP_03_01_2012-EX-4-RESELLER AGREEMENT",
+    "category": "License Grant",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"License Grant\" that should be reviewed by a lawyer. Details: Does the contract contain a license granted by one party to its counterparty?",
+    "ground_truth_answer": [
+      "Subject to payment of the Annual Minimum Commitment (\"AMC\"  - defined herein), Diversinet hereby grants to Reseller an exclusive, non- transferable and non-assignable right to market, sell, and sub-license those Diversinet products listed in Schedule 2 (the \"Products\") within the  territory listed in Schedule 3 (the \"Territory\") to Canadian headquartered companies, and governmental and broader public sector entities located  in Canada.",
+      "In addition, Diversinet hereby grants to Reseller the right to use those Diversinet trademarks and copyrighted materials with respect to the  Products solely for the purpose of marketing and distribution of the Products as authorized hereunder."
+    ],
+    "is_impossible": false,
+    "natural_question": "Does this contract give one company permission to use or sell something belonging to the other company?",
+    "natural_answer": "Yes, this contract allows Reseller to market, sell, and sublicense certain Diversinet products within a specific territory in Canada.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "UpjohnInc_20200121_10-12G_EX-2.6_11948692_EX-2.6_Manufacturing Agreement_ Supply Agreement",
+    "category": "Anti-Assignment",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Anti-Assignment\" that should be reviewed by a lawyer. Details: Is consent or notice required of a party if the contract is assigned to a third party?",
+    "ground_truth_answer": [
+      "Customer may, without Manufacturer's consent, assign the rights and obligations of this Agreement (i) on a Product-by-Product basis, to a Third Party in connection with a bona fide transfer, sale or divestiture of all or substantially all of its business to which such Product relates or in the event of such business's spin-off, merger or consolidation with another company or business entity or (ii) to any Third Party which acquires or succeeds to all or substantially all of the assets of the business of Customer to which this Agreement and the Facility Addenda relate (including in connection with such business's spin-off, merger or consolidation with another company or business entity).",
+      "receipt of such notice to receive Technical Support at Manufacturer's sole cost to enable Customer to orderly transfer production of affected Product or Products to a Customer facility or an alternative facility as designated by Customer; provided that Manufacturer shall notify Customer of any proposed or planned Facility Disposition by Manufacturer or any of its Affiliates as soon as reasonably practicable and in any event no later than the date that is three (3) months prior to the effective date of such Facility Disposition.",
+      "Notwithstanding anything to the contrary in this Agreement, neither Party may assign this Agreement in whole or in part to a Restricted Party.",
+      "Subject to Section 7.4, Manufacturer may, without Customer's consent, assign the rights and obligations of this Agreement (i) on a Facility-by-Facility basis, to a Third Party in connection with a bona fide transfer, sale or divestiture of such Facility or (ii) to any Third Party which acquires or succeeds to all or substantially all of the assets of the business of Manufacturer to which this Agreement and the Facility Addendum relates (including in connection with such business's spin-off, merger or consolidation with another company or business entity).",
+      "Any attempted assignment that contravenes the terms of this Agreement shall be void ab initio and of no force or effect.",
+      "In the event that Manufacturer or any of its Affiliates, directly or indirectly, sells, assigns, leases, conveys, transfers or otherwise disposes of any Facility (a \"Facility Disposition\"), then Manufacturer shall immediately notify Customer of such event and Customer shall be entitled for a period of six (6) months after the receipt of such notice to terminate any Facility Addendum with respect to such Facility for cause immediately upon written notice to Manufacturer and, in the event Customer decides not to terminate the Facility Addendum for cause, Customer shall be entitled for a period of two (2) years (or such longer period in order to obtain approval for manufacture from all applicable Governmental Authorities) after",
+      "Except as otherwise provided in this Section 17.5, neither Party shall assign this Agreement or any rights, benefits or obligations under or relating to this Agreement, in each case whether by operation of law or otherwise, without the other Party's prior written consent (not to be unreasonably withheld, conditioned or delayed)."
+    ],
+    "is_impossible": false,
+    "natural_question": "If I sell my business, do I need the other party's permission to transfer this contract to the new owner?",
+    "natural_answer": "You don't need the manufacturer's consent to assign this contract to a third party in certain situations, like a sale or merger of your business.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "EhaveInc_20190515_20-F_EX-4.44_11678816_EX-4.44_License Agreement_ Reseller Agreement",
+    "category": "Minimum Commitment",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Minimum Commitment\" that should be reviewed by a lawyer. Details: Is there a minimum order size or minimum amount or units per-time period that one party must buy from the counterparty under the contract?",
+    "ground_truth_answer": [
+      "Notwithstanding anything to the contrary contained herein, the exclusive appointment and license set out in Sections 2(a) and 2(b) shall become non-exclusive if:",
+      "or (ii) at any time after November 1, 2010 CHT fails to achieve annual revenues of $500,000."
+    ],
+    "is_impossible": false,
+    "natural_question": "Does this contract require me to buy a minimum amount of products or services from the other party?",
+    "natural_answer": "The contract does contain a minimum commitment clause, which states that the exclusive appointment and license will become non-exclusive if annual revenues of $500,000 are not achieved.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "LegacyEducationAllianceInc_20200330_10-K_EX-10.18_12090678_EX-10.18_Development Agreement",
+    "category": "Expiration Date",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Expiration Date\" that should be reviewed by a lawyer. Details: On what date will the contract's initial term expire?",
+    "ground_truth_answer": [
+      "The term \"Term\" shall mean an initial term of five years, automatically renewable thereafter for successive 5-year terms unless either party provides prior written notice of termination not less than 90 days prior to the end of such five-year term; provided, however, T&B shall have the right to terminate the license after the first year of the Term if LEA does not conduct the Business so as to meet the Cash Sales benchmarks set by the parties for years two through five of the Term, as set forth in Section 3.3, below.",
+      "The Term shall commence upon the Effective Date and shall continue for an initial term of five (5) years."
+    ],
+    "is_impossible": false,
+    "natural_question": "When does the initial part of this contract end?",
+    "natural_answer": "The contract's initial term lasts for five years and starts on the effective date.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "CHERRYHILLMORTGAGEINVESTMENTCORP_09_26_2013-EX-10.1-Strategic Alliance Agreement",
+    "category": "Governing Law",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Governing Law\" that should be reviewed by a lawyer. Details: Which state/country's law governs the interpretation of the contract?",
+    "ground_truth_answer": [
+      "This Agreement shall be governed by the laws of the State of New York, without giving effect to its principles of conflicts of laws, other than Section 5-1401 of the New York General Obligations Law."
+    ],
+    "is_impossible": false,
+    "natural_question": "Which state's laws apply to this contract?",
+    "natural_answer": "This contract is governed by the laws of New York.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "InmodeLtd_20190729_F-1A_EX-10.9_11743243_EX-10.9_Manufacturing Agreement",
+    "category": "Anti-Assignment",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Anti-Assignment\" that should be reviewed by a lawyer. Details: Is consent or notice required of a party if the contract is assigned to a third party?",
+    "ground_truth_answer": [
+      "Neither Party shall have the right to assign or otherwise transfer its rights or obligations under this Agreement except with the prior written consent of the other Party, not to be unreasonably withheld or delayed."
+    ],
+    "is_impossible": false,
+    "natural_question": "Can either of us transfer our responsibilities in this contract to someone else, and if so, do we need to get permission first?",
+    "natural_answer": "You need to get the other party's written permission before assigning your rights or obligations to someone else in this contract.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "DOMINIADVISORTRUST_02_18_2005-EX-99.(H)(2)-SPONSORSHIP AGREEMENT",
+    "category": "Effective Date",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Effective Date\" that should be reviewed by a lawyer. Details: The date when the contract is effective\u00a0",
+    "ground_truth_answer": [
+      "This Agreement shall become effective as of the day and year first above written and shall govern the relations between the parties hereto thereafter, unless terminated as set forth in this Section 6.",
+      "February 4, 2005"
+    ],
+    "is_impossible": false,
+    "natural_question": "When does this contract officially start?",
+    "natural_answer": "This contract is effective starting from February 4, 2005, as stated at the beginning of the agreement.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT",
+    "category": "Minimum Commitment",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Minimum Commitment\" that should be reviewed by a lawyer. Details: Is there a minimum order size or minimum amount or units per-time period that one party must buy from the counterparty under the contract?",
+    "ground_truth_answer": [
+      "Reseller acknowledges that meeting the Quotas is an           essential element of this Agreement and that this Agreement may be           terminated by TouchStar if, in TouchStar's reasonable opinion,           Reseller will not meet the Quotas during the Term or any extension           thereof."
+    ],
+    "is_impossible": false,
+    "natural_question": "Does this contract require me to buy a minimum amount of products from the other party?",
+    "natural_answer": "This contract does require meeting certain sales quotas, which are considered essential to the agreement.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules",
+    "category": "Renewal Term",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Renewal Term\" that should be reviewed by a lawyer. Details: What is the renewal term after the initial term expires? This includes automatic extensions and unilateral extensions with prior notice.",
+    "ground_truth_answer": [
+      "After the initial period of two years, the maintenance and support       contract shall be automatically renewed for a period of one year on each       renewal date, unless one of the parties terminates the maintenance and       support contract through written notification to the other party in the       form of a registered letter with proof of receipt, at least six (6) weeks       prior to the renewal date."
+    ],
+    "is_impossible": false,
+    "natural_question": "What happens to my maintenance and support contract after the first two years are up?",
+    "natural_answer": "The contract automatically renews for one year at a time unless one of the parties cancels it in writing at least six weeks beforehand.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "EhaveInc_20190515_20-F_EX-4.44_11678816_EX-4.44_License Agreement_ Reseller Agreement",
+    "category": "License Grant",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"License Grant\" that should be reviewed by a lawyer. Details: Does the contract contain a license granted by one party to its counterparty?",
+    "ground_truth_answer": [
+      "In connection with the exercise of CHT's rights under the Escrow Agreement, Ehave hereby grants to CHT a non- exclusive, non-transferable (except as set forth in Section 20(f)), right and license to use and copy the materials deposited with the Escrow Agent, including the Source Code, its Specifications and documentation, and any resulting corrections, repairs, translations, enhancements, and other derivative works and improvements made by CHT, for the sole purposes of providing to CHT the ability to operate, support and maintain, the Ehave Companion Solution for its End Users from time to time, until such time that CHT is able to migrate off the Ehave Companion Solution, but in any event not exceeding twelve months from the date of release of the materials from escrow.",
+      "For such purpose, CHT hereby grants to Ehave a non-exclusive, royalty-free, revocable, limited license during the Term and Transition-out Period and within the Territory to use, reproduce, publish and display the CHT Marks solely in connection with the operation of the Ehave Companion Solution for and on behalf of CHT and End Users.",
+      "Pursuant to the Subscription Agreement, CHT shall obtain from each End User the right to and hereby grants, effective upon the execution and delivery of such End User's Subscription Agreement, to Ehave: (i) a royalty-free, non-exclusive, non-transferable, limited right and licence during the term of such Subscription Agreement to use, copy, store and display the End User Data solely for the purpose of enabling Ehave to operate the Ehave Companion Solution for such End User and as may be necessary for the purpose of enabling Ehave to provide support services in accordance with this Agreement; and (ii) a royalty-free, non-exclusive, limited, perpetual right and license to use, copy, store and display End User Data on an aggregated and anonymous basis and so as not to permit the identification of any End User or individual for the sole purpose of improving or developing enhancements to the Ehave Companion Solution , provided that Ehave shall not have any right to use, commercialize or exploit such End User Data in any other manner or for any other purpose.",
+      "Subject to the terms and conditions of this Agreement commencing as of the Effective Date and for the duration of the Term and any Transition-out Period, Ehave hereby grants to CHT a non-transferable (except as permitted under Section 20(f)), right to: (i) sub-license the use of the Ehave Companion Solution within the Field of Use in the Territory to End Users and their respective Authorized Users, including in operation or by interfacing with other software, hardware, systems, networks and services, in accordance with and subject to the provisions of CHT's Subscription Agreement; and (ii) use the Ehave Companion Solution to support its licensed End Users.",
+      "If CHT requires Ehave to host the CHT Developments, then CHT hereby grants to Ehave a royalty-free, non-exclusive, non-transferable, limited right and licence during the Term hereof to use the CHT Developments solely for the purpose of enabling its operation for CHT and its End Users' purposes."
+    ],
+    "is_impossible": false,
+    "natural_question": "Does this contract allow either party to use something belonging to the other party?",
+    "natural_answer": "Yes, the contract includes licenses that let both parties use certain materials and trademarks belonging to each other under specific conditions.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "DOMINIADVISORTRUST_02_18_2005-EX-99.(H)(2)-SPONSORSHIP AGREEMENT",
+    "category": "Governing Law",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Governing Law\" that should be reviewed by a lawyer. Details: Which state/country's law governs the interpretation of the contract?",
+    "ground_truth_answer": [
+      "This Agreement shall be construed and enforced and interpreted in accordance with and governed by the laws of the Commonwealth of Massachusetts without reference to principles of conflicts of law."
+    ],
+    "is_impossible": false,
+    "natural_question": "Which state's laws apply to this contract if something goes wrong?",
+    "natural_answer": "This contract is governed by the laws of Massachusetts.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "EhaveInc_20190515_20-F_EX-4.44_11678816_EX-4.44_License Agreement_ Reseller Agreement",
+    "category": "Termination For Convenience",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Termination For Convenience\" that should be reviewed by a lawyer. Details: Can a party terminate this\u00a0 contract without cause (solely by giving a notice and allowing a waiting\u00a0 period to expire)?",
+    "ground_truth_answer": [
+      "In addition, CHT may terminate this Agreement and the rights granted hereunder, in whole or in part, and without prejudice to enforcement of any other legal right or remedy (including any express termination right set forth elsewhere in this Agreement), at any time without cause, by providing at least thirty (30) Business Days prior written notice to Ehave, but subject to payment of a termination fee equal to an amount set out in Schedule 6."
+    ],
+    "is_impossible": false,
+    "natural_question": "Can either of us cancel this contract for no reason, just by giving notice and waiting a bit?",
+    "natural_answer": "Yes, one party can terminate the contract without cause by giving 30 business days' notice, but they have to pay a termination fee.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "EUROPEANMICROHOLDINGSINC_03_06_1998-EX-10.6-DISTRIBUTOR AGREEMENT",
+    "category": "Expiration Date",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Expiration Date\" that should be reviewed by a lawyer. Details: On what date will the contract's initial term expire?",
+    "ground_truth_answer": [
+      "The Term will commence on the Effective Date of this Agreement and      will remain in effect, unless sooner terminated under paragraphs 5.2, 5.3,      or 5.4, until the termination date specified in Exhibit A.",
+      "September 30, 1997"
+    ],
+    "is_impossible": false,
+    "natural_question": "When does the initial term of this contract end?",
+    "natural_answer": "The contract's initial term expires on September 30, 1997, as specified in Exhibit A.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "LegacyEducationAllianceInc_20200330_10-K_EX-10.18_12090678_EX-10.18_Development Agreement",
+    "category": "Governing Law",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Governing Law\" that should be reviewed by a lawyer. Details: Which state/country's law governs the interpretation of the contract?",
+    "ground_truth_answer": [
+      "This Agreement will be governed by and construed in accordance with the laws of the State of New York without regard to its provisions concerning the applicability of the laws of other jurisdictions, and specifically excluding the United Nations Convention on the International Sale of Goods."
+    ],
+    "is_impossible": false,
+    "natural_question": "Which state's laws apply to this contract?",
+    "natural_answer": "This contract is governed by the laws of the State of New York.",
+    "reviewed_by_human": false
+  },
+  {
+    "contract_title": "UpjohnInc_20200121_10-12G_EX-2.6_11948692_EX-2.6_Manufacturing Agreement_ Supply Agreement",
+    "category": "Renewal Term",
+    "cuad_question": "Highlight the parts (if any) of this contract related to \"Renewal Term\" that should be reviewed by a lawyer. Details: What is the renewal term after the initial term expires? This includes automatic extensions and unilateral extensions with prior notice.",
+    "ground_truth_answer": [
+      "A Facility Addendum may be extended for up to three (3) additional periods of twelve (12) months (each, an \"Extension Period\") by written notice given by Customer to Manufacturer not less than twelve (12) months prior to the expiration of the Initial Term or the applicable Extension Period, as the case may be",
+      "Unless otherwise provided in the applicable Facility Addendum, this Agreement (a) shall commence on the Effective Date and shall continue for a period of four (4) years from such date (the \"Initial Term\" of this Agreement), unless sooner terminated pursuant to Section 7.3, 7.4, 7.5, 7.6 or 7.7, and (b) may be extended for up to three (3) additional periods of twelve (12) months (each, an \"Extension Period\") by written notice given by Customer to Manufacturer not less than twelve (12) months prior to the expiration of the Initial Term or the applicable Extension Period, as the case may be."
+    ],
+    "is_impossible": false,
+    "natural_question": "What happens to my contract after the first 4 years are up, can it be automatically extended or renewed?",
+    "natural_answer": "The contract can be extended for up to three more years in 12-month periods if the customer gives the manufacturer at least a year's notice before the initial term or any extension period ends.",
+    "reviewed_by_human": false
+  }
+]
