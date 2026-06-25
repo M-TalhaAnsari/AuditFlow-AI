@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AuditFlow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #FAFAF7;
+    --paper-card: #FFFFFF;
+    --ink: #1C1C1A;
+    --ink-soft: #4A4A45;
+    --rule: #DEDAD1;
+    --meta: #8B8378;
+    --verified: #2D5F4F;
+    --verified-bg: #EAF1ED;
+    --partial: #A8763E;
+    --partial-bg: #F6EEE2;
+    --unsupported: #A8403A;
+    --unsupported-bg: #F7E9E7;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Source Serif 4', serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    padding: 28px 24px 20px;
+    border-bottom: 1px solid var(--rule);
+    text-align: center;
+  }
+
+  header h1 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    font-size: 1.05rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin: 0 0 6px;
+    color: var(--ink);
+  }
+
+  header p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--meta);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  main {
+    flex: 1;
+    max-width: 680px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 24px 20px 140px;
+    overflow-y: auto;
+  }
+
+  .empty-state {
+    text-align: center;
+    margin-top: 18vh;
+    color: var(--meta);
+  }
+  .empty-state .mark {
+    font-size: 2.4rem;
+    margin-bottom: 10px;
+  }
+  .empty-state p {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+  }
+
+  .turn { margin-bottom: 34px; }
+
+  .question {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--meta);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 10px;
+  }
+  .question::before { content: "Q — "; }
+
+  .card {
+    background: var(--paper-card);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 20px 22px;
+  }
+
+  .card.notice {
+    border-left: 3px solid var(--partial);
+  }
+
+  .notice-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--partial);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  .candidate-list {
+    list-style: none;
+    margin: 10px 0 0;
+    padding: 0;
+  }
+  .candidate-list li {
+    font-size: 0.92rem;
+    padding: 8px 0;
+    border-top: 1px solid var(--rule);
+    color: var(--ink-soft);
+  }
+  .candidate-list li:first-child { border-top: none; }
+
+  .source-line {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--meta);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .claim {
+    display: flex;
+    gap: 14px;
+    padding: 14px 0;
+    border-top: 1px solid var(--rule);
+  }
+  .claim:first-of-type { border-top: none; padding-top: 0; }
+
+  .stamp {
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 2px solid currentColor;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transform: rotate(-6deg);
+  }
+  .stamp.SUPPORTED { color: var(--verified); background: var(--verified-bg); }
+  .stamp.PARTIAL { color: var(--partial); background: var(--partial-bg); }
+  .stamp.UNSUPPORTED { color: var(--unsupported); background: var(--unsupported-bg); }
+
+  .claim-body { flex: 1; }
+  .claim-text {
+    font-size: 1rem;
+    line-height: 1.5;
+    margin-bottom: 6px;
+  }
+  .claim-meta {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .claim-meta.SUPPORTED { color: var(--verified); }
+  .claim-meta.PARTIAL { color: var(--partial); }
+  .claim-meta.UNSUPPORTED { color: var(--unsupported); }
+
+  .claim-reason {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--meta);
+    line-height: 1.5;
+  }
+
+  .loading {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--meta);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .loading .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--meta);
+    animation: pulse 1.2s infinite ease-in-out;
+  }
+  .loading .dot:nth-child(2) { animation-delay: 0.2s; }
+  .loading .dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes pulse { 0%, 80%, 100% { opacity: 0.25; } 40% { opacity: 1; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .loading .dot { animation: none; }
+  }
+
+  footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, var(--paper) 60%, transparent);
+    padding: 24px 20px 28px;
+  }
+
+  .input-row {
+    max-width: 680px;
+    margin: 0 auto;
+    display: flex;
+    gap: 10px;
+    background: var(--paper-card);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 6px;
+  }
+
+  .input-row input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 12px 14px;
+    font-family: 'Source Serif 4', serif;
+    font-size: 1rem;
+    color: var(--ink);
+    outline: none;
+  }
+  .input-row input::placeholder { color: var(--meta); }
+
+  .input-row button {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    border-radius: 3px;
+    padding: 0 20px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .input-row button:hover { opacity: 0.85; }
+  .input-row button:disabled { opacity: 0.4; cursor: default; }
+
+  *:focus-visible {
+    outline: 2px solid var(--verified);
+    outline-offset: 2px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>AuditFlow</h1>
+  <p>Every claim checked against its source — before you see it</p>
+</header>
+
+<main id="main">
+  <div class="empty-state" id="emptyState">
+    <div class="mark">📋</div>
+    <p>ASK ABOUT A CONTRACT TO BEGIN</p>
+  </div>
+</main>
+
+<footer>
+  <div class="input-row">
+    <input
+      type="text"
+      id="questionInput"
+      placeholder="What is the governing law in the Upjohn agreement?"
+      autocomplete="off"
+    >
+    <button id="sendBtn" onclick="submitQuestion()">Ask</button>
+  </div>
+</footer>
+
+<script>
+  // ---- Configuration ----
+  // Point this at your deployed FastAPI backend's /ask endpoint
+  const API_URL = "http://localhost:8000/ask";
+
+  const main = document.getElementById('main');
+  const emptyState = document.getElementById('emptyState');
+  const input = document.getElementById('questionInput');
+  const sendBtn = document.getElementById('sendBtn');
+
+  const STAMP_SYMBOL = { SUPPORTED: '✓', PARTIAL: '~', UNSUPPORTED: '✕' };
+  const STAMP_LABEL = { SUPPORTED: 'Verified', PARTIAL: 'Partially supported', UNSUPPORTED: 'Not supported' };
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function renderTurn(question, resultHtml) {
+    if (emptyState) emptyState.remove();
+    const turn = document.createElement('div');
+    turn.className = 'turn';
+    turn.innerHTML = `
+      <div class="question">${escapeHtml(question)}</div>
+      ${resultHtml}
+    `;
+    main.appendChild(turn);
+    turn.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    return turn;
+  }
+
+  function renderClarification(candidates) {
+    const items = candidates.map(c => `<li>${escapeHtml(c)}</li>`).join('');
+    return `
+      <div class="card notice">
+        <div class="notice-title">Multiple contracts matched</div>
+        <p style="margin:0; color: var(--ink-soft); font-size: 0.92rem;">
+          Specify which contract you mean, or rephrase to include its name.
+        </p>
+        <ul class="candidate-list">${items}</ul>
+      </div>
+    `;
+  }
+
+  function renderLowRelevance(topContract) {
+    return `
+      <div class="card notice">
+        <div class="notice-title">Not confident enough to answer</div>
+        <p style="margin:0; color: var(--ink-soft); font-size: 0.92rem;">
+          Found content in <strong>${escapeHtml(topContract)}</strong>, but it doesn't
+          clearly answer this question. Try rephrasing or naming the contract directly.
+        </p>
+      </div>
+    `;
+  }
+
+  function renderAnswer(topContract, claims) {
+    const claimsHtml = claims.map(claim => {
+      const v = claim.verdict || 'PARTIAL';
+      return `
+        <div class="claim">
+          <div class="stamp ${v}">${STAMP_SYMBOL[v] || '?'}</div>
+          <div class="claim-body">
+            <div class="claim-meta ${v}">${STAMP_LABEL[v] || v}</div>
+            <div class="claim-text">${escapeHtml(claim.text)}</div>
+            <div class="claim-reason">${escapeHtml(claim.reason || '')}</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    return `
+      <div class="card">
+        <div class="source-line">Source — ${escapeHtml(topContract)}</div>
+        ${claimsHtml}
+      </div>
+    `;
+  }
+
+  function renderLoading(question) {
+    if (emptyState) emptyState.remove();
+    const turn = document.createElement('div');
+    turn.className = 'turn';
+    turn.id = 'loadingTurn';
+    turn.innerHTML = `
+      <div class="question">${escapeHtml(question)}</div>
+      <div class="card">
+        <div class="loading">
+          <span>Checking contracts</span>
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        </div>
+      </div>
+    `;
+    main.appendChild(turn);
+    turn.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  }
+
+  async function submitQuestion() {
+    const question = input.value.trim();
+    if (!question) return;
+
+    input.value = '';
+    sendBtn.disabled = true;
+    renderLoading(question);
+
+    try {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question })
+      });
+
+      if (!response.ok) throw new Error(`Server returned ${response.status}`);
+      const result = await response.json();
+
+      document.getElementById('loadingTurn').remove();
+
+      let html;
+      if (result.status === 'need_clarification') {
+        html = renderClarification(result.candidate_contracts);
+      } else if (result.status === 'low_relevance') {
+        html = renderLowRelevance(result.top_contract);
+      } else if (result.status === 'answered') {
+        html = renderAnswer(result.top_contract, result.claims);
+      } else {
+        html = `<div class="card notice"><div class="notice-title">Something went wrong</div>
+                 <p style="margin:0; color: var(--ink-soft);">Please try again.</p></div>`;
+      }
+      renderTurn(question, html);
+
+    } catch (err) {
+      const loadingTurn = document.getElementById('loadingTurn');
+      if (loadingTurn) loadingTurn.remove();
+      renderTurn(question, `
+        <div class="card notice">
+          <div class="notice-title">Connection error</div>
+          <p style="margin:0; color: var(--ink-soft); font-size: 0.9rem;">
+            Couldn't reach AuditFlow's backend. Make sure the API server is running. (${escapeHtml(err.message)})
+          </p>
+        </div>
+      `);
+    } finally {
+      sendBtn.disabled = false;
+    }
+  }
+
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') submitQuestion();
+  });
+</script>
+
+</body>
+</html>
