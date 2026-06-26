@@ -81,9 +81,9 @@ def cross_encoder_rank(query:str, candidates, top_k:int=5):
 
     return scored[:top_k]
 
-def check_docement_consistency(reranked_results, concentration_threshold: float = 0.6, score_threshold: float=-2.5):
+def check_docement_consistency(reranked_results, concentration_threshold: float = 0.6, score_threshold: float=-2.15):
     """
-    ILook at both the contract_name agreement and the rerank scores of the top reranked chunks
+    I Look at both the contract_name agreement and the rerank scores of the top reranked chunks
     Two ways this can be low-confidence
     - concentration is low - top results are scattered across many contracts
     - scores are low/negetive

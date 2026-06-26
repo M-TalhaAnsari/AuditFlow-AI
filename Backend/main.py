@@ -10,7 +10,7 @@ if root_dir not in sys.path:
     sys.path.insert(0, root_dir)
 
 
-from verirag.src.pipeline import Sessions
+from src.pipeline import Sessions
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware

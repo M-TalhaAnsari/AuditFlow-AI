@@ -20,7 +20,15 @@ Rules:
     - "text" is a real sentence explaining what's missing, e.g.
       "The provided excerpts do not contain a general description of this company."
     - "source_chunk_id" is null
-  NEVER set "text" to null. "text" must always be a real, non-empty string.
+- If a clause defines a term by referring to another part of the document 
+  (e.g. "the date first written above", "as set forth in Section X"), 
+  do NOT use that cross-reference as your answer. Instead, look for the 
+  actual concrete value (the real date, name, or number) elsewhere in 
+  the provided excerpts, and cite THAT chunk instead.
+- Only return a cross-reference phrase as your answer if no concrete 
+  value is available anywhere in the provided excerpts.
+NEVER set "text" to null. "text" must always be a real, non-empty string.
+
 
 Excerpts:
 {context}
