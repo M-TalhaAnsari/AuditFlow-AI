@@ -152,6 +152,16 @@ class Sessions:
             if mentioned and mentioned != self.active_contract:
                 print(f"[DEBUG] Question explicitly names a different contract: {mentioned} - dropping stale memory")
                 self.active_contract = None 
+                result = answer_with_retry(question, mentioned)
+                if result is not None:
+                    self.active_contract = mentioned
+                    verified_claims = verify_all_claims(result["claims"], CHUNK_LOOKUP)
+                    print("\nFinal Answer")
+                    for claim in verified_claims:
+                        badge = {"SUPPORTED": "[OK]", "PARTIAL": "[?]", "UNSUPPORTED": "[X]", "NO_ANSWER": "[-]"}.get(claim["verdict"], "[?]")
+                        print(f"  {badge} {claim['text']}")
+                        print(f"      verdict: {claim['verdict']} | reason: {claim['reason']}")
+                    return {"status": "answered", "claims": verified_claims, "top_contract": mentioned}
             if self.active_contract:
                 print(f"[DEBUG] Retrying scoped to active contract: {self.active_contract}")
                 result = answer_with_retry(question, self.active_contract)

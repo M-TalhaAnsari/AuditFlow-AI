@@ -6,3 +6,4 @@ venv/
 data/processed/faiss_index_*/
 .DS_Store
 *.log
+__init__.py
