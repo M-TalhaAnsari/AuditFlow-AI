@@ -9,10 +9,17 @@ Rerank the wider candidate when didn't get answer from the given top 5 contract
 from collections import Counter
 
 REFORMULATION_TEMPLATE = {
-    "effective date":"dated as of",
-    "agreement date":"made this day of",
-    "signed":"made and entered into as of",
-    "parties":"by and between",
+    "effective date": "dated as of",
+    "agreement date": "made this day of",
+    "end date": "shall expire on",
+    "expiration date": "shall expire on",
+    "expiry date": "shall expire on",
+    "term of this agreement": "shall continue for a period of",
+    "how long does this agreement last": "shall continue for a period of",
+    "when does this agreement end": "shall expire on",
+    "when does this agreement expire": "shall expire on",
+    "signed": "made and entered into as of",
+    "parties": "by and between",
     "governing law": "governed by and construed in accordance with the laws of",
     "jurisdiction": "governed by and construed in accordance with the laws of",
     "termination": "may terminate this agreement",
