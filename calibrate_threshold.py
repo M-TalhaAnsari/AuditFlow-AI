@@ -23,7 +23,7 @@ ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
 
 from chunker_contextual import load_cuad_subset
-from retrieval_eval import load_eval_questions, add_ground_truth_ids
+from retrieval_evaluation import load_eval_questions, add_ground_truth_ids
 from src.retrieve import get_verification_context
 
 
@@ -99,9 +99,13 @@ def sweep_thresholds(results: list[dict], n_candidates: int = 25):
 if __name__ == "__main__":
     print("Loading eval questions and computing ground truth...")
     cuad_data = load_cuad_subset("data/processed/cuad_subset.json")
-    questions = load_eval_questions("Evaluation/eval_set_draft.json")
-    if "ground_truth_document_id" not in questions[0]:
-        questions = add_ground_truth_ids(questions, cuad_data)
+    eval_path = "Evaluation/eval_set_specific.json"
+    if not Path(eval_path).exists():
+        print(f"'{eval_path}' doesn't exist yet -- run "
+              f"`python generate_specific_eval_questions.py` first.")
+        sys.exit(1)
+
+    questions = load_eval_questions(eval_path)
 
     print(f"Running real retrieval for {len(questions)} questions (this calls your live index + reranker)...")
     results = collect_scores(questions)

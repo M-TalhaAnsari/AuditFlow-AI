@@ -1,12 +1,6 @@
 """
 retrieval_eval.py
 
-Retrieval-only sanity check -- no generation, no verification. Answers one
-question per config: "does the correct contract get retrieved, and how high
-does it rank?" This is what should be run FIRST for each chunk-size config,
-before committing to a full pipeline pass -- a bad config gets caught in
-minutes, not discovered in the morning after burning the whole night on it.
-
 """
 import json
 import pickle
@@ -20,11 +14,7 @@ from build_index import get_embedder
 from title_parser import parse_title
 from chunker_contextual import slugify
 
-RERANKER = CrossEncoder("BAAI/bge-reranker-base")  # ms-marco-MiniLM-L6 was tested and
-                                                     # confirmed to LOWER recall on this
-                                                     # corpus -- see eval results. bge-reranker
-                                                     # is trained on far more diverse/formal
-                                                     # text and is a better fit for contracts.
+RERANKER = CrossEncoder("BAAI/bge-reranker-base")  
 
 
 def load_eval_questions(path: str) -> list[dict]:

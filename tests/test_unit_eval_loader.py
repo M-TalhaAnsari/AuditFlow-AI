@@ -1,7 +1,7 @@
 
 import json
 import pytest
-from retrieval_eval import load_eval_questions
+from retrieval_evaluation import load_eval_questions
 
 
 def test_loads_plain_list(tmp_path):

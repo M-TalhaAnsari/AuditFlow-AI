@@ -20,7 +20,7 @@ from pathlib import Path
 
 from build_index import build_config_index
 from chunker_contextual import load_cuad_subset
-from retrieval_eval import evaluate_config, add_ground_truth_ids, load_eval_questions
+from retrieval_evaluation import evaluate_config, add_ground_truth_ids, load_eval_questions
 
 CONFIGS = [
     {"name": "chunk_800",  "chunk_size": 800,  "chunk_overlap": 150},

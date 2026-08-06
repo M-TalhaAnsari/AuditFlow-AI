@@ -1,6 +1,13 @@
 """
 Connect the generate and retrieve
 
+
+Known limitation carried forward unchanged (out of scope for this pass):
+  Sessions() is still instantiated once as a global singleton in main.py.
+  That means concurrent users share session state (active_contract,
+  pending_question). Fine for single-user local testing, NOT fine for
+  multiple concurrent users -- flagged here again so it doesn't get
+  forgotten before any multi-user deployment.
 """
 import os
 from src.retrieve import get_verification_context, retriever, get_all_docs
@@ -222,8 +229,17 @@ class Sessions:
         print(f"\n[CONFIDENT - top document: {consistency['top_contract']}, "
               f"concentration: {consistency['concentration']:.2f}, "
               f"avg_score: {consistency['avg_top_score']:.3f}]")
+
+        # chunks here is the WIDE reranked pool (up to 15, possibly mixed
+        # across several documents) -- now that we've decided which
+        # document is actually being asked about, generation should only
+        # see THAT document's chunks, not the full mixed pool.
+        top_doc = consistency["top_contract"]
+        scoped_chunks = [(doc, score) for doc, score in chunks
+                          if doc.metadata.get("document_id") == top_doc][:5]
+
         print("Generating answer....")
-        result = generate_answer(question, chunks)
+        result = generate_answer(question, scoped_chunks)
         verified_claims = verify_all_claims(result["claims"], CHUNK_LOOKUP)
 
         print("\n Final Answer ")
