@@ -123,13 +123,6 @@ async def extract_one(doc_hash: str, preamble_text: str, semaphore: asyncio.Sema
 
 
 def load_cached_identities(documents: list[dict]) -> dict[str, DocumentIdentity]:
-    """
-    Reads ONLY the on-disk cache -- makes no LLM calls. chunker_contextual.py
-    uses this so building an index never triggers API calls by accident;
-    run `python identity_extraction.py <cuad_json>` as its own step first
-    to populate the cache, then build indices from it as many times as you
-    want for free.
-    """
     cache = _load_cache()
     identities: dict[str, DocumentIdentity] = {}
     missing = 0
@@ -192,16 +185,3 @@ async def extract_all_identities(documents: list[dict]) -> dict[str, DocumentIde
     return results
 
 
-if __name__ == "__main__":
-    import sys
-    from chunker_contextual import load_cuad_subset
-
-    path = sys.argv[1] if len(sys.argv) > 1 else "data/processed/cuad_subset.json"
-    data = load_cuad_subset(path)
-    identities = asyncio.run(extract_all_identities(data))
-
-    print()
-    for identity in identities.values():
-        flag = "  <-- REVIEW" if identity.confidence == "low" or identity.source == "failed" else ""
-        print(f"[{identity.source:6}] {identity.company_name} vs {identity.counterparty_name} "
-              f"-- {identity.contract_type}{flag}")

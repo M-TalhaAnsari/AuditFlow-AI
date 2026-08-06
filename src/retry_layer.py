@@ -86,11 +86,7 @@ def get_scoped_context(question: str, document_id: str, retriever_fn, full_conte
 
 def generate_with_bounded_retry(question: str, document_id: str, generate_fn, retriever_fn,
                                  full_context_fn, log=print):
-    """
-    Generate an answer with AT MOST one retry, triggered only if the first
-    attempt's claims indicate missing information and a rule-based
-    reformulation is available.
-    """
+   
     scoped = get_scoped_context(question, document_id, retriever_fn, full_context_fn, top_k=5)
     if scoped is None:
         return None

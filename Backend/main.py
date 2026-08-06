@@ -20,7 +20,6 @@ session = Sessions()
 
 app = FastAPI()
 
-# allow the static HTML file (served from file:// or a different port) to call this API
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

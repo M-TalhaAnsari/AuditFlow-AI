@@ -6,8 +6,7 @@ clean, embeddable identity string: company name + contract type.
 import re
 from dataclasses import dataclass
 
-# Fill this in after reviewing the printed output for your 15 real titles.
-# Key = exact raw_title string, value = (company_name, contract_type).
+
 MANUAL_OVERRIDES: dict[str, tuple[str, str]] = {
     # "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules":
     #     ("Slovak Wireless Finance CoBV", "Maintenance and Support Contract"),
@@ -85,19 +84,3 @@ def parse_title(raw_title: str) -> ParsedTitle:
 
     return ParsedTitle(raw_title, company_name, contract_type, clean_title, confidence)
 
-
-if __name__ == "__main__":
-    samples = [
-        "LejuHoldingsLtd_20140121_DRS (on F-1)_EX-10.26_8473102_EX-10.26_Content License Agreement2",
-        "TICKETSCOMINC_06_22_1999-EX-10.22-SPONSORSHIP AGREEMENT",
-        "UpjohnInc_20200121_10-12G_EX-2.6_11948692_EX-2.6_Manufacturing Agreement_ Supply Agreement",
-        "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules",
-        "InmodeLtd_20190729_F-1A_EX-10.9_11743243_EX-10.9_Manufacturing Agreement",
-        "EhaveInc_20190515_20-F_EX-4.44_11678816_EX-4.44_License Agreement_ Reseller Agreement",
-    ]
-    print("Reviewing parse quality -- fix any 'low' confidence ones via MANUAL_OVERRIDES:\n")
-    for s in samples:
-        p = parse_title(s)
-        flag = "  <-- REVIEW" if p.parse_confidence == "low" else ""
-        print(f"[{p.parse_confidence:4}] {p.clean_title}{flag}")
-        print(f"        raw: {s}\n")

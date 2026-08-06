@@ -35,10 +35,7 @@ CHUNK_LOOKUP = get_full_chunk_lookup()
 def get_all_document_identities():
     """
     document_id -> {company_name, counterparty_name, document_title}
-    for every document in the corpus. Built once at startup, same as the
-    old ALL_CONTRACT_NAMES was -- but now carries real party names instead
-    of just a raw filename, which is what makes proper name-based
-    document matching possible below.
+    for every document in the corpus. 
     """
     identities = {}
     for doc in get_all_docs():

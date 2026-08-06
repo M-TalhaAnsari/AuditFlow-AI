@@ -36,10 +36,7 @@ _bm25_retriever = None
 
 def retriever():
     """
-    Loads the FAISS index and BM25 corpus ONCE (cached in module-level
-    globals), instead of reloading from disk / rebuilding BM25 from
-    scratch on every call -- that rebuild-per-call pattern was the
-    original latency bug.
+    Loads the FAISS index and BM25 corpus 
     """
     global _faiss_store, _bm25_retriever
 
@@ -101,19 +98,7 @@ def cross_encoder_rank(query: str, candidates, top_k: int = 5):
 
 def check_docement_consistency(reranked_results, concentration_threshold: float = 0.6,
                                 score_threshold: float = -2.15):
-    """
-    NOTE ON score_threshold: -2.15 was tuned against ms-marco-MiniLM's
-    score distribution. bge-reranker-base produces DIFFERENT raw scores --
-    this number needs to be recalibrated against your actual eval data,
-    not assumed to still be correct. Run a quick histogram of reranked
-    scores for known-correct vs known-wrong matches from your 65 eval
-    questions before trusting this value. Left as-is (not guessed) so it
-    doesn't silently give you a false sense of correctness.
-
-    Groups by document_id (the canonical field from the new pipeline),
-    falling back to contract_name for chunks from an older index that
-    doesn't have document_id set.
-    """
+  
     def doc_key(doc):
         return doc.metadata.get("document_id") or doc.metadata.get("contract_name", "UNKNOWN")
 
@@ -137,9 +122,7 @@ def check_docement_consistency(reranked_results, concentration_threshold: float 
 
 def get_all_docs():
     """
-    Returns the full corpus (every chunk, with metadata) -- backed by the
-    same cached BM25 corpus retriever() already loads, so callers don't
-    need to reach into FAISS docstore internals to enumerate documents.
+    Returns the full corpus (every chunk, with metadata) -- 
     """
     retriever()  # ensures _bm25_retriever is populated
     return _bm25_retriever.docs
@@ -155,22 +138,3 @@ def get_verification_context(query: str):
         "consistency": consistency,
     }
 
-
-if __name__ == "__main__":
-    test_query = "What is the governing law or jurisdiction?"
-
-    result = get_verification_context(test_query)
-
-    print(f"\nQuery: {test_query}")
-    print(f"\nDocument consistency check:")
-    print(f"  Top contract: {result['consistency']['top_contract']}")
-    print(f"  Concentration: {result['consistency']['concentration']:.2f}")
-    print(f"  Avg score: {result['consistency']['avg_top_score']:.3f}")
-    print(f"  Confident: {result['consistency']['is_confident']}")
-    print(f"  Breakdown: {result['consistency']['contract_breakdown']}")
-
-    print(f"\nTop {len(result['chunks'])} reranked chunks:")
-    for idx, (doc, score) in enumerate(result['chunks']):
-        doc_id = doc.metadata.get("document_id") or doc.metadata.get("contract_name", "UNKNOWN")
-        print(f"\n[Result {idx+1}] rerank_score={score:.3f} | document={doc_id}")
-        print(doc.page_content[:200] + "...")

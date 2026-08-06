@@ -35,14 +35,6 @@ REGEX_SEPARATORS = [
 
 def build_documents(cuad_data: list[dict], chunk_size: int, chunk_overlap: int,
                      identities: dict | None = None) -> list[Document]:
-    """
-    identities: optional pre-loaded {doc_hash: DocumentIdentity} map from
-    identity_extraction.py. If not passed, loads whatever's already cached
-    on disk (no LLM calls triggered here -- run identity_extraction.py as
-    its own step first). Any document with no cached identity, or one that
-    failed extraction, falls back to regex title parsing rather than
-    breaking the build.
-    """
     if identities is None:
         identities = load_cached_identities(cuad_data)
 
@@ -119,12 +111,3 @@ def build_documents(cuad_data: list[dict], chunk_size: int, chunk_overlap: int,
 
     return all_chunks
 
-
-if __name__ == "__main__":
-    import sys
-    path = sys.argv[1] if len(sys.argv) > 1 else "data/processed/cuad_subset.json"
-    data = load_cuad_subset(path)
-    chunks = build_documents(data, chunk_size=1000, chunk_overlap=200)
-    print(f"Loaded {len(data)} contracts -> {len(chunks)} chunks")
-    print("\nSample chunk metadata:")
-    print(json.dumps(chunks[0].metadata, indent=2))

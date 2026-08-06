@@ -17,11 +17,7 @@ from langchain_core.documents import Document
 
 from chunker_contextual import load_cuad_subset, build_documents
 
-# 1024-dim. Stick with this over a 384-dim model -- at a 15-document corpus
-# there's no meaningful compute cost to paying for the bigger embedding
-# space, and the failure mode you're fighting (near-identical boilerplate
-# clauses across different contracts) is exactly what needs the extra
-# dimensionality to keep separable.
+# 1024-dim. 
 EMBEDDING_MODEL = "BAAI/bge-large-en-v1.5"
 
 
@@ -57,12 +53,7 @@ def embed_batch_with_retry(embedder: HuggingFaceEmbeddings, batch: list[str],
 
 
 def embed_with_progress(embedder: HuggingFaceEmbeddings, texts: list[str], batch_size: int = 16) -> list[list[float]]:
-    """
-    Manually batches embedding calls instead of one silent embed_documents()
-    call over everything, so you get elapsed time + ETA printed as it runs --
-    matters once this is 15,000 documents deep, not 15. Each batch retries
-    on failure instead of taking the whole run down with it.
-    """
+   
     n = len(texts)
     embeddings: list[list[float]] = []
     start = time.time()
@@ -95,10 +86,6 @@ def build_config_index(cuad_json_path: str, chunk_size: int, chunk_overlap: int,
 
     embedder = get_embedder()
 
-    # embedding_text (title + chunk) becomes page_content in the stored
-    # index -- both dense (FAISS) and sparse (BM25) retrieval benefit from
-    # the title tokens being present. metadata["raw_chunk_text"] still
-    # carries the pure chunk text for verification to check claims against.
     faiss_docs = [
         Document(page_content=c.metadata["embedding_text"], metadata=c.metadata)
         for c in chunks
@@ -120,13 +107,3 @@ def build_config_index(cuad_json_path: str, chunk_size: int, chunk_overlap: int,
     print(f"[{out_dir}] saved FAISS index + BM25 corpus ({len(faiss_docs)} docs).")
     return chunks
 
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--cuad-json", default="data/processed/cuad_subset.json")
-    parser.add_argument("--chunk-size", type=int, required=True)
-    parser.add_argument("--chunk-overlap", type=int, required=True)
-    parser.add_argument("--out", required=True)
-    args = parser.parse_args()
-
-    build_config_index(args.cuad_json, args.chunk_size, args.chunk_overlap, args.out)

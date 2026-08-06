@@ -47,14 +47,6 @@ def format_context(reranked_results):
     """
     Turning doc, score (reranked result) into a labeled context block the
     LLM can cite back to by chunk_id.
-
-    Uses metadata["raw_chunk_text"] (pure clause text) rather than
-    doc.page_content -- page_content now holds embedding_text (title +
-    chunk), built for embedding/reranking, not for showing the model as
-    the actual contract excerpt. Passing the title-prefixed text here
-    would risk the model citing/paraphrasing the title as if it were
-    contract content. Falls back to page_content for any doc from an
-    older index that doesn't have raw_chunk_text set.
     """
     blocks = []
     for doc, score in reranked_results:

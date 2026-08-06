@@ -36,14 +36,6 @@ def build_chunk_lookup(all_docs):
     """
     Build a {chunk_id: chunk_text} dictionary so claims can be checked
     against their real source text.
-
-    Uses metadata["raw_chunk_text"] (pure chunk text, no title prefix)
-    rather than doc.page_content -- page_content now holds embedding_text
-    (title + chunk), built for embedding/reranking, not for grounding
-    checks. Verifying a claim against text that includes the title would
-    let the judge "confirm" claims based on the title rather than the
-    actual clause. Falls back to page_content for any doc from an older
-    index that doesn't have raw_chunk_text set.
     """
     return {
         doc.metadata.get("chunk_id"): doc.metadata.get("raw_chunk_text", doc.page_content)
@@ -117,24 +109,3 @@ def verify_all_claims(claims: list, chunk_lookup: dict) -> list:
     """Verify a full list of claims, one at a time"""
     return [verify_claim(claim, chunk_lookup) for claim in claims]
 
-
-if __name__ == "__main__":
-    fake_lookup = {
-        "chunk_174": "Governing Law. This Agreement will be governed by and interpreted "
-                     "in accordance with the local laws of the State of Washington, U.S.A., "
-                     "without regard to its conflicts of law provisions.",
-    }
-
-    test_claims = [
-        {"text": "This Agreement will be governed by and interpreted in accordance with "
-                  "the local laws of the State of Washington, U.S.A., without regard to its "
-                  "conflicts of law provisions.", "source_chunk_id": "chunk_174"},
-        {"text": "This Agreement is governed by the laws of the State of California.",
-         "source_chunk_id": "chunk_174"},
-    ]
-
-    results = verify_all_claims(test_claims, fake_lookup)
-    for r in results:
-        print(f"\nClaim: {r['text']}")
-        print(f"Verdict: {r['verdict']}")
-        print(f"Reason: {r['reason']}")
