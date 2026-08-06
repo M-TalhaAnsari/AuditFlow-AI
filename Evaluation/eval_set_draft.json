@@ -18,7 +18,8 @@
     "is_impossible": false,
     "natural_question": "Who are the parties involved in this contract?",
     "natural_answer": "The parties involved in this contract are the Seller and AHF Holding, Inc.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "armstrong-flooring-inc-intellectual-property-agreement"
   },
   {
     "contract_title": "DOMINIADVISORTRUST_02_18_2005-EX-99.(H)(2)-SPONSORSHIP AGREEMENT",
@@ -30,7 +31,8 @@
     "is_impossible": false,
     "natural_question": "What's the name of this contract?",
     "natural_answer": "This contract is called the Sponsorship Agreement.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "domini-advisor-trust-sponsorship-agreement"
   },
   {
     "contract_title": "LejuHoldingsLtd_20140121_DRS (on F-1)_EX-10.26_8473102_EX-10.26_Content License Agreement2",
@@ -45,7 +47,8 @@
     "is_impossible": false,
     "natural_question": "Who are the companies that signed this contract?",
     "natural_answer": "The companies that signed this contract are SINA Leju and Beijing SINA.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "beijing-sina-internet-information-service-co-mutual-terminat"
   },
   {
     "contract_title": "DIVERSINETCORP_03_01_2012-EX-4-RESELLER AGREEMENT",
@@ -60,7 +63,8 @@
     "is_impossible": false,
     "natural_question": "Does this contract require me to buy a minimum amount of something from the other party?",
     "natural_answer": "The contract does contain a minimum commitment clause, which is related to meeting sales targets as outlined in Schedule 3.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "diversinet-corp-reseller-agreement"
   },
   {
     "contract_title": "InmodeLtd_20190729_F-1A_EX-10.9_11743243_EX-10.9_Manufacturing Agreement",
@@ -72,7 +76,8 @@
     "is_impossible": false,
     "natural_question": "When does this contract actually start?",
     "natural_answer": "This contract is effective as of January 4, 2011.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "invasix-ltd-turn-key-manufacturing-agreement"
   },
   {
     "contract_title": "InmodeLtd_20190729_F-1A_EX-10.9_11743243_EX-10.9_Manufacturing Agreement",
@@ -84,7 +89,8 @@
     "is_impossible": false,
     "natural_question": "What is the name of this contract?",
     "natural_answer": "This contract is called the TURN-KEY MANUFACTURING AGREEMENT.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "invasix-ltd-turn-key-manufacturing-agreement"
   },
   {
     "contract_title": "EUROPEANMICROHOLDINGSINC_03_06_1998-EX-10.6-DISTRIBUTOR AGREEMENT",
@@ -96,7 +102,8 @@
     "is_impossible": false,
     "natural_question": "When does this contract actually start?",
     "natural_answer": "This contract is effective as of November 5, 1997.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "watchguard-technologies-inc-distributor-agreement"
   },
   {
     "contract_title": "DOMINIADVISORTRUST_02_18_2005-EX-99.(H)(2)-SPONSORSHIP AGREEMENT",
@@ -111,7 +118,8 @@
     "is_impossible": false,
     "natural_question": "Who are the parties involved in this contract?",
     "natural_answer": "The parties in this contract are referred to as Trust, Domini, or the Sponsor.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "domini-advisor-trust-sponsorship-agreement"
   },
   {
     "contract_title": "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT",
@@ -123,7 +131,8 @@
     "is_impossible": false,
     "natural_question": "When did this contract go into effect?",
     "natural_answer": "This contract went into effect on September 14, 200_.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "touchstar-software-corporation-reseller-agreement"
   },
   {
     "contract_title": "DIVERSINETCORP_03_01_2012-EX-4-RESELLER AGREEMENT",
@@ -135,7 +144,8 @@
     "is_impossible": false,
     "natural_question": "What is the name of this contract?",
     "natural_answer": "This contract is called the Reseller Agreement.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "diversinet-corp-reseller-agreement"
   },
   {
     "contract_title": "LegacyEducationAllianceInc_20200330_10-K_EX-10.18_12090678_EX-10.18_Development Agreement",
@@ -147,7 +157,8 @@
     "is_impossible": false,
     "natural_question": "When does this contract actually start?",
     "natural_answer": "This contract is effective as of December 23, 2019.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "legacy-education-alliance-holdings-inc-real-estate-education"
   },
   {
     "contract_title": "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT",
@@ -159,7 +170,8 @@
     "is_impossible": false,
     "natural_question": "When was this contract signed?",
     "natural_answer": "This contract was signed on September 14, 200_.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "touchstar-software-corporation-reseller-agreement"
   },
   {
     "contract_title": "TICKETSCOMINC_06_22_1999-EX-10.22-SPONSORSHIP AGREEMENT",
@@ -171,7 +183,8 @@
     "is_impossible": false,
     "natural_question": "When was this contract signed?",
     "natural_answer": "This contract was signed on February 17, 1999.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "tickets-com-inc-sponsorship-agreement"
   },
   {
     "contract_title": "UpjohnInc_20200121_10-12G_EX-2.6_11948692_EX-2.6_Manufacturing Agreement_ Supply Agreement",
@@ -187,7 +200,8 @@
     "is_impossible": false,
     "natural_question": "Does this contract require me to buy a minimum amount of product at a time?",
     "natural_answer": "Yes, the contract requires you to order at least a certain amount of product, known as the Minimum Order Quantity, for finished products, and to order in batches of a specific size for API or bulk drug products.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "pfizer-inc-manufacturing-and-supply-agreement"
   },
   {
     "contract_title": "LejuHoldingsLtd_20140121_DRS (on F-1)_EX-10.26_8473102_EX-10.26_Content License Agreement2",
@@ -199,7 +213,8 @@
     "is_impossible": false,
     "natural_question": "When was this contract signed?",
     "natural_answer": "This contract was signed on a specific day in 2009.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "beijing-sina-internet-information-service-co-mutual-terminat"
   },
   {
     "contract_title": "EhaveInc_20190515_20-F_EX-4.44_11678816_EX-4.44_License Agreement_ Reseller Agreement",
@@ -214,7 +229,8 @@
     "is_impossible": false,
     "natural_question": "Who are the companies that signed this contract?",
     "natural_answer": "The companies that signed this contract are Ehave and Companion Healthcare Technologies Corp.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "ehave-inc-license-and-reseller-agreement"
   },
   {
     "contract_title": "DIVERSINETCORP_03_01_2012-EX-4-RESELLER AGREEMENT",
@@ -226,7 +242,8 @@
     "is_impossible": false,
     "natural_question": "When was this contract signed?",
     "natural_answer": "This contract was signed on January 11, 2011.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "diversinet-corp-reseller-agreement"
   },
   {
     "contract_title": "EUROPEANMICROHOLDINGSINC_03_06_1998-EX-10.6-DISTRIBUTOR AGREEMENT",
@@ -238,7 +255,8 @@
     "is_impossible": false,
     "natural_question": "When was this contract signed?",
     "natural_answer": "This contract was signed on November 5, 1997.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "watchguard-technologies-inc-distributor-agreement"
   },
   {
     "contract_title": "CHERRYHILLMORTGAGEINVESTMENTCORP_09_26_2013-EX-10.1-Strategic Alliance Agreement",
@@ -250,7 +268,8 @@
     "is_impossible": false,
     "natural_question": "What is the name of this contract?",
     "natural_answer": "This contract is called the Strategic Alliance Agreement.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "freedom-mortgage-corporation-strategic-alliance-agreement"
   },
   {
     "contract_title": "LegacyEducationAllianceInc_20200330_10-K_EX-10.18_12090678_EX-10.18_Development Agreement",
@@ -265,7 +284,8 @@
     "is_impossible": false,
     "natural_question": "Who are the parties involved in this contract?",
     "natural_answer": "The parties involved in this contract are T&B Seminars, Inc. and T&B.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "legacy-education-alliance-holdings-inc-real-estate-education"
   },
   {
     "contract_title": "ArmstrongFlooringInc_20190107_8-K_EX-10.2_11471795_EX-10.2_Intellectual Property Agreement",
@@ -277,7 +297,8 @@
     "is_impossible": false,
     "natural_question": "What is the name of this contract?",
     "natural_answer": "This contract is called the Intellectual Property Agreement.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "armstrong-flooring-inc-intellectual-property-agreement"
   },
   {
     "contract_title": "EUROPEANMICROHOLDINGSINC_03_06_1998-EX-10.6-DISTRIBUTOR AGREEMENT",
@@ -292,7 +313,8 @@
     "is_impossible": false,
     "natural_question": "Who are the parties involved in this contract?",
     "natural_answer": "The parties in this contract are the Distributor and WGT.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "watchguard-technologies-inc-distributor-agreement"
   },
   {
     "contract_title": "UpjohnInc_20200121_10-12G_EX-2.6_11948692_EX-2.6_Manufacturing Agreement_ Supply Agreement",
@@ -304,7 +326,8 @@
     "is_impossible": false,
     "natural_question": "When does this contract actually start?",
     "natural_answer": "This contract does contain information about when it becomes effective.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "pfizer-inc-manufacturing-and-supply-agreement"
   },
   {
     "contract_title": "TICKETSCOMINC_06_22_1999-EX-10.22-SPONSORSHIP AGREEMENT",
@@ -319,7 +342,8 @@
     "is_impossible": false,
     "natural_question": "Who are the parties that signed this contract?",
     "natural_answer": "The parties involved in this contract are Tickets.com, Inc. and Tickets.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "tickets-com-inc-sponsorship-agreement"
   },
   {
     "contract_title": "LegacyEducationAllianceInc_20200330_10-K_EX-10.18_12090678_EX-10.18_Development Agreement",
@@ -331,7 +355,8 @@
     "is_impossible": false,
     "natural_question": " ",
     "natural_answer": "This contract is called the Real Estate Education Training Program Development Agreement.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "legacy-education-alliance-holdings-inc-real-estate-education"
   },
   {
     "contract_title": "CHERRYHILLMORTGAGEINVESTMENTCORP_09_26_2013-EX-10.1-Strategic Alliance Agreement",
@@ -341,7 +366,8 @@
     "is_impossible": true,
     "natural_question": "What happens to the contract after the first term ends, is it automatically renewed or can it be extended?",
     "natural_answer": "This contract does contain a renewal term clause, but the specific details are not provided here.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "freedom-mortgage-corporation-strategic-alliance-agreement"
   },
   {
     "contract_title": "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules",
@@ -351,7 +377,8 @@
     "is_impossible": true,
     "natural_question": "Can either of us end this contract whenever we want, without a specific reason, just by giving notice and waiting a bit?",
     "natural_answer": "This contract does contain a termination for convenience clause, but the details are not provided here.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "sicap-ltd-maintenance-and-support-contract"
   },
   {
     "contract_title": "LejuHoldingsLtd_20140121_DRS (on F-1)_EX-10.26_8473102_EX-10.26_Content License Agreement2",
@@ -361,7 +388,8 @@
     "is_impossible": true,
     "natural_question": "When does this contract actually start?",
     "natural_answer": "This contract does contain an effective date clause, but the details are not provided here.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "beijing-sina-internet-information-service-co-mutual-terminat"
   },
   {
     "contract_title": "DOMINIADVISORTRUST_02_18_2005-EX-99.(H)(2)-SPONSORSHIP AGREEMENT",
@@ -371,7 +399,8 @@
     "is_impossible": true,
     "natural_question": "Does this contract allow it to be transferred to someone else without needing permission or notification?",
     "natural_answer": "This contract doesn't have a section about assigning it to a third party, so it seems that part is missing.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "domini-advisor-trust-sponsorship-agreement"
   },
   {
     "contract_title": "UpjohnInc_20200121_10-12G_EX-2.6_11948692_EX-2.6_Manufacturing Agreement_ Supply Agreement",
@@ -381,7 +410,8 @@
     "is_impossible": true,
     "natural_question": "Can either of us cancel this contract whenever we want, as long as we give the other person some notice?",
     "natural_answer": "This contract does contain a termination for convenience clause, even though the exact details aren't specified in the given information.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "pfizer-inc-manufacturing-and-supply-agreement"
   },
   {
     "contract_title": "RgcResourcesInc_20151216_8-K_EX-10.3_9372751_EX-10.3_Franchise Agreement",
@@ -391,7 +421,8 @@
     "is_impossible": true,
     "natural_question": "Which country or state's laws apply to this contract?",
     "natural_answer": "This contract does not specify which country or state's laws govern its interpretation.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "roanoke-gas-company-gas-franchise-agreement"
   },
   {
     "contract_title": "CHERRYHILLMORTGAGEINVESTMENTCORP_09_26_2013-EX-10.1-Strategic Alliance Agreement",
@@ -401,7 +432,8 @@
     "is_impossible": true,
     "natural_question": "Does this contract limit how much one party can be sued for if they break the rules?",
     "natural_answer": "There is no limit on liability in this contract.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "freedom-mortgage-corporation-strategic-alliance-agreement"
   },
   {
     "contract_title": "DOMINIADVISORTRUST_02_18_2005-EX-99.(H)(2)-SPONSORSHIP AGREEMENT",
@@ -411,7 +443,8 @@
     "is_impossible": true,
     "natural_question": "What happens to the contract after the first term ends, does it automatically renew or can one side extend it?",
     "natural_answer": "This contract does contain a renewal term clause.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "domini-advisor-trust-sponsorship-agreement"
   },
   {
     "contract_title": "InmodeLtd_20190729_F-1A_EX-10.9_11743243_EX-10.9_Manufacturing Agreement",
@@ -421,7 +454,8 @@
     "is_impossible": true,
     "natural_question": "When was this contract signed?",
     "natural_answer": "This contract doesn't specifically mention an agreement date.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "invasix-ltd-turn-key-manufacturing-agreement"
   },
   {
     "contract_title": "EhaveInc_20190515_20-F_EX-4.44_11678816_EX-4.44_License Agreement_ Reseller Agreement",
@@ -431,7 +465,8 @@
     "is_impossible": true,
     "natural_question": "What happens to the contract after the first term is over, does it renew automatically or can one side decide to extend it?",
     "natural_answer": "This contract does contain a renewal term clause, but the details are not specified here.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "ehave-inc-license-and-reseller-agreement"
   },
   {
     "contract_title": "LejuHoldingsLtd_20140121_DRS (on F-1)_EX-10.26_8473102_EX-10.26_Content License Agreement2",
@@ -441,7 +476,8 @@
     "is_impossible": true,
     "natural_question": "Does this contract include a section where one party gives the other party permission to use something?",
     "natural_answer": "This contract does contain a license grant clause, but the details are not provided here.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "beijing-sina-internet-information-service-co-mutual-terminat"
   },
   {
     "contract_title": "LejuHoldingsLtd_20140121_DRS (on F-1)_EX-10.26_8473102_EX-10.26_Content License Agreement2",
@@ -451,7 +487,8 @@
     "is_impossible": true,
     "natural_question": "Does this contract require me to buy a minimum amount of something from the other party?",
     "natural_answer": "This contract does not have a minimum commitment or purchase requirement.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "beijing-sina-internet-information-service-co-mutual-terminat"
   },
   {
     "contract_title": "DOMINIADVISORTRUST_02_18_2005-EX-99.(H)(2)-SPONSORSHIP AGREEMENT",
@@ -461,7 +498,8 @@
     "is_impossible": true,
     "natural_question": "Does this contract give one company permission to use something belonging to the other company?",
     "natural_answer": "Yes, the contract does contain a license grant clause, even though the specific details are not provided.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "domini-advisor-trust-sponsorship-agreement"
   },
   {
     "contract_title": "LejuHoldingsLtd_20140121_DRS (on F-1)_EX-10.26_8473102_EX-10.26_Content License Agreement2",
@@ -471,7 +509,8 @@
     "is_impossible": true,
     "natural_question": "Can either of us end this contract whenever we want, just by giving notice and waiting a bit?",
     "natural_answer": "This contract does allow for termination without cause, but the details are not explicitly stated in the provided text, however, the presence of the clause is confirmed.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "beijing-sina-internet-information-service-co-mutual-terminat"
   },
   {
     "contract_title": "DOMINIADVISORTRUST_02_18_2005-EX-99.(H)(2)-SPONSORSHIP AGREEMENT",
@@ -481,7 +520,8 @@
     "is_impossible": true,
     "natural_question": "Does this contract require me to buy a minimum amount of something from the other party?",
     "natural_answer": "This contract does have a minimum commitment clause, but since the ground truth answer is N/A and it's marked as present, it implies the details are not explicitly stated, however the presence is acknowledged.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "domini-advisor-trust-sponsorship-agreement"
   },
   {
     "contract_title": "CHERRYHILLMORTGAGEINVESTMENTCORP_09_26_2013-EX-10.1-Strategic Alliance Agreement",
@@ -491,7 +531,8 @@
     "is_impossible": true,
     "natural_question": "Can either of us end this contract at any time just by giving notice, without needing a specific reason?",
     "natural_answer": "Although the contract does contain a termination for convenience clause, the details of it should be reviewed by a lawyer.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "freedom-mortgage-corporation-strategic-alliance-agreement"
   },
   {
     "contract_title": "PANDIONTHERAPEUTICSHOLDCOLLC_05_22_2020-EX-10.17-CONSULTING AGREEMENT",
@@ -501,7 +542,8 @@
     "is_impossible": true,
     "natural_question": "When does this contract actually take effect?",
     "natural_answer": "This contract does not explicitly mention an effective date.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "immunotolerance-inc-consulting-agreement"
   },
   {
     "contract_title": "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules",
@@ -511,7 +553,8 @@
     "is_impossible": true,
     "natural_question": "Does this contract include a license that lets one party use something belonging to the other party?",
     "natural_answer": "This contract does contain a license grant clause, even though the exact details are not specified here.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "sicap-ltd-maintenance-and-support-contract"
   },
   {
     "contract_title": "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT",
@@ -521,7 +564,8 @@
     "is_impossible": true,
     "natural_question": "What happens to the contract after the first term ends, and are there any automatic extensions or extensions that one side can choose?",
     "natural_answer": "This contract does contain a renewal term clause, but the details are not specified here.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "touchstar-software-corporation-reseller-agreement"
   },
   {
     "contract_title": "LejuHoldingsLtd_20140121_DRS (on F-1)_EX-10.26_8473102_EX-10.26_Content License Agreement2",
@@ -531,7 +575,8 @@
     "is_impossible": true,
     "natural_question": "When does the initial term of this contract end?",
     "natural_answer": "This contract does not specify an expiration date for its initial term.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "beijing-sina-internet-information-service-co-mutual-terminat"
   },
   {
     "contract_title": "InmodeLtd_20190729_F-1A_EX-10.9_11743243_EX-10.9_Manufacturing Agreement",
@@ -541,7 +586,8 @@
     "is_impossible": true,
     "natural_question": "Does this contract give one company permission to use something belonging to the other company?",
     "natural_answer": "This contract does contain a license grant clause, even though the specific details aren't provided here.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "invasix-ltd-turn-key-manufacturing-agreement"
   },
   {
     "contract_title": "CHERRYHILLMORTGAGEINVESTMENTCORP_09_26_2013-EX-10.1-Strategic Alliance Agreement",
@@ -551,7 +597,8 @@
     "is_impossible": true,
     "natural_question": "When does this contract actually start?",
     "natural_answer": "This contract doesn't explicitly mention an effective date.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "freedom-mortgage-corporation-strategic-alliance-agreement"
   },
   {
     "contract_title": "PANDIONTHERAPEUTICSHOLDCOLLC_05_22_2020-EX-10.17-CONSULTING AGREEMENT",
@@ -561,7 +608,8 @@
     "is_impossible": true,
     "natural_question": "Does this contract require me to buy a minimum amount of something from the other party?",
     "natural_answer": "This contract does not have a minimum commitment or purchase requirement.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "immunotolerance-inc-consulting-agreement"
   },
   {
     "contract_title": "PANDIONTHERAPEUTICSHOLDCOLLC_05_22_2020-EX-10.17-CONSULTING AGREEMENT",
@@ -571,7 +619,8 @@
     "is_impossible": true,
     "natural_question": "Is there a limit to how much one party can be held responsible if they break the rules of this contract?",
     "natural_answer": "This contract does contain a cap on liability, even though the specific details are not provided here.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "immunotolerance-inc-consulting-agreement"
   },
   {
     "contract_title": "LejuHoldingsLtd_20140121_DRS (on F-1)_EX-10.26_8473102_EX-10.26_Content License Agreement2",
@@ -581,7 +630,8 @@
     "is_impossible": true,
     "natural_question": "What happens to the contract after the first term is over, like does it renew automatically or can one side decide to extend it?",
     "natural_answer": "This contract actually does have a section about renewal terms.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "beijing-sina-internet-information-service-co-mutual-terminat"
   },
   {
     "contract_title": "DIVERSINETCORP_03_01_2012-EX-4-RESELLER AGREEMENT",
@@ -594,7 +644,8 @@
     "is_impossible": false,
     "natural_question": "Does this contract give one company permission to use or sell something belonging to the other company?",
     "natural_answer": "Yes, this contract allows Reseller to market, sell, and sublicense certain Diversinet products within a specific territory in Canada.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "diversinet-corp-reseller-agreement"
   },
   {
     "contract_title": "UpjohnInc_20200121_10-12G_EX-2.6_11948692_EX-2.6_Manufacturing Agreement_ Supply Agreement",
@@ -612,7 +663,8 @@
     "is_impossible": false,
     "natural_question": "If I sell my business, do I need the other party's permission to transfer this contract to the new owner?",
     "natural_answer": "You don't need the manufacturer's consent to assign this contract to a third party in certain situations, like a sale or merger of your business.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "pfizer-inc-manufacturing-and-supply-agreement"
   },
   {
     "contract_title": "EhaveInc_20190515_20-F_EX-4.44_11678816_EX-4.44_License Agreement_ Reseller Agreement",
@@ -625,7 +677,8 @@
     "is_impossible": false,
     "natural_question": "Does this contract require me to buy a minimum amount of products or services from the other party?",
     "natural_answer": "The contract does contain a minimum commitment clause, which states that the exclusive appointment and license will become non-exclusive if annual revenues of $500,000 are not achieved.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "ehave-inc-license-and-reseller-agreement"
   },
   {
     "contract_title": "LegacyEducationAllianceInc_20200330_10-K_EX-10.18_12090678_EX-10.18_Development Agreement",
@@ -638,7 +691,8 @@
     "is_impossible": false,
     "natural_question": "When does the initial part of this contract end?",
     "natural_answer": "The contract's initial term lasts for five years and starts on the effective date.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "legacy-education-alliance-holdings-inc-real-estate-education"
   },
   {
     "contract_title": "CHERRYHILLMORTGAGEINVESTMENTCORP_09_26_2013-EX-10.1-Strategic Alliance Agreement",
@@ -650,7 +704,8 @@
     "is_impossible": false,
     "natural_question": "Which state's laws apply to this contract?",
     "natural_answer": "This contract is governed by the laws of New York.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "freedom-mortgage-corporation-strategic-alliance-agreement"
   },
   {
     "contract_title": "InmodeLtd_20190729_F-1A_EX-10.9_11743243_EX-10.9_Manufacturing Agreement",
@@ -662,7 +717,8 @@
     "is_impossible": false,
     "natural_question": "Can either of us transfer our responsibilities in this contract to someone else, and if so, do we need to get permission first?",
     "natural_answer": "You need to get the other party's written permission before assigning your rights or obligations to someone else in this contract.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "invasix-ltd-turn-key-manufacturing-agreement"
   },
   {
     "contract_title": "DOMINIADVISORTRUST_02_18_2005-EX-99.(H)(2)-SPONSORSHIP AGREEMENT",
@@ -675,7 +731,8 @@
     "is_impossible": false,
     "natural_question": "When does this contract officially start?",
     "natural_answer": "This contract is effective starting from February 4, 2005, as stated at the beginning of the agreement.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "domini-advisor-trust-sponsorship-agreement"
   },
   {
     "contract_title": "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT",
@@ -687,7 +744,8 @@
     "is_impossible": false,
     "natural_question": "Does this contract require me to buy a minimum amount of products from the other party?",
     "natural_answer": "This contract does require meeting certain sales quotas, which are considered essential to the agreement.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "touchstar-software-corporation-reseller-agreement"
   },
   {
     "contract_title": "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules",
@@ -699,7 +757,8 @@
     "is_impossible": false,
     "natural_question": "What happens to my maintenance and support contract after the first two years are up?",
     "natural_answer": "The contract automatically renews for one year at a time unless one of the parties cancels it in writing at least six weeks beforehand.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "sicap-ltd-maintenance-and-support-contract"
   },
   {
     "contract_title": "EhaveInc_20190515_20-F_EX-4.44_11678816_EX-4.44_License Agreement_ Reseller Agreement",
@@ -715,7 +774,8 @@
     "is_impossible": false,
     "natural_question": "Does this contract allow either party to use something belonging to the other party?",
     "natural_answer": "Yes, the contract includes licenses that let both parties use certain materials and trademarks belonging to each other under specific conditions.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "ehave-inc-license-and-reseller-agreement"
   },
   {
     "contract_title": "DOMINIADVISORTRUST_02_18_2005-EX-99.(H)(2)-SPONSORSHIP AGREEMENT",
@@ -727,7 +787,8 @@
     "is_impossible": false,
     "natural_question": "Which state's laws apply to this contract if something goes wrong?",
     "natural_answer": "This contract is governed by the laws of Massachusetts.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "domini-advisor-trust-sponsorship-agreement"
   },
   {
     "contract_title": "EhaveInc_20190515_20-F_EX-4.44_11678816_EX-4.44_License Agreement_ Reseller Agreement",
@@ -739,7 +800,8 @@
     "is_impossible": false,
     "natural_question": "Can either of us cancel this contract for no reason, just by giving notice and waiting a bit?",
     "natural_answer": "Yes, one party can terminate the contract without cause by giving 30 business days' notice, but they have to pay a termination fee.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "ehave-inc-license-and-reseller-agreement"
   },
   {
     "contract_title": "EUROPEANMICROHOLDINGSINC_03_06_1998-EX-10.6-DISTRIBUTOR AGREEMENT",
@@ -752,7 +814,8 @@
     "is_impossible": false,
     "natural_question": "When does the initial term of this contract end?",
     "natural_answer": "The contract's initial term expires on September 30, 1997, as specified in Exhibit A.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "watchguard-technologies-inc-distributor-agreement"
   },
   {
     "contract_title": "LegacyEducationAllianceInc_20200330_10-K_EX-10.18_12090678_EX-10.18_Development Agreement",
@@ -764,7 +827,8 @@
     "is_impossible": false,
     "natural_question": "Which state's laws apply to this contract?",
     "natural_answer": "This contract is governed by the laws of the State of New York.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "legacy-education-alliance-holdings-inc-real-estate-education"
   },
   {
     "contract_title": "UpjohnInc_20200121_10-12G_EX-2.6_11948692_EX-2.6_Manufacturing Agreement_ Supply Agreement",
@@ -777,6 +841,7 @@
     "is_impossible": false,
     "natural_question": "What happens to my contract after the first 4 years are up, can it be automatically extended or renewed?",
     "natural_answer": "The contract can be extended for up to three more years in 12-month periods if the customer gives the manufacturer at least a year's notice before the initial term or any extension period ends.",
-    "reviewed_by_human": false
+    "reviewed_by_human": false,
+    "ground_truth_document_id": "pfizer-inc-manufacturing-and-supply-agreement"
   }
 ]

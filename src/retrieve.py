@@ -1,51 +1,69 @@
 """
-Using the technique Cross-documnet retrieval pipeline for (Searching across all the document)
+Cross-document retrieval pipeline (searching across all documents).
 
 Pipeline:
 Hybrid retrieval (Dense FAISS and Sparse BM25) over the full corpus
-Reranking the candidates with a technique cross-encoder (Stage 1 Bi-Encoder + BM25 and then Cross-Encoder)
-Document Consistency Check 
-"""
+Reranking the candidates with a cross-encoder
+Document Consistency Check
 
-import os
+"""
+import pickle
 from collections import Counter
+from pathlib import Path
+
 from langchain_community.vectorstores import FAISS
 from langchain_community.retrievers import BM25Retriever
-from langchain_classic.retrievers.ensemble import EnsembleRetriever
 from langchain_huggingface import HuggingFaceEmbeddings
 from sentence_transformers import CrossEncoder
 
-DB_DIR = "data/processed/faiss_index_regex"
+INDEX_DIR = Path("data/processed/config_runs/chunk_1000")
+DB_DIR = INDEX_DIR / "faiss_index"
+BM25_CORPUS_PATH = INDEX_DIR / "bm25_corpus.pkl"
 
 hf_embedding = HuggingFaceEmbeddings(
-        model_name = "BAAI/bge-large-en-v1.5",
-        model_kwargs={'device': 'cpu'},
-        encode_kwargs = {'normalize_embeddings': True, 'batch_size':32},
-        show_progress = True
-    )
+    model_name="BAAI/bge-large-en-v1.5",
+    model_kwargs={'device': 'cpu'},
+    encode_kwargs={'normalize_embeddings': True, 'batch_size': 32},
+    show_progress=True,
+)
 
-reranker = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
+reranker = CrossEncoder("BAAI/bge-reranker-base")
+
+# module-level cache -- populated on first call, reused after that
+_faiss_store = None
+_bm25_retriever = None
+
 
 def retriever():
     """
-    Load the FAISS Index and build both retrievers over the all contracts
+    Loads the FAISS index and BM25 corpus ONCE (cached in module-level
+    globals), instead of reloading from disk / rebuilding BM25 from
+    scratch on every call -- that rebuild-per-call pattern was the
+    original latency bug.
     """
-    vector_store = FAISS.load_local(DB_DIR, hf_embedding, allow_dangerous_deserialization=True)
+    global _faiss_store, _bm25_retriever
 
-    all_docs = list(vector_store.docstore._dict.values())
+    if _faiss_store is None:
+        _faiss_store = FAISS.load_local(
+            str(DB_DIR), hf_embedding, allow_dangerous_deserialization=True
+        )
 
-    bm25_retriever = BM25Retriever.from_documents(all_docs)
-    bm25_retriever.k =20
+    if _bm25_retriever is None:
+        with open(BM25_CORPUS_PATH, "rb") as f:
+            docs = pickle.load(f)
+        _bm25_retriever = BM25Retriever.from_documents(docs)
+        _bm25_retriever.k = 20
 
-    faiss_retriever = vector_store.as_retriever(search_kwargs={"k":20})
+    faiss_retriever = _faiss_store.as_retriever(search_kwargs={"k": 20})
+    return _bm25_retriever, faiss_retriever
 
-    return bm25_retriever, faiss_retriever
 
 def Reciprocal_Rank_Fusion(ranked_lists, k=60):
     """
-    Merge the list of document using RRF.
-    ranked_list : list of lists of langchain document objects, each already sorted from best-to-worst 
-    Returns: a single list fo doc(doc, rrf_score) sorted best-to-worst
+    Merge lists of documents using RRF.
+    ranked_list: list of lists of langchain Document objects, each already
+    sorted best-to-worst.
+    Returns: a single list of (doc, rrf_score) sorted best-to-worst.
     """
     scores = {}
     doc_lookup = {}
@@ -53,73 +71,81 @@ def Reciprocal_Rank_Fusion(ranked_lists, k=60):
     for ranked_list in ranked_lists:
         for rank, doc in enumerate(ranked_list):
             key = doc.metadata.get("chunk_id", doc.page_content[:50])
-            scores[key]  =scores.get(key, 0) + 1.0/(k+rank+1)
+            scores[key] = scores.get(key, 0) + 1.0 / (k + rank + 1)
             doc_lookup[key] = doc
 
-    fused = sorted(scores.items(), key=lambda x:x[1], reverse=True)
-    return [(doc_lookup[key], score) for key,score in fused]
+    fused = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+    return [(doc_lookup[key], score) for key, score in fused]
 
-def hybrid_retrieve(query: str, top_n_after_fusion: int =20):
-    # dense + sparse retrieval over the full contracts, fused with RRF
-    bm25_retriever, faiss_retriver = retriever()
+
+def hybrid_retrieve(query: str, top_n_after_fusion: int = 20):
+    bm25_retriever, faiss_retriever = retriever()
 
     bm25_result = bm25_retriever.invoke(query)
-    faiss_result = faiss_retriver.invoke(query)
+    faiss_result = faiss_retriever.invoke(query)
 
     fused = Reciprocal_Rank_Fusion([bm25_result, faiss_result])
     return [doc for doc, score in fused[:top_n_after_fusion]]
 
-def cross_encoder_rank(query:str, candidates, top_k:int=5):
-    """
-    Score each pair (query, chunk) pair with a cross-encoder for precise relevance, then return the top_k result
-    """
+
+def cross_encoder_rank(query: str, candidates, top_k: int = 5):
+    """Score each (query, chunk) pair with the cross-encoder, return top_k."""
     pairs = [(query, doc.page_content) for doc in candidates]
     scores = reranker.predict(pairs)
 
     scored = list(zip(candidates, scores))
-    scored.sort(key=lambda x: x[1], reverse = True)
+    scored.sort(key=lambda x: x[1], reverse=True)
 
     return scored[:top_k]
 
-def check_docement_consistency(reranked_results, concentration_threshold: float = 0.6, score_threshold: float=-2.15):
+
+def check_docement_consistency(reranked_results, concentration_threshold: float = 0.6,
+                                score_threshold: float = -2.15):
     """
-    I Look at both the contract_name agreement and the rerank scores of the top reranked chunks
-    Two ways this can be low-confidence
-    - concentration is low - top results are scattered across many contracts
-    - scores are low/negetive
+    NOTE ON score_threshold: -2.15 was tuned against ms-marco-MiniLM's
+    score distribution. bge-reranker-base produces DIFFERENT raw scores --
+    this number needs to be recalibrated against your actual eval data,
+    not assumed to still be correct. Run a quick histogram of reranked
+    scores for known-correct vs known-wrong matches from your 65 eval
+    questions before trusting this value. Left as-is (not guessed) so it
+    doesn't silently give you a false sense of correctness.
 
-    Returns:
-    - top-contract: the most common contract_name among the top results
-    - concentration: fraction of the top results that share the top_contract
-    - avg_top_score: average rerank scores of chunks from top_contract
-    - is_confident: bool - requires both good concentration and good scores
-    - contract_breakdown: counter of the contract_naem -> count
+    Groups by document_id (the canonical field from the new pipeline),
+    falling back to contract_name for chunks from an older index that
+    doesn't have document_id set.
     """
+    def doc_key(doc):
+        return doc.metadata.get("document_id") or doc.metadata.get("contract_name", "UNKNOWN")
 
-    contract_names = [doc.metadata.get("contract_name", "UNKNOWN") for doc, score in reranked_results]
-    counts = Counter(contract_names)
-    top_contract, top_count = counts.most_common(1)[0]
-    concentration = top_count / len(contract_names)
+    doc_ids = [doc_key(doc) for doc, score in reranked_results]
+    counts = Counter(doc_ids)
+    top_doc, top_count = counts.most_common(1)[0]
+    concentration = top_count / len(doc_ids)
 
-    # average score of only the chunks belonging to the top contract
-    top_contract_scores = [score for doc, score in reranked_results 
-                           if doc.metadata.get("contract_name","UNKNOWM") == top_contract]
-    avg_top_score = sum(top_contract_scores) / len(top_contract_scores)
+    top_doc_scores = [score for doc, score in reranked_results if doc_key(doc) == top_doc]
+    avg_top_score = sum(top_doc_scores) / len(top_doc_scores)
 
     is_confident = (concentration >= concentration_threshold) and (avg_top_score >= score_threshold)
     return {
-        "top_contract": top_contract,
+        "top_contract": top_doc,
         "concentration": concentration,
-        "avg_top_score":avg_top_score,
+        "avg_top_score": avg_top_score,
         "is_confident": is_confident,
-        "contract_breakdown": dict(counts)
+        "contract_breakdown": dict(counts),
     }
 
-def get_verification_context(query: str):
-    """
-    all above function will be called in a certain manner
-    """
 
+def get_all_docs():
+    """
+    Returns the full corpus (every chunk, with metadata) -- backed by the
+    same cached BM25 corpus retriever() already loads, so callers don't
+    need to reach into FAISS docstore internals to enumerate documents.
+    """
+    retriever()  # ensures _bm25_retriever is populated
+    return _bm25_retriever.docs
+
+
+def get_verification_context(query: str):
     candidates = hybrid_retrieve(query, top_n_after_fusion=20)
     reranked = cross_encoder_rank(query, candidates, top_k=5)
     consistency = check_docement_consistency(reranked)
@@ -139,10 +165,12 @@ if __name__ == "__main__":
     print(f"\nDocument consistency check:")
     print(f"  Top contract: {result['consistency']['top_contract']}")
     print(f"  Concentration: {result['consistency']['concentration']:.2f}")
+    print(f"  Avg score: {result['consistency']['avg_top_score']:.3f}")
     print(f"  Confident: {result['consistency']['is_confident']}")
     print(f"  Breakdown: {result['consistency']['contract_breakdown']}")
 
     print(f"\nTop {len(result['chunks'])} reranked chunks:")
     for idx, (doc, score) in enumerate(result['chunks']):
-        print(f"\n[Result {idx+1}] rerank_score={score:.3f} | contract={doc.metadata.get('contract_name', 'UNKNOWN')}")
+        doc_id = doc.metadata.get("document_id") or doc.metadata.get("contract_name", "UNKNOWN")
+        print(f"\n[Result {idx+1}] rerank_score={score:.3f} | document={doc_id}")
         print(doc.page_content[:200] + "...")

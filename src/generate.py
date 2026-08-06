@@ -2,7 +2,7 @@
 We will take the user's question + retrieved/reranked chunks and produce the answer broken into atomic clain, each tagged to the chunk it came from.
 """
 
-import json 
+import json
 import ollama
 
 
@@ -42,17 +42,28 @@ Respond with ONLY valid JSON in this exact format, no other text, no markdown fe
   ]
 }}"""
 
+
 def format_context(reranked_results):
     """
-    Turning doc, score (Reranked result ) into a labeled context
-    block the llm can cite back to by chunk_id
+    Turning doc, score (reranked result) into a labeled context block the
+    LLM can cite back to by chunk_id.
+
+    Uses metadata["raw_chunk_text"] (pure clause text) rather than
+    doc.page_content -- page_content now holds embedding_text (title +
+    chunk), built for embedding/reranking, not for showing the model as
+    the actual contract excerpt. Passing the title-prefixed text here
+    would risk the model citing/paraphrasing the title as if it were
+    contract content. Falls back to page_content for any doc from an
+    older index that doesn't have raw_chunk_text set.
     """
     blocks = []
     for doc, score in reranked_results:
         chunk_id = doc.metadata.get("chunk_id", "UNKNOWN")
-        blocks.append(f"[chunk_id: {chunk_id}]\n{doc.page_content}")
+        source_text = doc.metadata.get("raw_chunk_text", doc.page_content)
+        blocks.append(f"[chunk_id: {chunk_id}]\n{source_text}")
 
     return "\n\n---\n\n".join(blocks)
+
 
 def extract_json(raw_text: str) -> dict:
     """
@@ -63,16 +74,16 @@ def extract_json(raw_text: str) -> dict:
         text = text.strip("`")
         if text.lower().startswith("json"):
             text = text[4:].strip()
- 
-    if not text.startswith("{"):
-        start = text.find("{")
-        end = text.rfind("}")
-        if start != -1 and end != -1:
-            text = text[start:end + 1]
- 
-    return json.loads(text)  
 
-def generate_answer(question: str, reranked_results, max_retries: int =2) -> dict:
+    start = text.find("{")
+    end = text.rfind("}")
+    if start != -1 and end != -1:
+        text = text[start:end + 1]
+
+    return json.loads(text)
+
+
+def generate_answer(question: str, reranked_results, max_retries: int = 2) -> dict:
     """
     Generate a structured, source-tagged answer
 
@@ -92,7 +103,7 @@ def generate_answer(question: str, reranked_results, max_retries: int =2) -> dic
             messages=[{"role": "user", "content": prompt}],
         )
         raw = response["message"]["content"]
- 
+
         try:
             parsed = extract_json(raw)
             if "claims" not in parsed:
@@ -102,24 +113,23 @@ def generate_answer(question: str, reranked_results, max_retries: int =2) -> dic
             last_error = e
             print(f"  [generation attempt {attempt + 1} failed to parse JSON: {e}]")
             continue
- 
+
     raise ValueError(f"Generation failed to produce valid JSON after {max_retries + 1} attempts: {last_error}")
 
 
 if __name__ == "__main__":
-    # Quick standalone test using fake chunks, so this can be tested
-    # independently before wiring it to your real retrieval pipeline.
     class FakeDoc:
         def __init__(self, page_content, metadata):
             self.page_content = page_content
             self.metadata = metadata
- 
+
     fake_results = [
         (FakeDoc(
             "Governing Law. This Agreement shall be governed by the laws of the State of Israel.",
-            {"chunk_id": "inmode_12", "contract_name": "Inmode Manufacturing Agreement"}
+            {"chunk_id": "inmode_12", "contract_name": "Inmode Manufacturing Agreement",
+             "raw_chunk_text": "Governing Law. This Agreement shall be governed by the laws of the State of Israel."}
         ), 2.09),
     ]
- 
+
     result = generate_answer("What is the governing law of this agreement?", fake_results)
     print(json.dumps(result, indent=2))

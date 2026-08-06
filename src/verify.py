@@ -31,29 +31,42 @@ Question: Does the source text fully support the claim? Check carefully:
 Respond with ONLY valid JSON, no other text, no markdown fences:
 {{"verdict": "SUPPORTED" | "PARTIAL" | "UNSUPPORTED", "reason": "one sentence explanation"}}"""
 
+
 def build_chunk_lookup(all_docs):
     """
-    Build a  {chunk_id : chunk_text} dictionary from our FAISS docstore's
-    documnets so claims can be checked against their real source text
-    """
-    return {doc.metadata.get("chunk_id"): doc.page_content for doc in all_docs}
+    Build a {chunk_id: chunk_text} dictionary so claims can be checked
+    against their real source text.
 
-def extract_json(raw_text: str) ->dict:
+    Uses metadata["raw_chunk_text"] (pure chunk text, no title prefix)
+    rather than doc.page_content -- page_content now holds embedding_text
+    (title + chunk), built for embedding/reranking, not for grounding
+    checks. Verifying a claim against text that includes the title would
+    let the judge "confirm" claims based on the title rather than the
+    actual clause. Falls back to page_content for any doc from an older
+    index that doesn't have raw_chunk_text set.
+    """
+    return {
+        doc.metadata.get("chunk_id"): doc.metadata.get("raw_chunk_text", doc.page_content)
+        for doc in all_docs
+    }
+
+
+def extract_json(raw_text: str) -> dict:
     " Defensive JSON extraction "
     text = raw_text.strip()
     if text.startswith("```"):
         text = text.strip("`")
         if text.lower().startswith("json"):
             text = text[4:].strip()
-    if not text.startswith("{"):
-        start = text.find("{")
-        end = text.rfind("}")
-        if start != -1 and end !=-1:
-            text = text[start:end+1]
+    start = text.find("{")
+    end = text.rfind("}")
+    if start != -1 and end != -1:
+        text = text[start:end + 1]
 
     return json.loads(text)
 
-def verify_claim(claim: dict, chunk_lookup: dict, max_retries: int =2) -> dict:
+
+def verify_claim(claim: dict, chunk_lookup: dict, max_retries: int = 2) -> dict:
     """
     Check one claim against its cited source chunk
     Returns:
@@ -72,18 +85,17 @@ def verify_claim(claim: dict, chunk_lookup: dict, max_retries: int =2) -> dict:
     source_text = chunk_lookup.get(chunk_id)
 
     if source_text is None:
-        # the claim  cited a chunk_id that doesn't exist in our lookup
+        # the claim cited a chunk_id that doesn't exist in our lookup
         # this itself is a red flag worth surfacing, not hiding
+        return {**claim, "verdict": "UNSUPPORTED", "reason": "Cited source_chunk_id not found in corpus"}
 
-        return {**claim, "verdict":"UNSUPPORTED", "reason": "Cited source_chunk_id not found in corpus"}
-
-    prompt = PROMPT.format(source_text= source_text, claim_text=claim["text"])
+    prompt = PROMPT.format(source_text=source_text, claim_text=claim["text"])
 
     last_error = None
-    for attempt in range(max_retries+1):
+    for attempt in range(max_retries + 1):
         response = client.chat.completions.create(
-            model = MODEL,
-            messages= [{"role":"user", "content":prompt}]
+            model=MODEL,
+            messages=[{"role": "user", "content": prompt}]
         )
         raw = response.choices[0].message.content
 
@@ -96,32 +108,31 @@ def verify_claim(claim: dict, chunk_lookup: dict, max_retries: int =2) -> dict:
             last_error = e
             continue
 
-        # if judging itself failed after retries, fail SAFE - treat as unsupported
+    # if judging itself failed after retries, fail SAFE - treat as unsupported
     # rather than silently passing an unverified claim through
     return {**claim, "verdict": "UNSUPPORTED", "reason": f"Judge failed to respond validly: {last_error}"}
 
+
 def verify_all_claims(claims: list, chunk_lookup: dict) -> list:
-    """Verify a full list of claims, ane at a time"""
+    """Verify a full list of claims, one at a time"""
     return [verify_claim(claim, chunk_lookup) for claim in claims]
 
+
 if __name__ == "__main__":
-    # Standalone test using a fake chunk lookup, independent of the
-    # real pipeline, so generation/retrieval bugs don't mask verifier bugs.
     fake_lookup = {
         "chunk_174": "Governing Law. This Agreement will be governed by and interpreted "
                      "in accordance with the local laws of the State of Washington, U.S.A., "
                      "without regard to its conflicts of law provisions.",
     }
- 
+
     test_claims = [
         {"text": "This Agreement will be governed by and interpreted in accordance with "
                   "the local laws of the State of Washington, U.S.A., without regard to its "
                   "conflicts of law provisions.", "source_chunk_id": "chunk_174"},
-        # a deliberately WRONG claim to confirm the judge catches it
         {"text": "This Agreement is governed by the laws of the State of California.",
          "source_chunk_id": "chunk_174"},
     ]
- 
+
     results = verify_all_claims(test_claims, fake_lookup)
     for r in results:
         print(f"\nClaim: {r['text']}")
