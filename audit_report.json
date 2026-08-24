@@ -1,0 +1,194 @@
+{
+  "summary": {
+    "total_documents": 15,
+    "low_confidence_title_parse": 6,
+    "no_self_declared_hint_found": 13,
+    "empty_context": 0,
+    "unknown_contract_type": 0,
+    "needs_review": 13
+  },
+  "documents": [
+    {
+      "raw_title": "LejuHoldingsLtd_20140121_DRS (on F-1)_EX-10.26_8473102_EX-10.26_Content License Agreement2",
+      "document_title": "Leju Holdings Ltd � Content License Agreement",
+      "company_name": "Leju Holdings Ltd",
+      "contract_type": "Content License Agreement",
+      "parse_confidence": "high",
+      "self_declared_hint": "THIS MUTUAL TERMINATION AGREEMENT",
+      "num_chunks": 4,
+      "flags": []
+    },
+    {
+      "raw_title": "WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT",
+      "document_title": "Worldwidestrategiesinc � Reseller Agreement",
+      "company_name": "WORLDWIDESTRATEGIESINC",
+      "contract_type": "RESELLER AGREEMENT",
+      "parse_confidence": "low",
+      "self_declared_hint": null,
+      "num_chunks": 126,
+      "flags": [
+        "low_confidence_title_parse",
+        "no_self_declared_hint_found"
+      ]
+    },
+    {
+      "raw_title": "DOMINIADVISORTRUST_02_18_2005-EX-99.(H)(2)-SPONSORSHIP AGREEMENT",
+      "document_title": "Dominiadvisortrust � Sponsorship Agreement",
+      "company_name": "DOMINIADVISORTRUST",
+      "contract_type": "SPONSORSHIP AGREEMENT",
+      "parse_confidence": "low",
+      "self_declared_hint": null,
+      "num_chunks": 18,
+      "flags": [
+        "low_confidence_title_parse",
+        "no_self_declared_hint_found"
+      ]
+    },
+    {
+      "raw_title": "EUROPEANMICROHOLDINGSINC_03_06_1998-EX-10.6-DISTRIBUTOR AGREEMENT",
+      "document_title": "Europeanmicroholdingsinc � Distributor Agreement",
+      "company_name": "EUROPEANMICROHOLDINGSINC",
+      "contract_type": "DISTRIBUTOR AGREEMENT",
+      "parse_confidence": "low",
+      "self_declared_hint": null,
+      "num_chunks": 79,
+      "flags": [
+        "low_confidence_title_parse",
+        "no_self_declared_hint_found"
+      ]
+    },
+    {
+      "raw_title": "InmodeLtd_20190729_F-1A_EX-10.9_11743243_EX-10.9_Manufacturing Agreement",
+      "document_title": "Inmode Ltd � Manufacturing Agreement",
+      "company_name": "Inmode Ltd",
+      "contract_type": "Manufacturing Agreement",
+      "parse_confidence": "high",
+      "self_declared_hint": null,
+      "num_chunks": 67,
+      "flags": [
+        "no_self_declared_hint_found"
+      ]
+    },
+    {
+      "raw_title": "SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules",
+      "document_title": "Slovakwirelessfinancecobv � Maintenance And Support Contract For Sicap(R) Modules",
+      "company_name": "SLOVAKWIRELESSFINANCECOBV",
+      "contract_type": "Maintenance and support contract for SICAP(R) modules",
+      "parse_confidence": "low",
+      "self_declared_hint": null,
+      "num_chunks": 47,
+      "flags": [
+        "low_confidence_title_parse",
+        "no_self_declared_hint_found"
+      ]
+    },
+    {
+      "raw_title": "RgcResourcesInc_20151216_8-K_EX-10.3_9372751_EX-10.3_Franchise Agreement",
+      "document_title": "Rgc Resources Inc � Franchise Agreement",
+      "company_name": "Rgc Resources Inc",
+      "contract_type": "Franchise Agreement",
+      "parse_confidence": "high",
+      "self_declared_hint": null,
+      "num_chunks": 8,
+      "flags": [
+        "no_self_declared_hint_found"
+      ]
+    },
+    {
+      "raw_title": "UpjohnInc_20200121_10-12G_EX-2.6_11948692_EX-2.6_Manufacturing Agreement_ Supply Agreement",
+      "document_title": "Upjohn Inc � Supply Agreement",
+      "company_name": "Upjohn Inc",
+      "contract_type": "Supply Agreement",
+      "parse_confidence": "high",
+      "self_declared_hint": null,
+      "num_chunks": 375,
+      "flags": [
+        "no_self_declared_hint_found"
+      ]
+    },
+    {
+      "raw_title": "PANDIONTHERAPEUTICSHOLDCOLLC_05_22_2020-EX-10.17-CONSULTING AGREEMENT",
+      "document_title": "Pandiontherapeuticsholdcollc � Consulting Agreement",
+      "company_name": "PANDIONTHERAPEUTICSHOLDCOLLC",
+      "contract_type": "CONSULTING AGREEMENT",
+      "parse_confidence": "low",
+      "self_declared_hint": null,
+      "num_chunks": 35,
+      "flags": [
+        "low_confidence_title_parse",
+        "no_self_declared_hint_found"
+      ]
+    },
+    {
+      "raw_title": "LegacyEducationAllianceInc_20200330_10-K_EX-10.18_12090678_EX-10.18_Development Agreement",
+      "document_title": "Legacy Education Alliance Inc � Development Agreement",
+      "company_name": "Legacy Education Alliance Inc",
+      "contract_type": "Development Agreement",
+      "parse_confidence": "high",
+      "self_declared_hint": null,
+      "num_chunks": 78,
+      "flags": [
+        "no_self_declared_hint_found"
+      ]
+    },
+    {
+      "raw_title": "TICKETSCOMINC_06_22_1999-EX-10.22-SPONSORSHIP AGREEMENT",
+      "document_title": "Ticketscominc � Sponsorship Agreement",
+      "company_name": "TICKETSCOMINC",
+      "contract_type": "SPONSORSHIP AGREEMENT",
+      "parse_confidence": "high",
+      "self_declared_hint": null,
+      "num_chunks": 12,
+      "flags": [
+        "no_self_declared_hint_found"
+      ]
+    },
+    {
+      "raw_title": "ArmstrongFlooringInc_20190107_8-K_EX-10.2_11471795_EX-10.2_Intellectual Property Agreement",
+      "document_title": "Armstrong Flooring Inc � Intellectual Property Agreement",
+      "company_name": "Armstrong Flooring Inc",
+      "contract_type": "Intellectual Property Agreement",
+      "parse_confidence": "high",
+      "self_declared_hint": null,
+      "num_chunks": 92,
+      "flags": [
+        "no_self_declared_hint_found"
+      ]
+    },
+    {
+      "raw_title": "DIVERSINETCORP_03_01_2012-EX-4-RESELLER AGREEMENT",
+      "document_title": "Diversinetcorp � Reseller Agreement",
+      "company_name": "DIVERSINETCORP",
+      "contract_type": "RESELLER AGREEMENT",
+      "parse_confidence": "high",
+      "self_declared_hint": null,
+      "num_chunks": 101,
+      "flags": [
+        "no_self_declared_hint_found"
+      ]
+    },
+    {
+      "raw_title": "CHERRYHILLMORTGAGEINVESTMENTCORP_09_26_2013-EX-10.1-Strategic Alliance Agreement",
+      "document_title": "Cherryhillmortgageinvestmentcorp � Strategic Alliance Agreement",
+      "company_name": "CHERRYHILLMORTGAGEINVESTMENTCORP",
+      "contract_type": "Strategic Alliance Agreement",
+      "parse_confidence": "low",
+      "self_declared_hint": null,
+      "num_chunks": 41,
+      "flags": [
+        "low_confidence_title_parse",
+        "no_self_declared_hint_found"
+      ]
+    },
+    {
+      "raw_title": "EhaveInc_20190515_20-F_EX-4.44_11678816_EX-4.44_License Agreement_ Reseller Agreement",
+      "document_title": "Ehave Inc � Reseller Agreement",
+      "company_name": "Ehave Inc",
+      "contract_type": "Reseller Agreement",
+      "parse_confidence": "high",
+      "self_declared_hint": "THIS LICENSE AND RESELLER AGREEMENT",
+      "num_chunks": 144,
+      "flags": []
+    }
+  ]
+}

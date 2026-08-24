@@ -1,0 +1,46 @@
+[
+  {
+    "config": "data\\processed\\config_runs\\chunk_800",
+    "n_questions": 65,
+    "fused_recall@5": 0.3384615384615385,
+    "fused_recall@10": 0.5076923076923077,
+    "fused_mrr": 0.1911299811299811,
+    "reranked_recall@5": 0.2923076923076923,
+    "reranked_mrr": 0.1836263736263736,
+    "chunk_size": 800,
+    "chunk_overlap": 150
+  },
+  {
+    "config": "data\\processed\\config_runs\\chunk_1000",
+    "n_questions": 65,
+    "fused_recall@5": 0.38461538461538464,
+    "fused_recall@10": 0.5692307692307692,
+    "fused_mrr": 0.19926739926739925,
+    "reranked_recall@5": 0.2923076923076923,
+    "reranked_mrr": 0.1495238095238095,
+    "chunk_size": 1000,
+    "chunk_overlap": 200
+  },
+  {
+    "config": "data\\processed\\config_runs\\chunk_1200",
+    "n_questions": 65,
+    "fused_recall@5": 0.2923076923076923,
+    "fused_recall@10": 0.5076923076923077,
+    "fused_mrr": 0.17396880896880895,
+    "reranked_recall@5": 0.27692307692307694,
+    "reranked_mrr": 0.1281318681318681,
+    "chunk_size": 1200,
+    "chunk_overlap": 200
+  },
+  {
+    "config": "data\\processed\\config_runs\\chunk_1500",
+    "n_questions": 65,
+    "fused_recall@5": 0.3384615384615385,
+    "fused_recall@10": 0.5846153846153846,
+    "fused_mrr": 0.18830280830280827,
+    "reranked_recall@5": 0.27692307692307694,
+    "reranked_mrr": 0.16173992673992676,
+    "chunk_size": 1500,
+    "chunk_overlap": 250
+  }
+]

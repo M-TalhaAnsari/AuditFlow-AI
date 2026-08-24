@@ -1,11 +1,39 @@
-__pycache__/
-*.pyc
+# Environments
 venv/
+.venv/
+env/
 .env
-*.env
-data/processed/faiss_index_*/
-data/processed/config_runs*/
-.DS_Store
-*.log
-__init__.py
 
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+
+# IDE
+.vscode/
+.idea/
+
+# Large / generated artifacts -- rebuildable from source data, don't commit
+data/processed/config_runs/
+data/processed/**/faiss_index/
+data/processed/**/*.pkl
+
+# Model caches (HuggingFace / sentence-transformers download these locally)
+.cache/
+*.bin
+
+# Eval run outputs -- regenerable by rerunning the eval scripts
+rerank_pool_comparison_results.json
+*.json
+# Logs
+*.log
+
+# OS noise
+.DS_Store
+Thumbs.db
+
+audit_report.json
+*.png
+models/*

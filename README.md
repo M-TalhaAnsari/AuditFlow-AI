@@ -1,89 +1,94 @@
 # AuditFlow
 
-A verification-first RAG system for legal and financial contracts that checks every generated claim against its cited source before returning an answer.
+A verification-first RAG system for legal and financial contracts that checks
+every generated claim against its cited source before returning an answer.
+Built to run fully on-premises — no cloud vector store, no mandatory cloud
+LLM dependency for core retrieval.
+
+---
 
 ## Problem
 
-Standard RAG pipelines retrieve context, generate an answer, and return it without checking whether the generated text is actually supported by the retrieved source. In legal and financial documents, this is a meaningful risk: dropped conditions, misattributed clauses, or conflated terms across similar contracts can produce answers that read as confident and well-cited but are not accurate.
+Standard RAG pipelines retrieve context, generate an answer, and return it
+without checking whether the generated text is actually supported by the
+retrieved source. In legal and financial documents this is a meaningful risk:
+dropped conditions, misattributed clauses, or conflated terms across similar
+contracts can produce answers that read as confident and well-cited but are
+factually wrong.
 
-AuditFlow adds a verification stage that decomposes generated answers into atomic, source-tagged claims and checks each one against its cited chunk using a separate LLM-as-judge pass, before the answer is shown.
+AuditFlow adds a verification stage that decomposes generated answers into
+atomic, source-tagged claims and checks each one against its cited chunk using
+a separate LLM-as-judge pass, before the answer is shown to the user.
 
-## Screenshots
+---
 
-<img src="image.png" width="700">
-<img src="image-1.png" width="700">
-<img src="image-2.png" width="700">
-<img src="image-3.png" width="700">
-<img src="image-4.png" width="700">
-
-## Architecture
+## How it works
 
 ```
-Query
-  │
-  ▼
-Hybrid Retrieval (BM25 + dense FAISS, fused via Reciprocal Rank Fusion)
-  │
-  ▼
-Cross-Encoder Reranking (top 20 → top 5)
-  │
-  ▼
-Document Consistency Check
-  (concentration across contracts + average rerank score)
-  │
-  ├─ Low concentration  → request clarification (ambiguous across documents)
-  ├─ Low average score  → decline (right document, content not relevant enough)
-  └─ Confident          → proceed
-        │
-        ▼
-  Generation (atomic, source-tagged claims, structured JSON output)
-        │
-        ▼
-  Verification (claim vs. cited source chunk, judged independently)
-        │
-        ▼
-  Answer with per-claim verdict: SUPPORTED / PARTIAL / UNSUPPORTED / NO_ANSWER
+Query → Hybrid Retrieval (BM25 + FAISS) → RRF Fusion
+      → ONNX Cross-Encoder Reranking
+      → Document-Level Score Aggregation
+      → Confidence Gate (score_threshold=0.355)
+      → Atomic Claim Generation (Qwen2.5-7B)
+      → Per-Claim Verification (Llama-3.3-70B via Groq)
+      → Answer with per-claim verdict: SUPPORTED / PARTIAL / UNSUPPORTED / NO_ANSWER
 ```
 
-A session-level memory layer retries retrieval scoped to the previously-resolved contract when a follow-up question is too vague to resolve on its own, and detects when a question explicitly names a different contract to avoid incorrectly carrying over stale context (see Limitations).
+Session memory retries retrieval scoped to the previously-resolved contract
+when a follow-up question is too vague to resolve on its own, and detects
+when a question explicitly names a different contract to avoid incorrectly
+carrying over stale context.
 
-If the first generation attempt finds no source for a claim, a single bounded retry is attempted with a rule-based query reformulation (e.g. mapping "effective date" → "dated as of") before falling back to a "not enough information" response. No additional LLM call is used for the reformulation step itself.
+---
 
 ## Stack
 
-- **Retrieval**: BM25 (`rank_bm25`) + dense embeddings (`BAAI/bge-large-en-v1.5`) via FAISS, fused with Reciprocal Rank Fusion
-- **Reranking**: `cross-encoder/ms-marco-MiniLM-L-6-v2`
-- **Generation**: Qwen2.5-7B-Instruct, served locally via Ollama (dev); Llama-3.1-8B via Groq (deployment path)
-- **Verification (judge)**: Llama-3.3-70B via Groq API
-- **Dataset**: [CUAD](https://www.atticusprojectai.org/cuad) (Contract Understanding Atticus Dataset), 15-contract subset
-- **Backend**: FastAPI
-- **Frontend**: HTML/CSS/JS, no framework
+| Component | Choice | Notes |
+|---|---|---|
+| Embedding | BAAI/bge-large-en-v1.5 | 1024-dim, normalized, CPU |
+| Sparse retrieval | BM25 (rank_bm25) | Loaded once at startup |
+| Dense retrieval | FAISS | Local index, no server needed |
+| Fusion | Reciprocal Rank Fusion | top 20 candidates |
+| Reranker | bge-reranker-base (ONNX) | max_length=128, top_k=5, ~3.8s avg CPU |
+| Generation | Qwen2.5-7B via Ollama | Local; Groq Llama-3.1-8B as fallback |
+| Verification judge | Llama-3.3-70B via Groq | Per-claim faithfulness check |
+| Identity extraction | Gemini Flash (Groq fallback) | One-time at ingestion, cached |
+| Dataset | CUAD (15-contract subset) | Contract Understanding Atticus Dataset |
+| Backend | FastAPI | |
+| Frontend | HTML / CSS / JS | No framework |
+
+---
 
 ## Evaluation
 
-A 65-question evaluation set was built from CUAD's lawyer-verified clause annotations, rephrased into natural-language questions, spanning 12 clause categories (Parties, Governing Law, Effective Date, Cap on Liability, etc.), including both answerable and intentionally unanswerable (`is_impossible=True`) cases.
+A 65-question evaluation set was built from CUAD's lawyer-verified clause
+annotations, rephrased into natural-language questions spanning 12 clause
+categories, including both answerable and unanswerable cases.
 
-Each result was manually labeled against the ground-truth clause text.
+**Retrieval (eval_set_specific.json — 65 document-named questions):**
 
 | Metric | Result |
 |---|---|
-| Hallucination rate (among answered questions) | 1/6 = 16.7% |
-| Correct decline rate (on unanswerable/ambiguous questions) | 24/25 = 96.0% |
-| Questions resulting in a generated answer | 6/65 (9.2%) |
-| Questions correctly declined (clarification or low-relevance) | 59/65 (90.8%) |
+| Recall@5 | 100% |
+| Recall@10 | 100% |
+| MRR | 1.000 |
+| score_threshold (calibrated) | 0.355 |
 
-The system is precision-oriented by design: it declines to answer roughly 90% of the time on this eval set, in exchange for a low error rate on the answers it does produce. This is a deliberate tradeoff for a legal-document use case, where an incorrect answer is more costly than a request for clarification.
+**Reranker sweep winner** (max_length=128, fusion=20, top_k=5):
 
-## Known limitations
+| Metric | Value |
+|---|---|
+| avg rerank time | 3.8s |
+| p95 rerank time | 4.4s |
 
-- **Contract names mentioned inside a query do not, by themselves, guarantee correct retrieval.** A rule-based check detects when a question names a contract different from the one currently in session memory and re-scopes retrieval accordingly; however, this match is based on name fragments and prefixes, not true fuzzy matching, so unusual abbreviations or misspellings of a contract name may not be detected.
-- **The conversational memory fallback assumes a vague follow-up continues the previous topic** unless a different contract is explicitly detected in the text. This is a deliberate, bounded heuristic rather than true intent classification.
-- **Verification confirms faithfulness to the cited source, not relevance to the question.** A claim can be verified as fully supported by its source chunk while the chunk itself does not address what was asked. This was observed in evaluation (see `eval/eval_results.json`, "Minimum Commitment" category).
-- **A subset of CUAD's ground-truth answers contain redacted placeholder values** (e.g. a bullet character, or a partial date such as "200_") rather than real values, reflecting redactions in the original SEC filings. The system correctly retrieves and cites these placeholders as-is; there is no real value to find in the source text for these fields.
-- **The system does not resolve internal cross-references.** A clause defining a term by reference (e.g. "the Effective Date means the date first written above") may be cited verbatim rather than resolved to the actual value elsewhere in the document. A generation-prompt rule and a preamble-chunk-inclusion heuristic mitigate this for common cases (dates, parties) but do not eliminate it generally.
-- **Out-of-scope questions** (e.g., general company information not present in the contract text) are correctly identified as unanswerable, but are not distinguished in the UI from genuinely ambiguous retrieval failures.
+Note: 100% recall is partly because every question in the specific eval set names
+its document. A mixed vague/specific eval set would be a harder test.
+
+---
 
 ## Running locally
+
+**Prerequisites:** Python 3.12+, Ollama, GROQ_API_KEY, GEMINI_API_KEY
 
 ```bash
 # 1. Install dependencies
@@ -92,27 +97,82 @@ pip install -r requirements.txt
 # 2. Pull the local generation model
 ollama pull qwen2.5:7b-instruct
 
-# 3. Set environment variables (.env)
-GROQ_API_KEY=your_key_here
+# 3. Set environment variables
+cp .env.example .env
+# fill in GROQ_API_KEY, GEMINI_API_KEY
 
-# 4. Build the index (first run only)
-python src/splitter.py
-python src/embedding.py
+# 4. Extract document identities from contract preambles (one-time, ~1 min for 15 docs)
+python identity_extraction.py data/processed/cuad_subset.json
 
-# 5. Start the backend
+# 5. Build the index (one-time, ~25-30 min on CPU)
+python build_index.py --chunk-size 1000 --chunk-overlap 200 --out data/processed/config_runs/chunk_1000
+
+# 6. Start the backend
 uvicorn Backend.main:app --reload --port 8000
 
-# 6. Serve the frontend
+# 7. Serve the frontend
 cd frontend && python -m http.server 5500
 ```
+
+---
+
+## Running tests
+
+```bash
+# Fast unit tests -- no index or API keys needed
+pytest -v
+
+# Integration tests -- needs index + Ollama + Groq
+pytest -m integration -v
+
+# Latency and concurrency tests
+pytest tests/test_load.py -v
+
+# Reranker config sweep (timing + recall across max_length/fusion/top_k)
+python rerank_sweep_eval.py
+
+# Recalibrate score_threshold after any pipeline change
+python calibrate_threshold.py
+```
+
+---
 
 ## Project structure
 
 ```
 verirag/
-├── Backend/        FastAPI app exposing the pipeline as an API
-├── data/           Raw CUAD data and processed FAISS index
-├── eval/           Evaluation set, results, and scoring
-├── frontend/       Static HTML/CSS/JS client
-└── src/            Retrieval, generation, verification pipeline
+├── Backend/            FastAPI app
+├── src/auditflow/      Core pipeline (retrieval, generation, verification, session)
+├── models/             ONNX reranker model
+├── data/processed/     FAISS index, BM25 corpus, identity cache, source contracts
+├── Evaluation/         Eval question sets and sweep results
+├── tests/              Unit, integration, reliability, and load tests
+├── frontend/           Static HTML/CSS/JS client
+├── chunker_contextual.py
+├── build_index.py
+├── identity_extraction.py
+├── title_parser.py
+├── retrieval_eval.py
+├── calibrate_threshold.py
+├── rerank_sweep_eval.py
+└── generate_specific_eval_questions.py
 ```
+
+---
+
+## Known limitations
+
+- `Sessions()` is a global singleton — concurrent users share session state.
+  For multi-user deployment, per-session-ID state is needed.
+- Identity extraction uses the historical contract name (e.g. "Invasix Ltd.")
+  not the current brand name ("Inmode"). Queries using the current name will
+  not match via the entity-matching path (though content-based retrieval
+  still works).
+- Verification confirms faithfulness to the cited chunk, not relevance to the
+  question. A SUPPORTED claim can still be off-topic if the wrong chunk was
+  retrieved.
+- Internal cross-references ("the date first written above") may be cited
+  verbatim rather than resolved to the actual value.
+
+See `ARCHITECTURE.md` for the full technical design, latency breakdown, and
+improvement roadmap.

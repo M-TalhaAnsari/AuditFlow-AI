@@ -1,0 +1,31 @@
+# Role hierarchy: each role inherits everything the role below it can do.
+# employee IS-A viewer, ceo IS-A employee, admin IS-A ceo (plus the
+# unconditional wildcard rule below, which is what actually makes admin
+# a superuser -- the chain alone would only grant admin ceo's explicit
+# permissions, not automatic access to new resource types added later).
+g, employee, viewer
+g, ceo, employee
+g, admin, ceo
+
+# viewer: read-only. Can query existing documents, cannot see raw
+# document content/metadata listings or change anything.
+p, viewer, ask, execute
+p, viewer, history, read_own
+p, admin, history, read_all
+
+
+# employee: adds document ingestion (build_index / upload) on top of
+# viewer. This is the default role for most on-premises staff.
+p, employee, documents, read
+p, employee, documents, write
+
+# ceo: adds full document control (delete) and audit/reporting access
+# on top of employee. Business-visibility role, not a system-admin role.
+p, ceo, documents, delete
+p, ceo, reports, read
+
+# admin: unconditional access to everything, including user and policy
+# management, which no other role has any path to (there's no
+# `p, ceo, admin, *` above, so ceo/employee/viewer never reach it even
+# through the g() chain).
+p, admin, *, *

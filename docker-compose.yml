@@ -1,0 +1,28 @@
+# docker-compose.yml
+services:
+  redis-primary:
+    image: redis:7-alpine
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+
+  redis-replica-1:
+    image: redis:7-alpine
+    command: redis-server --replicaof redis-primary 6379
+
+  redis-replica-2:
+    image: redis:7-alpine
+    command: redis-server --replicaof redis-primary 6379
+
+  sentinel-1:
+    image: redis:7-alpine
+    command: redis-sentinel /etc/sentinel.conf
+    volumes: ["./sentinel.conf:/etc/sentinel.conf"]
+
+  sentinel-2:
+    image: redis:7-alpine
+    command: redis-sentinel /etc/sentinel.conf
+    volumes: ["./sentinel.conf:/etc/sentinel.conf"]
+
+  sentinel-3:
+    image: redis:7-alpine
+    command: redis-sentinel /etc/sentinel.conf
+    volumes: ["./sentinel.conf:/etc/sentinel.conf"]

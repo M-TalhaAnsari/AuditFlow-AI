@@ -1,43 +1,12 @@
 {
-  "5f0a99037b4f2702": {
-    "document_hash": "5f0a99037b4f2702",
-    "company_name": "Legacy Education Alliance Holdings, Inc.",
-    "counterparty_name": "T&B Seminars, Inc.",
-    "contract_type": "Real Estate Education Training Program Development Agreement",
+  "3fe2ad835e95cd78": {
+    "document_hash": "3fe2ad835e95cd78",
+    "company_name": "Beijing SINA Internet Information Service Co.",
+    "counterparty_name": "Shanghai SINA Leju Information Technology Co. Ltd.",
+    "contract_type": "Mutual Termination Agreement",
     "confidence": "high",
-    "source": "gemini"
-  },
-  "080a043bebc1daeb": {
-    "document_hash": "080a043bebc1daeb",
-    "company_name": "EHAVE, INC.",
-    "counterparty_name": "COMPANION HEALTHCARE TECHNOLOGIES CORP",
-    "contract_type": "LICENSE AND RESELLER AGREEMENT",
-    "confidence": "high",
-    "source": "gemini"
-  },
-  "ddd36a0c3866ae8d": {
-    "document_hash": "ddd36a0c3866ae8d",
-    "company_name": "INVASIX LTD.",
-    "counterparty_name": "FLEXTRONICS ISRAEL LTD.",
-    "contract_type": "Turn-Key Manufacturing Agreement",
-    "confidence": "high",
-    "source": "gemini"
-  },
-  "0bfdb08482e2032d": {
-    "document_hash": "0bfdb08482e2032d",
-    "company_name": "TouchStar Software Corporation",
-    "counterparty_name": "Worldwide Strategies",
-    "contract_type": "Reseller Agreement",
-    "confidence": "high",
-    "source": "groq"
-  },
-  "deb8b9c54df31d0f": {
-    "document_hash": "deb8b9c54df31d0f",
-    "company_name": "Freedom Mortgage Corporation",
-    "counterparty_name": "Cherry Hill Mortgage Investment Corp.",
-    "contract_type": "Strategic Alliance Agreement",
-    "confidence": "high",
-    "source": "groq"
+    "source": "gemini",
+    "self_declared_hint": "THIS MUTUAL TERMINATION AGREEMENT"
   },
   "3e5e60a61bfa5247": {
     "document_hash": "3e5e60a61bfa5247",
@@ -45,71 +14,53 @@
     "counterparty_name": "Alan Crane",
     "contract_type": "Consulting Agreement",
     "confidence": "high",
-    "source": "groq"
+    "source": "gemini",
+    "self_declared_hint": ""
+  },
+  "deb8b9c54df31d0f": {
+    "document_hash": "deb8b9c54df31d0f",
+    "company_name": "Freedom Mortgage Corporation",
+    "counterparty_name": "Cherry Hill Mortgage Investment Corp.",
+    "contract_type": "Strategic Alliance Agreement",
+    "confidence": "high",
+    "source": "gemini",
+    "self_declared_hint": ""
+  },
+  "0c77b99139dce922": {
+    "document_hash": "0c77b99139dce922",
+    "company_name": "EuroTel Bratislava a.s.",
+    "counterparty_name": "Sicap Ltd",
+    "contract_type": "Maintenance and Support Contract",
+    "confidence": "high",
+    "source": "gemini",
+    "self_declared_hint": ""
+  },
+  "cf9790748429789c": {
+    "document_hash": "cf9790748429789c",
+    "company_name": "Pfizer Inc.",
+    "counterparty_name": "Upjohn Inc.",
+    "contract_type": "Manufacturing and Supply Agreement",
+    "confidence": "high",
+    "source": "groq",
+    "self_declared_hint": ""
   },
   "420bdefe0fc947f8": {
     "document_hash": "420bdefe0fc947f8",
     "company_name": "Armstrong Flooring, Inc.",
-    "counterparty_name": "AHF Holding, Inc.",
+    "counterparty_name": "AHF Holding, Inc. and Armstrong Hardwood Flooring Company",
     "contract_type": "Intellectual Property Agreement",
     "confidence": "high",
-    "source": "gemini"
+    "source": "groq",
+    "self_declared_hint": ""
   },
-  "6e9b5b2f05e7ee67": {
-    "document_hash": "6e9b5b2f05e7ee67",
-    "company_name": "WatchGuard Technologies, Inc.",
-    "counterparty_name": "European Micro",
-    "contract_type": "Distributor Agreement",
+  "ddd36a0c3866ae8d": {
+    "document_hash": "ddd36a0c3866ae8d",
+    "company_name": "INVASIX LTD.",
+    "counterparty_name": "FLEXTRONICS ISRAEL LTD.",
+    "contract_type": "Turn-Key Manufacturing Agreement",
     "confidence": "high",
-    "source": "groq"
-  },
-  "39989a904cd15ca0": {
-    "document_hash": "39989a904cd15ca0",
-    "company_name": "Tickets.com, Inc.",
-    "counterparty_name": "MP3.com, Inc.",
-    "contract_type": "Sponsorship Agreement",
-    "confidence": "high",
-    "source": "groq"
-  },
-  "0c77b99139dce922": {
-    "document_hash": "0c77b99139dce922",
-    "company_name": "Sicap Ltd",
-    "counterparty_name": "EuroTel Bratislava a.s.",
-    "contract_type": "Maintenance and support contract",
-    "confidence": "high",
-    "source": "groq"
-  },
-  "3fe2ad835e95cd78": {
-    "document_hash": "3fe2ad835e95cd78",
-    "company_name": "Beijing SINA Internet Information Service Co.",
-    "counterparty_name": "Shanghai SINA Leju Information Technology Co. Ltd.",
-    "contract_type": "Mutual Termination Agreement",
-    "confidence": "high",
-    "source": "groq"
-  },
-  "c0fa9504af6790fe": {
-    "document_hash": "c0fa9504af6790fe",
-    "company_name": "Diversinet Corp.",
-    "counterparty_name": "2205925 Ontario Limited",
-    "contract_type": "Reseller Agreement",
-    "confidence": "high",
-    "source": "groq"
-  },
-  "cf9790748429789c": {
-    "document_hash": "cf9790748429789c",
-    "company_name": "PFIZER INC.",
-    "counterparty_name": "UPJOHN INC.",
-    "contract_type": "MANUFACTURING AND SUPPLY AGREEMENT",
-    "confidence": "high",
-    "source": "groq"
-  },
-  "7a477cdda4d67a97": {
-    "document_hash": "7a477cdda4d67a97",
-    "company_name": "ROANOKE GAS COMPANY",
-    "counterparty_name": "TOWN OF VINTON, VIRGINIA",
-    "contract_type": "GAS FRANCHISE AGREEMENT",
-    "confidence": "high",
-    "source": "gemini"
+    "source": "groq",
+    "self_declared_hint": ""
   },
   "df2c0a369add855e": {
     "document_hash": "df2c0a369add855e",
@@ -117,6 +68,70 @@
     "counterparty_name": "Domini Social Investments LLC",
     "contract_type": "Sponsorship Agreement",
     "confidence": "high",
-    "source": "gemini"
+    "source": "gemini",
+    "self_declared_hint": ""
+  },
+  "c0fa9504af6790fe": {
+    "document_hash": "c0fa9504af6790fe",
+    "company_name": "Diversinet Corp.",
+    "counterparty_name": "2205925 Ontario Limited",
+    "contract_type": "Reseller Agreement",
+    "confidence": "high",
+    "source": "groq",
+    "self_declared_hint": ""
+  },
+  "0bfdb08482e2032d": {
+    "document_hash": "0bfdb08482e2032d",
+    "company_name": "TouchStar Software Corporation",
+    "counterparty_name": "Worldwide Strategies",
+    "contract_type": "Reseller Agreement",
+    "confidence": "high",
+    "source": "groq",
+    "self_declared_hint": ""
+  },
+  "5f0a99037b4f2702": {
+    "document_hash": "5f0a99037b4f2702",
+    "company_name": "Legacy Education Alliance Holdings, Inc.",
+    "counterparty_name": "T&B Seminars, Inc.",
+    "contract_type": "Real Estate Education Training Program Development Agreement",
+    "confidence": "high",
+    "source": "groq",
+    "self_declared_hint": ""
+  },
+  "7a477cdda4d67a97": {
+    "document_hash": "7a477cdda4d67a97",
+    "company_name": "ROANOKE GAS COMPANY",
+    "counterparty_name": "TOWN OF VINTON, VIRGINIA",
+    "contract_type": "GAS FRANCHISE AGREEMENT",
+    "confidence": "high",
+    "source": "groq",
+    "self_declared_hint": ""
+  },
+  "080a043bebc1daeb": {
+    "document_hash": "080a043bebc1daeb",
+    "company_name": "EHAVE, INC.",
+    "counterparty_name": "COMPANION HEALTHCARE TECHNOLOGIES CORP",
+    "contract_type": "LICENSE AND RESELLER AGREEMENT",
+    "confidence": "high",
+    "source": "groq",
+    "self_declared_hint": "THIS LICENSE AND RESELLER AGREEMENT"
+  },
+  "39989a904cd15ca0": {
+    "document_hash": "39989a904cd15ca0",
+    "company_name": "MP3.com, Inc.",
+    "counterparty_name": "Tickets.com, Inc.",
+    "contract_type": "Sponsorship Agreement",
+    "confidence": "high",
+    "source": "gemini",
+    "self_declared_hint": ""
+  },
+  "6e9b5b2f05e7ee67": {
+    "document_hash": "6e9b5b2f05e7ee67",
+    "company_name": "WatchGuard Technologies, Inc.",
+    "counterparty_name": "European Micro",
+    "contract_type": "Distributor Agreement",
+    "confidence": "high",
+    "source": "groq",
+    "self_declared_hint": ""
   }
 }
