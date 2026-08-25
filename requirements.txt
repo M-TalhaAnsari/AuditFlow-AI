@@ -9,6 +9,7 @@ langchain_text_splitters==1.1.2
 numpy==2.5.2
 ollama==0.6.2
 onnxruntime==1.27.0
+optimum[onnxruntime]==2.1.0
 protobuf==7.36.0
 psycopg2_binary==2.9.12
 pydantic==2.13.4
