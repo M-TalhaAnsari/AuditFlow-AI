@@ -24,8 +24,8 @@ import casbin
 
 _enforcer: "casbin.Enforcer | None" = None
 
-MODEL_PATH = Path(__file__).parent / "casbin_model.conf"
-POLICY_PATH = Path(__file__).parent / "policy.csv"
+MODEL_PATH = Path(__file__).parent.parent / "RBAC/casbin_model.conf"
+POLICY_PATH = Path(__file__).parent.parent / "RBAC/policy.csv"
 
 
 def get_enforcer() -> "casbin.Enforcer":

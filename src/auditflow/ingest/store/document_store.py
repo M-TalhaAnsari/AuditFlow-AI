@@ -17,6 +17,14 @@ CHANGED vs original:
   identity metadata (company_name/counterparty_name/document_title)
   without going chunk-by-chunk through FAISS metadata. pipeline.py's
   get_all_document_identities() needs this directly.
+- Added execute() -- a generic escape hatch for ad-hoc INSERT/UPDATE/
+  DELETE statements that don't warrant their own typed function (e.g.
+  history_store.py's record_turn()). Every other function above stayed
+  typed on purpose (readable call sites, no raw SQL scattered through
+  the app); this is just for the cases a dedicated function isn't worth
+  writing yet. NOTE: transaction() (multi-statement atomic blocks, needed
+  by Stage 2's refresh-token rotation) is NOT included here -- that's
+  real work for when you actually build Stage 2, not added speculatively.
 """
 import os
 from contextlib import contextmanager
@@ -61,6 +69,15 @@ def apply_schema(schema_path: str = "src/auditflow/ingest/store/schema.sql"):
         ddl = f.read()
     with _cursor() as cur:
         cur.execute(ddl)
+
+
+def execute(query: str, params: tuple = ()) -> None:
+    """Generic INSERT/UPDATE/DELETE for callers that don't have (and don't
+    need) a dedicated typed function above. Not for SELECTs -- use
+    _cursor() directly or add a typed fetch function instead, so callers
+    keep getting real return types rather than raw RealDictRow soup."""
+    with _cursor() as cur:
+        cur.execute(query, params)
 
 
 # ---------------------------------------------------------------- documents

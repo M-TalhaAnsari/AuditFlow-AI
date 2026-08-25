@@ -1,28 +1,99 @@
-# docker-compose.yml
 services:
+  fastapi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: verirag-fastapi
+    ports:
+      - "8000:8000"
+    environment:
+      SENTINEL_HOSTS: "sentinel-1:26379,sentinel-2:26379,sentinel-3:26379"
+      REDIS_SERVICE_NAME: "auditflow-redis"
+    depends_on:
+      redis-primary:
+        condition: service_healthy
+      sentinel-1:
+        condition: service_started
+      sentinel-2:
+        condition: service_started
+      sentinel-3:
+        condition: service_started
+    networks:
+      - verirag-network
   redis-primary:
     image: redis:7-alpine
     command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 2s
+      retries: 10
+    networks:
+      - verirag-network
 
   redis-replica-1:
     image: redis:7-alpine
     command: redis-server --replicaof redis-primary 6379
+    depends_on:
+      redis-primary:
+        condition: service_healthy
+    networks:
+      - verirag-network
 
   redis-replica-2:
     image: redis:7-alpine
     command: redis-server --replicaof redis-primary 6379
+    depends_on:
+      redis-primary:
+        condition: service_healthy
+    networks:
+      - verirag-network
 
   sentinel-1:
     image: redis:7-alpine
     command: redis-sentinel /etc/sentinel.conf
-    volumes: ["./sentinel.conf:/etc/sentinel.conf"]
+    ports:
+      - "26379:26379"
+    volumes:
+      - "./sentinel.conf:/etc/sentinel.conf"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      redis-primary:
+        condition: service_healthy
+    networks:
+      - verirag-network
 
   sentinel-2:
     image: redis:7-alpine
     command: redis-sentinel /etc/sentinel.conf
-    volumes: ["./sentinel.conf:/etc/sentinel.conf"]
+    ports:
+      - "26380:26379"
+    volumes:
+      - "./sentinel.conf:/etc/sentinel.conf"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      redis-primary:
+        condition: service_healthy
+    networks:
+      - verirag-network
 
   sentinel-3:
     image: redis:7-alpine
     command: redis-sentinel /etc/sentinel.conf
-    volumes: ["./sentinel.conf:/etc/sentinel.conf"]
+    ports:
+      - "26381:26379"
+    volumes:
+      - "./sentinel.conf:/etc/sentinel.conf"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      redis-primary:
+        condition: service_healthy
+    networks:
+      - verirag-network
+
+networks:
+  verirag-network:
+    driver: bridge

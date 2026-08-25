@@ -1,10 +1,11 @@
 """
 FastAPI app, session_store-backed per-user state (Stage 1: Redis Sentinel HA).
-
-
 """
 import sys
 import os
+
+from dotenv import load_dotenv
+load_dotenv()  
 
 root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 if root_dir not in sys.path:
