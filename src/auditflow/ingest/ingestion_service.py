@@ -1,32 +1,6 @@
 """
 src/auditflow/ingest/ingestion_service.py
 
-The insert/update/delete entrypoint. This is the ONE place that coordinates
-document_store (Postgres registry), FaissIndex, and Bm25Index -- callers
-(build_index.py today, an API endpoint later) never touch those three
-directly, so there's exactly one code path where the "did this actually
-change" diff logic lives.
-
-Update algorithm:
-    1. Look up the document's existing content_hash in Postgres.
-       - Same hash -> no-op, return immediately (nothing re-embedded).
-    2. Re-chunk the new context -> new ChunkRecords with content-addressed ids.
-    3. Diff new chunk_ids against the chunk_ids currently stored for this
-       document_id:
-       - in new, not in old -> to_embed (only these get embedded)
-       - in old, not in new -> to_delete (removed from FAISS + BM25 + Postgres)
-       - in both -> unchanged, left alone entirely
-    4. Embed only to_embed, write to FAISS, BM25, and Postgres; delete
-       to_delete from all three; upsert the document row.
-
-KNOWN LIMITATION (not fixed by this pass, flagging per the review): steps 4
-write to FAISS, then BM25, then Postgres with no compensating rollback. If
-Postgres fails after FAISS already wrote, the three stores now disagree and
-nothing here notices or repairs it. A real fix needs either a write-ahead
-log of the intended diff (replay on next call) or making document_store
-the source of truth checked before serving FAISS/BM25 results. Worth
-doing before this is trusted with real user uploads; out of scope for this
-pass, which is architecture wiring, not distributed-write correctness.
 """
 from schemas.errors import IngestionError
 from src.auditflow.ingest import chunker
@@ -34,6 +8,7 @@ from src.auditflow.ingest.models import DocumentIdentity, DocumentRecord, Ingest
 from src.auditflow.ingest.index.faiss_index import FaissIndex
 from src.auditflow.ingest.index.bm25_index import Bm25Index
 from src.auditflow.ingest.store import document_store
+from src.auditflow.retrieval.cache_watcher import bump_index_version
 
 CHUNK_SIZE = 1000
 CHUNK_OVERLAP = 200
@@ -96,6 +71,8 @@ class IngestionService:
                 detail={"document_id": new_record.document_id},
             ) from exc
 
+        bump_index_version()
+
         return IngestResult(
             document_id=new_record.document_id,
             added_chunks=len(to_add),
@@ -117,6 +94,8 @@ class IngestionService:
             raise
         except Exception as exc:  # noqa: BLE001
             raise IngestionError(f"Failed to delete document {document_id!r}") from exc
+
+        bump_index_version()
 
 
 def _chunk_metadata(doc: DocumentRecord, chunk) -> dict:

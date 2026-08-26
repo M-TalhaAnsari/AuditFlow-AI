@@ -1,8 +1,5 @@
 """
 src/auditflow/retrieval/cache_watcher.py
-cache coherence for the in-memory FAISS/BM25 caches in
-retrieve.py (and, by extension, pipeline.py's Sessions() singleton --
-see reload_hooks.py).
 
 """
 from __future__ import annotations
@@ -18,8 +15,11 @@ POLL_INTERVAL_SECONDS = 30
 
 _last_seen_version: int | None = None
 
-def _bump_index_version() -> int:
 
+def bump_index_version() -> int:
+    """Called by ingestion_service.py (IngestionService.insert_or_update_document /
+    delete_document) immediately after a document's FAISS + BM25 saves both
+    succeed """
     r = get_primary(db=0)
     return int(r.incr(INDEX_VERSION_KEY))
 
