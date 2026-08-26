@@ -3,20 +3,12 @@ src/auditflow/auth/security.py
 
 Password hashing (bcrypt) and JWT issuing/verification (PyJWT).
 
-Local, on-premises auth -- no external identity provider, no OAuth flow.
-That's an intentional simplification for a single-deployment internal
-tool, not a corner cut for a web-facing product: this whole design
-assumes the server is reachable only from inside your network.
 
-AUTH_SECRET_KEY has no default -- the process refuses to start rather than
-silently signing tokens with a guessable key. Generate one once with:
-    python -c "import secrets; print(secrets.token_hex(32))"
-and put it in your .env. If it ever changes, every existing token is
-invalidated (users just log in again -- there's no session store to clean
-up, which is the point of using JWTs here instead of server-side sessions).
 """
 import os
+import secrets
 import time
+from datetime import timedelta
 
 import bcrypt
 import jwt
@@ -27,7 +19,10 @@ from schemas.errors import AuthenticationError
 
 JWT_SECRET = os.environ["AUTH_SECRET_KEY"]
 JWT_ALGORITHM = "HS256"
-JWT_EXPIRY_SECONDS = 8 * 60 * 60  # 8h -- one workday, for an internal tool
+
+ACCESS_TOKEN_EXPIRY_SECONDS = 15 * 60
+
+LEGACY_JWT_EXPIRY_SECONDS = 8 * 60 * 60
 
 
 def hash_password(plain_password: str) -> str:
@@ -38,9 +33,12 @@ def verify_password(plain_password: str, password_hash: str) -> bool:
     return bcrypt.checkpw(plain_password.encode("utf-8"), password_hash.encode("utf-8"))
 
 
-def issue_token(username: str, role: str) -> str:
+def issue_token(username: str, role: str, *, ttl: timedelta | None = None) -> str:
+    """Issue a short-lived access JWT. 
+    """
     now = int(time.time())
-    payload = {"sub": username, "role": role, "iat": now, "exp": now + JWT_EXPIRY_SECONDS}
+    expiry_seconds = int(ttl.total_seconds()) if ttl is not None else ACCESS_TOKEN_EXPIRY_SECONDS
+    payload = {"sub": username, "role": role, "iat": now, "exp": now + expiry_seconds}
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
 
@@ -51,3 +49,9 @@ def decode_token(token: str) -> dict:
         raise AuthenticationError("Session expired, please log in again") from exc
     except jwt.InvalidTokenError as exc:
         raise AuthenticationError("Invalid authentication token") from exc
+
+
+def generate_refresh_token() -> str:
+    """256 bits of CSPRNG entropy, URL-safe. 
+    """
+    return secrets.token_urlsafe(32)

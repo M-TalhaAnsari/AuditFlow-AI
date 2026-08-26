@@ -1,6 +1,6 @@
 """
-Pydantic schemas for authentication/authorization -- login request/response
-and the verified-identity object every protected route receives.
+Pydantic schemas for authentication/authorization -- login/refresh
+request/response and the verified-identity object 
 """
 from __future__ import annotations
 
@@ -20,6 +20,12 @@ class LoginRequest(BaseModel):
 
 
 class LoginResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    role: str
+
+
+class RefreshResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     role: str

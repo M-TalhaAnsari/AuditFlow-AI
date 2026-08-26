@@ -1,11 +1,14 @@
 """
 FastAPI app, session_store-backed per-user state (Stage 1: Redis Sentinel HA).
+
+
 """
 import sys
 import os
+import contextlib
 
 from dotenv import load_dotenv
-load_dotenv()  
+load_dotenv()
 
 root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 if root_dir not in sys.path:
@@ -18,6 +21,9 @@ from redis.exceptions import ConnectionError as RedisConnectionError
 
 from src.auditflow.orchestration.pipeline import Sessions
 from src.auditflow.orchestration.session_store import get_session_store
+from src.auditflow.orchestration.history_queue import enqueue_history_write
+from src.auditflow.retrieval.cache_watcher import run_watcher_in_background
+from src.auditflow.retrieval.retrieve import reload_index_from_disk
 from src.auditflow.auth.dependencies import require_permission
 from src.auditflow.auth.routes import router as auth_router
 from core.logging_config import logger, setup_logging
@@ -30,13 +36,31 @@ setup_logging()
 pipeline = Sessions()
 session_store = get_session_store()
 
-app = FastAPI(title="AuditFlow")
+
+@contextlib.asynccontextmanager
+async def lifespan(app: FastAPI):
+    reload_callbacks = [reload_index_from_disk, pipeline.reload]
+    async with run_watcher_in_background(reload_callbacks):
+        yield
+
+
+app = FastAPI(title="AuditFlow", lifespan=lifespan)
 register_exception_handlers(app)
 app.include_router(auth_router)
 
+_cors_origins_raw = os.environ.get("CORS_ALLOWED_ORIGINS", "")
+_cors_origins = [o.strip() for o in _cors_origins_raw.split(",") if o.strip()]
+if not _cors_origins:
+    logger.warning(
+        "CORS_ALLOWED_ORIGINS is not set -- no origins will be allowed to make "
+        "credentialed requests (login/refresh will fail from a browser frontend). "
+        "Set it in .env, e.g. CORS_ALLOWED_ORIGINS=https://your-frontend.example.com"
+    )
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_cors_origins,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -67,6 +91,7 @@ def ask_endpoint(
         session_store.push_recent_turn(
             user.username, payload.question, response.status, response.top_contract
         )
+        enqueue_history_write(user.username, payload.question, response)
     except (RedisConnectionError, TimeoutError):
         logger.error("Session store unavailable for user=%s", user.username)
         raise HTTPException(status_code=503, detail="Session service temporarily unavailable, please retry")

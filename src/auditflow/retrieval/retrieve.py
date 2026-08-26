@@ -2,21 +2,9 @@
 src/auditflow/retrieval/retrieve.py
 
 Cross-document retrieval pipeline (searching across all documents).
-
-Pipeline:
-Hybrid retrieval (Dense FAISS and Sparse BM25) over the full corpus
-Reranking the candidates with a cross-encoder
-Document Consistency Check
-
-KNOWN LIMITATION (carried forward, not a regression): the FAISS store and
-the BM25Okapi object are both built ONCE at process start and cached in
-module-level globals -- exactly like the old retriever() did. If
-build_index.py / the ingestion service writes new chunks in a *different*
-process, this process's cache goes stale until restart. If ingestion ever
-runs in-process (e.g. an upload endpoint added later), call
-invalidate_cache() right after the write completes.
 """
 import logging
+import threading
 from pathlib import Path
 
 import onnxruntime as ort
@@ -50,6 +38,8 @@ _faiss_index: FaissIndex | None = None
 _bm25_index: Bm25Index | None = None
 _bm25_cache: tuple[list[str], object] | None = None  # (chunk_ids, BM25Okapi)
 
+_reload_lock = threading.Lock()
+
 
 def get_indexes() -> tuple[FaissIndex, Bm25Index]:
     """Loads the FAISS index and BM25 corpus ONCE (cached in module-level
@@ -79,6 +69,33 @@ def invalidate_cache():
 
     global _bm25_cache
     _bm25_cache = None
+
+
+def reload_index_from_disk() -> None:
+    """rebuild FAISS + BM25 from disk and swap in atomically.    """
+    global _embedder, _faiss_index, _bm25_index, _bm25_cache
+
+    if _embedder is None:
+        get_indexes()
+        return
+
+    try:
+        new_faiss_index = FaissIndex(str(FAISS_DIR), _embedder)
+        new_bm25_index = Bm25Index(str(BM25_CORPUS_PATH))
+        new_bm25_cache = new_bm25_index.build_bm25()
+        _ = new_faiss_index.store
+        if not new_bm25_index.corpus:
+            raise RetrievalError("Reloaded BM25 corpus is empty -- refusing to swap in a possibly incomplete write")
+    except Exception as exc:
+        raise RetrievalError("Failed to reload FAISS/BM25 indexes from disk") from exc
+
+    with _reload_lock:
+        _faiss_index = new_faiss_index
+        _bm25_index = new_bm25_index
+        _bm25_cache = new_bm25_cache
+
+    logger.info("FAISS/BM25 caches reloaded from disk (%d chunks in BM25 corpus)",
+                len(new_bm25_index.corpus))
 
 
 def _reciprocal_rank_fusion(ranked_id_lists: list[list[str]], k: int = 60) -> list[str]:
