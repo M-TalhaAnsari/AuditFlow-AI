@@ -6,6 +6,8 @@ services:
     container_name: verirag-fastapi
     ports:
       - "8000:8000"
+    env_file:
+      - .env
     environment:
       SENTINEL_HOSTS: "sentinel-1:26379,sentinel-2:26379,sentinel-3:26379"
       REDIS_SERVICE_NAME: "auditflow-redis"
