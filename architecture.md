@@ -1,228 +1,331 @@
 # AuditFlow — Architecture
 
-A verification-first RAG system for legal and financial contracts. Every
-generated claim is checked against its cited source chunk before being
-returned. On-premises by design: no cloud vector store, no cloud LLM
-dependency for core retrieval.
+## Do you need the frontend to test any of this? No — and don't build it first.
+
+Every layer of this system — Redis session state, Postgres rows, auth
+tokens, ingestion, retrieval, verification — is independently checkable
+with `curl`, `redis-cli`, and `psql` alone. None of it requires a browser.
+
+This is a deliberate ordering, not a shortcut:
+
+1. **Backend first, verified in isolation.** If `/ask` is wrong, a
+   frontend just gives you a prettier way to see the same wrong answer.
+   Every bug is easier to isolate at the `curl` layer — you see the exact
+   JSON, the exact status code, the exact Redis key, with nothing else
+   (React state, browser caching, CORS) in between you and the bug.
+2. **Frontend last, as a thin client over an already-trusted API.** Once
+   `/auth/login`, `/ask`, `/auth/refresh` are all independently verified
+   correct via the manual walkthrough in `README.md`, the frontend has
+   nothing to get wrong except rendering and UX — a much smaller surface
+   to debug.
+
+`README.md`'s "Manually verifying every piece" section is written entirely
+in `curl`/`redis-cli`/`psql` for this reason. Build or fix the frontend
+whenever you want — it is not a dependency for validating that the system
+underneath it works.
 
 ---
 
 ## System overview
 
+AuditFlow is a verification-first RAG system for legal/financial
+contracts: every generated claim is checked against its cited source
+chunk before being returned to the user. It runs on-premises — local
+FAISS/BM25 indexes, local Postgres-hosted-on-Neon registry, local Redis —
+with two points of external dependency: Groq (claim verification judge,
+identity extraction fallback) and Ollama (local generation) or Groq
+(generation fallback).
+
 ```
-User query
-    │
-    ▼
-Sessions.ask()                          [pipeline.py]
-    │
-    ├─ Named-entity match against        [pipeline.py]
-    │  company_name / counterparty_name  _mentions_different_contract()
-    │  (catches "Upjohn" routing to      uses identity_extraction cache
-    │  Pfizer/Upjohn document, and
-    │  counterparty names like
-    │  "Companion Healthcare")
-    │
-    ├─ get_verification_context()        [retrieve.py]
-    │      │
-    │      ├─ hybrid_retrieve()
-    │      │      ├─ BM25 (sparse)       top 20 fused (calibrated)
-    │      │      └─ FAISS (dense)       bge-large-en-v1.5, 1024-dim
-    │      │      └─ Reciprocal Rank Fusion
-    │      │
-    │      └─ cross_encoder_rank()       ONNX bge-reranker-base
-    │             max_length=128          top_k=5 (sweep-calibrated)
-    │             └─ check_docement_consistency()
-    │                   document-level score aggregation across pool
-    │                   score_threshold=0.355 (calibrated)
-    │
-    ├─ CONFIDENT → _generate_and_verify()
-    │      ├─ scope chunks to top document only (top 5 of that doc)
-    │      ├─ generate_answer()           [generate.py] Qwen2.5-7B via Ollama
-    │      │      atomic claims, each tagged to a chunk_id
-    │      └─ verify_all_claims()         [verify.py] Llama-3.3-70B via Groq
-    │             per-claim: SUPPORTED / PARTIAL / UNSUPPORTED / NO_ANSWER
-    │
-    ├─ LOW CONFIDENCE, active session → retry scoped to active_contract
-    │      └─ generate_with_bounded_retry()   [retry_layer.py]
-    │             rule-based query reformulation, at most one retry
-    │
-    └─ AMBIGUOUS → need_clarification / low_relevance response
+Query
+  -> Hybrid Retrieval (BM25 + FAISS) -> RRF Fusion
+  -> ONNX Cross-Encoder Reranking
+  -> Document-Level Score Aggregation (concentration + avg score)
+  -> Confidence Gate (score_threshold=0.355, concentration>=0.6)
+  -> Atomic Claim Generation (Qwen2.5-7B via Ollama, or Groq fallback)
+  -> Per-Claim Verification (Llama-3.3-70B via Groq)
+  -> AskResponse: answered / need_clarification / low_relevance
 ```
+
+Session memory (Redis) lets a vague follow-up ("what about the payment
+terms?") stay scoped to the previously-resolved contract, and detects
+when a question names a *different* contract by company/counterparty
+name so stale context gets dropped rather than silently carried over.
 
 ---
 
-## File map
+## Request lifecycle: what actually happens on `/ask`
+
+This is the sequence every one of the 6 phases below modifies a piece of.
+Understanding this flow is the fastest way to understand why each stage
+exists.
 
 ```
-verirag/
-├── Backend/
-│   └── main.py                     FastAPI app, single Sessions() instance
-├── src/auditflow/
-│   ├── retrieval/
-│   │   └── retrieve.py             Hybrid retrieval, ONNX reranking, consistency check
-│   ├── pipeline/
-│   │   └── pipeline.py             Session memory, routing, orchestration
-│   ├── generation/
-│   │   ├── generate.py             Atomic claim generation (Ollama/Qwen local)
-│   │   └── generate_groq.py        Groq Llama fallback generation path
-│   ├── verification/
-│   │   └── verify.py               LLM-as-judge hallucination verification
-│   └── session/
-│       └── retry_layer.py          Bounded retry with rule-based reformulation
-├── chunker_contextual.py           Contextual chunking (context only, title in embedding)
-├── build_index.py                  FAISS + BM25 index builder with progress + retry
-├── identity_extraction.py          Gemini/Groq party+type extraction from preamble text
-├── title_parser.py                 Regex fallback for identity when cache is empty
-├── retrieval_eval.py               Recall@k and MRR eval against labeled questions
-├── calibrate_threshold.py          Sweeps score_threshold values against eval data
-├── rerank_sweep_eval.py            Sweeps max_length/fusion/top_k with timing + recall
-├── generate_specific_eval_questions.py  Makes eval questions unambiguous
-├── run_all_configs.py              Multi-config chunk-size comparison sweep
-├── models/
-│   └── bge-reranker-onnx/          ONNX-exported bge-reranker-base (quantized)
-├── tests/
-│   ├── conftest.py                 Fixtures, skip markers for integration tests
-│   ├── test_unit_title_parser.py   Title parsing logic
-│   ├── test_unit_chunker.py        Chunking + metadata construction
-│   ├── test_unit_json_extraction.py JSON extraction robustness
-│   ├── test_unit_pipeline_matching.py Document name-matching logic
-│   ├── test_unit_eval_loader.py    Eval file loader shapes
-│   ├── test_unit_onnx_reranker.py  ONNX reranker unit tests
-│   ├── test_integration_pipeline.py Full pipeline integration tests
-│   ├── test_reliability.py         Failure-mode and graceful-degradation tests
-│   └── test_load.py                Concurrency and latency budget tests
-├── Evaluation/
-│   ├── eval_set_draft.json         Original 65 questions (mostly vague)
-│   ├── eval_set_specific.json      65 questions each naming their document (for calibration)
-│   └── sweep_results.json          Reranker sweep results (max_length / fusion / top_k)
-└── data/processed/
-    ├── config_runs/chunk_1000/     Active FAISS index + BM25 corpus
-    ├── cuad_subset.json            Source contracts (15 documents, CUAD subset)
-    └── identity_cache.json         Gemini/Groq extraction cache (keyed by preamble hash)
+1. Client sends POST /ask with a Bearer access token (15min TTL)
+2. require_permission() decodes the JWT -> CurrentUser(username, role)
+3. session_store.locked(username)          -- Redis lock, per-user, not global
+4.   state = session_store.get(username)   -- Redis GET, JSON -> SessionState
+5.   response = pipeline.ask(question, state)
+6.     -- if state.pending_question and answer looks like a selection:
+7.        resolve against state.pending_candidates
+8.     -- else: fresh hybrid_retrieve() -> rerank -> consistency check
+9.        -- confident -> generate_answer() -> verify_all_claims()
+10.       -- not confident -> retry scoped to active_contract, or ask
+11.          for clarification, or return low_relevance
+12.  session_store.set(username, state, role)  -- Redis SET, role-based TTL
+13. session_store.push_recent_turn(...)     -- Redis list, last 5 turns
+14. enqueue_history_write(...)              -- RQ job, Redis db=1 queue
+15. return response                         -- durable Postgres write
+                                                 happens ASYNCHRONOUSLY
 ```
+
+Lines 3, 4, 12 are Phase 1. Line 2's 15-minute TTL and the whole
+issue/refresh/revoke flow behind it is Phase 2. Line 14 (and the worker
+that actually executes the write) is Phase 3+4. The FAISS/BM25 objects
+read inside step 8, and the `chunk_lookup`/`all_identities` read inside
+steps 8-9, are kept fresh by Phase 5. Everything in this file's "Testing"
+section and the full test suite is Phase 6.
 
 ---
 
-## Key design decisions
+## The 6 phases (all complete)
 
-**Contextual embedding** — each chunk is embedded as `"<clean title>\n\n<chunk text>"`.
-`raw_chunk_text` (title-free) is stored separately in metadata for generation and
-verification, so the LLM judge checks claims against pure source text, not
-title-contaminated text. `page_content` holds the embedding-text; `raw_chunk_text`
-holds what the LLM actually reads.
+### Phase 1 -- Redis Sentinel HA
 
-**Identity extraction from preamble text, not filename** — every contract states
-its own parties and type in the first lines. SEC filing titles are inconsistent
-and noisy. LLM extraction (Gemini primary, Groq fallback) runs once at ingestion,
-cached by content hash, never re-runs on subsequent index builds. Scales to 1000s
-of documents at negligible one-time cost.
+**Problem:** a single Redis instance is a SPOF; if it dies, every user's
+session state (active contract, pending clarification) disappears and
+in-flight requests hang or 500.
 
-**Document-level score aggregation** — consistency check sums ONNX reranker scores
-across the full 20-candidate pool per document, instead of majority-voting on 5.
-Prevents a single high-scoring chunk from a wrong document winning by luck of rank.
+**Design:** 1 primary + N replicas + Sentinel quorum. `redis_client.py`
+resolves the current primary through Sentinel on every call
+(`get_primary(db=0)`), not once at startup -- a call made the instant
+after a failover transparently gets the new primary, no app restart. If
+Redis is genuinely unreachable, `main.py` catches
+`(RedisConnectionError, TimeoutError)` and returns a **503**, not a hang
+or an opaque 500.
 
-**score_threshold=0.355** — calibrated via `calibrate_threshold.py` against
-`eval_set_specific.json` (65 self-contained, document-naming questions). F1=1.000,
-100% precision at this value. Vague follow-up queries are *expected* to score
-below this on fresh retrieval and fall through to the session-memory fallback
-path — that is correct behavior, not a regression.
+**Also fixed in this stage:** `Sessions` used to keep `active_contract`/
+`pending_question` on `self` -- shared, mutable state across every
+concurrent user of the one `Sessions()` singleton. Now every method takes
+`state: SessionState` explicitly; `self` only holds corpus-wide read-only
+data (`chunk_lookup`, `all_identities`), which is safe to share because
+it's identical for every user.
 
-**ONNX reranker (bge-reranker-base)** — exported to ONNX and loaded via
-`optimum.onnxruntime` with `intra_op_num_threads=8`. Sweep-calibrated config:
-`max_length=128, fusion_pool=20, top_k=5`. Measured avg 3.8s / p95 4.4s on CPU,
-vs 10–17s with the original PyTorch cross-encoder.
+**Files:** `redis_client.py`, `session_store.py`, `pipeline.py`
+(state threading), `main.py` (`load_dotenv()` ordering + 503 handling).
 
-**Claim-then-verify** — generation produces atomic, chunk-tagged claims.
-Verification is a separate LLM-as-judge call per claim (Llama-3.3-70B via Groq),
-checking faithfulness to the cited source chunk. Catches entity attribution errors
-(e.g. a claim naming AFI when the source says AWI) that generation alone passes.
+**Verified (Phase 6):** real Sentinel promotion in **3.26s** after a hard
+kill of the primary process; `get_primary()` transparently resolves the
+new primary with zero code change or restart; an in-flight write during
+the outage window fails closed (raises a catchable error) in under a
+second, never hangs.
 
 ---
 
-## Latency profile (current, CPU-only with ONNX reranker)
+### Phase 2 -- Refresh tokens and revocation
 
-| Stage | Typical time | Notes |
+**Problem:** the original 8-hour access JWT meant revoking a compromised
+or deactivated account could take up to 8 hours to actually lock the
+user out -- there was no server-side session to invalidate.
+
+**Design:** access tokens dropped to **15 minutes**. A 7-day, **rotating**
+refresh token (opaque random string, SHA-256 hash stored in Postgres,
+never the raw value) lets the client silently renew without re-login.
+Every `/auth/refresh` call issues a brand-new refresh token and revokes
+the one just used, in the same transaction -- the old token is dead the
+instant it's used. **Reuse of an already-revoked token is treated as a
+theft signal**: it revokes the user's *entire* token family, forcing
+re-login everywhere (the standard mitigation for rotating refresh
+tokens, per RFC 9700).
+
+The refresh token travels as an **httpOnly, Secure, SameSite=Strict
+cookie** scoped to `/auth`, not in a JSON response body -- a
+JavaScript-readable long-lived credential is exactly what XSS goes
+after. This forced one necessary consequence: `main.py`'s CORS can no
+longer use `allow_origins=["*"]`, since wildcard origins are
+incompatible with credentialed (cookie-bearing) requests per the CORS
+spec -- it now reads an explicit `CORS_ALLOWED_ORIGINS` env var.
+
+**Files:** `security.py`, `refresh.py` (new), `routes.py`
+(`/auth/refresh`, `/auth/logout`), `schemas/auth.py`, `main.py`.
+
+**Verified (Phase 6, needs real Postgres to execute):**
+issue -> rotate -> confirm old hash dead -> confirm reuse revokes the
+whole family; expired-token rejection; unknown-token rejection.
+
+---
+
+### Phase 3+4 -- Async history queue + retention split
+
+**Problem:** `history_store.record_turn()` existed but was dead code --
+nothing called it -- and even if it had been wired in inline, a
+synchronous Postgres write on the request path adds latency to every
+`/ask` call for zero benefit to the user waiting on their answer.
+
+**Design:** `/ask` enqueues a job (RQ, on Redis **db=1** -- same
+Sentinel-HA cluster as sessions, different logical DB so an RQ flush can
+never touch session state) and returns immediately. A separate worker
+process does the actual Postgres write, with `Retry(max=3,
+interval=[10,30,60])` for transient blips, landing in RQ's dead-letter
+registry after 3 failures.
+
+The worker writes to **two tables in one transaction**:
+`conversation_turns` (user-facing history, retained **7 days for
+viewers, 30 days for employee/ceo/admin**) and `audit_log` (compliance
+record, never shown to users, fixed **90-day retention for everyone,
+regardless of role**). These are genuinely independent policies -- an
+`audit_log` row survives long after the same event's `conversation_turns`
+row has been deleted for a viewer.
+
+**Files:** `history_queue.py`, `history_worker.py`,
+`alembic/versions/0003_add_history_tables.py`, `main.py`.
+
+**Verified (Phase 6, needs real Postgres to execute):** atomic two-table
+write; a simulated mid-transaction failure rolls back *both* tables, not
+just the one that failed; retention DELETEs seeded at various ages
+correctly distinguish viewer (7d) from employee (30d) at the *same* row
+age, and `audit_log`'s fixed 90-day policy ignores role entirely.
+
+---
+
+### Phase 5 -- Cache coherence (FAISS/BM25 + in-process lookups)
+
+**Problem:** `retrieve.py` loads FAISS/BM25 from disk **once**, at
+process start, into module-level globals. If `build_index.py` runs in a
+different process (or a sibling worker under multiple
+gunicorn/uvicorn workers) and adds a new document, every *other*
+already-running worker serves the stale snapshot **indefinitely** -- a
+newly uploaded contract is invisible until a manual restart.
+
+**Design:** a Redis integer counter, `index:version` (same Sentinel
+cluster, db=0), incremented by `IngestionService` immediately after a
+document's FAISS+BM25 saves both succeed -- not once at the end of a
+`build_index.py` batch (if document #500 of 1000 crashes the script,
+documents #1-499 are still durably saved and must still be announced).
+A no-op (unchanged content hash) does not bump the counter.
+
+Every worker polls the counter every **30 seconds** (a background
+`asyncio` task in FastAPI's lifespan) and reloads from disk if it's
+fallen behind. **Polling, not Pub/Sub** -- a worker that's mid-restart
+when a Pub/Sub message fires would miss it forever; a counter is always
+re-checkable regardless of when a worker asks.
+
+This also fixes a second, less obvious instance of the same bug:
+`Sessions.__init__` builds `self.chunk_lookup` and `self.all_identities`
+once at startup too -- the same staleness problem, one level up. Both
+are kept in sync under the *same* version counter, in a fixed order
+(`retrieve.reload_index_from_disk()` before `pipeline.Sessions.reload()`,
+since the latter reads the former's freshly-loaded corpus).
+
+**A new FAISS index is validated (via `.store` access, forcing a lazy
+`RuntimeError` to surface immediately) before the atomic swap** -- this
+closes a real race where `build_index.py` could bump the version a beat
+before `FAISS.save_local()` finishes writing, which would otherwise swap
+in a broken index and only fail later, on some unrelated user's request.
+
+**Files:** `cache_watcher.py` (new), `retrieve.py`
+(`reload_index_from_disk`), `pipeline.py` (`Sessions.reload`),
+`ingestion_service.py` (`bump_index_version` call site),
+`main.py` (FastAPI lifespan wiring). **`build_index.py` itself needed
+zero changes** -- its per-document save already happens inside
+`IngestionService`, which is where the version bump belongs.
+
+**Verified (Phase 6):** import-chain and swap-ordering logic exercised
+directly; the pre-swap validation step was added specifically because a
+review caught the disk-write race described above before it shipped.
+
+---
+
+### Phase 6 -- Testing
+
+See `README.md`'s "Manually verifying every piece" for the step-by-step
+walkthrough, and the "Automated test suite" section below for what's
+already written and passing.
+
+---
+
+## Automated test suite (`tests/`)
+
+| Tier | Location | Status |
 |---|---|---|
-| Model load (cold start) | 10–30s | Only on first request per server restart |
-| BM25 retrieval | <0.1s | Loaded once at startup, in-memory |
-| FAISS dense retrieval | 1–2s | bge-large-en-v1.5 query embedding on CPU |
-| RRF fusion | <0.1s | Pure Python, trivial |
-| ONNX reranking | 3.8s avg / 4.4s p95 | max_length=128, 20 candidates, top 5 |
-| Generation (Ollama/Qwen) | 10–30s | Qwen2.5-7B. Dominant bottleneck if on CPU. |
-| Verification (Groq) | 1–4s | Sequential per-claim. Fast model, sequential is the cost. |
-| **Total per query** | **~6–10s (retrieval only)** | Full pipeline depends on generation |
+| Unit | `tests/unit/` | 46 tests, all passing, run against real code |
+| Concurrency/race | `tests/concurrency/` | 7 tests, all passing against real Redis+Sentinel |
+| Failover | `tests/failover/` | 4 tests; 3 passing against real infra, 1 known-flaky (see note below) |
+| Integration | `tests/integration/` | 10 tests, written+verified correct; needs `DATABASE_URL` to execute |
+| Load/latency | `tests/load/` | 4 tests, all passing against real Redis |
+
+**The two most important tests** (named explicitly as regression tests
+for the concurrency bug this whole phase exists to fix):
+- `tests/concurrency/test_session_race_conditions.py::TestConcurrentRequestsSameUserDontCorruptState` --
+  10 concurrent `/ask` calls for the same user; asserts no corruption.
+- `tests/concurrency/test_session_race_conditions.py::TestDifferentUsersDontLeakPendingQuestion` --
+  User A gets `need_clarification`; User B's next message must **not**
+  be silently treated as A's answer. This is the exact bug the
+  `Sessions()` singleton fix in Phase 1 exists to close.
+
+**Known flaky test:** one failover test can hit a `ConnectionError: "The
+previous master is now a slave"` if it queries at the exact microsecond
+of Sentinel's promotion. This is expected `redis-py` behavior, not an
+AuditFlow defect -- it's exactly what the real `/ask` endpoint's
+`except (RedisConnectionError, TimeoutError): return 503` exists to
+catch and retry past.
+
+**A real, not-yet-closed gap found while writing these tests:**
+`document_store.py`'s `SimpleConnectionPool` defaults to `max_conn=8`.
+At the stated 100-50,000 user scale, 8 Postgres connections is very
+likely too few once `/ask`'s history write and `/auth/refresh`'s
+rotation compete for the same pool under real concurrent load. This
+needs a real load test against real Postgres to find the actual
+saturation point -- see "Remaining work" below.
 
 ---
 
-## Reranker sweep results (eval_set_specific.json, 65 questions)
+## Remaining work
 
-All configs achieved 100% Recall@5/10 and MRR=1.000 on the specific eval set.
-Winner selected on latency alone:
+Roughly in the order you'd hit them going to production, not by
+difficulty:
 
-| max_length | fusion | top_k | avg_s | p95_s | R@5 | MRR |
-|---|---|---|---|---|---|---|
-| **128** | **20** | **5** | **3.8** | **4.4** | **100%** | **1.000** ← production |
-| 128 | 20 | 10 | 4.0 | 6.2 | 100% | 1.000 |
-| 128 | 20 | 15 | 5.0 | 7.0 | 100% | 1.000 |
-| 200 | 20 | 5 | 5.9 | 7.4 | 100% | 1.000 |
-| 256 | 20 | 5 | 9.6 | 13.9 | 100% | 1.000 |
-
-Note: 100% recall is partly because every question in `eval_set_specific.json`
-names its document. Re-run with a mixed vague/specific set for a harder read.
-
----
-
-## Latency improvement priorities (remaining)
-
-### P0 — GPU for generation
-Qwen2.5-7B on CPU is still 10–30s. If machine has a GPU, `OLLAMA_GPU_LAYERS=99`
-cuts this to 1–3s. Check with `ollama ps` — if it shows CPU, GPU is not being used.
-
-### P1 — Parallel claim verification
-`verify_all_claims()` calls Groq sequentially. `asyncio.gather()` would make all
-claims for one answer run in parallel. Expected 3–5× improvement on multi-claim answers.
-
-### P2 — Swap to Groq for generation (non-on-prem deployments)
-`USE_LOCAL_GENERATION=false` in `.env` enables `generate_groq.py`. Groq at
-~500 tok/s cuts generation to 2–5s. Trade-off: requires internet.
-
-### P3 — Async verification with span pre-check
-Cheap fuzzy string-containment check before each Groq judge call. Claims clearly
-present in the chunk are auto-SUPPORTED; clearly absent are auto-UNSUPPORTED.
-Only ambiguous cases go to Groq. Expected to cut Groq calls 30–50%.
-
----
-
-## Known limitations
-
-| # | Limitation | Impact | Planned fix |
-|---|---|---|---|
-| 1 | `Sessions()` is a global singleton in `main.py` | Concurrent users corrupt each other's `active_contract` state | Per-session-ID state keyed by UUID request header |
-| 2 | "Inmode" won't match the Invasix/Inmode document | User confusion using current brand name vs historical contract name | Also match against `raw_title` in `_mentions_different_contract` |
-| 3 | Verification checks faithfulness to cited chunk, not relevance to question | A SUPPORTED claim can still be off-topic | Separate relevance gate before faithfulness check |
-| 4 | Internal cross-references cited verbatim ("the date first written above") | Incomplete answers for date/party fields | Parent-chunk (small-to-big) retrieval |
-| 5 | `score_threshold=0.355` calibrated on document-naming queries only | No calibrated threshold for vague cold-start queries | Separate threshold for cold-start vs session-continuation paths |
-| 6 | LangSmith 403 noise in logs | Console noise only | `LANGCHAIN_TRACING_V2=false` in `.env` |
-
----
-
-## Environment variables (`.env`)
-
-```
-GROQ_API_KEY=...
-GEMINI_API_KEY=...
-USE_LOCAL_GENERATION=true      # false → Groq Llama for generation (needs internet)
-LANGCHAIN_TRACING_V2=false     # suppresses LangSmith 403 log noise
-```
-
----
-
-## Running tests
-
-```bash
-pytest -v                          # unit tests only (fast, no index/API needed)
-pytest -m integration -v           # integration tests (needs index + Ollama + Groq)
-pytest tests/test_load.py -v       # latency budget + concurrency tests
-python rerank_sweep_eval.py        # reranker config sweep (timing + recall)
-python calibrate_threshold.py      # recalibrate score_threshold after any pipeline change
-```
+1. **Load-test and likely raise `document_store.py`'s connection pool
+   size** (currently `max_conn=8`), or put PgBouncer in front of
+   Postgres. Not yet measured against real concurrent traffic --
+   flagged, not fixed.
+2. **Run the integration tier (`tests/integration/`) against a real
+   Postgres instance** -- written and reviewed correct, but not executed
+   in the sandboxed environment these tests were developed in (no
+   reachable Postgres install there). Needs `DATABASE_URL` in CI or any
+   real environment.
+3. **RQ retry/backoff worst case is 100 seconds** (`Retry(max=3,
+   interval=[10,30,60])`) before a history write either lands or
+   dead-letters. At scale, a real Postgres blip rate could produce a
+   meaningful backlog of in-flight retries -- worth a real load test
+   with a deliberately flaky Postgres proxy.
+4. **The 30-second cache-watcher poll interval is a real, user-facing
+   property**, not just an implementation detail: a newly uploaded
+   contract can be invisible to a given worker for up to 30s after
+   ingestion completes. Worth stating this plainly in user-facing docs
+   ("your document may take up to 30 seconds to become searchable"),
+   not just in code comments.
+5. **The known limitations already tracked before this phase** are
+   still open and weren't addressed by this phase (which was
+   infrastructure/reliability work, not retrieval-quality work):
+   - Identity extraction uses the historical contract name, not the
+     current brand -- queries using the current name miss the
+     entity-matching path (content-based retrieval still works).
+   - Verification confirms faithfulness to the cited chunk, not
+     relevance to the question -- a SUPPORTED claim can still be
+     off-topic if the wrong chunk was retrieved.
+   - Internal cross-references ("the date first written above") may be
+     cited verbatim rather than resolved to the actual value.
+6. **CORS hardening beyond the credentialed-cookie fix, PII/encryption-
+   at-rest on stored questions, ELK/Kibana operational logging, and an
+   admin API for user/policy management** were explicitly deferred at
+   the start of this phase and remain deferred.
+7. **The 3-Sentinel + 2-replica topology** (the actual target production
+   shape) was validated only at the 1-Sentinel + 1-replica level in this
+   round of testing -- the fuller topology proved fragile to orchestrate
+   reliably in a sandboxed test environment (unrelated to the
+   application code itself) and was deferred to a manual runbook
+   (documented in `tests/failover/test_sentinel_failover.py`) rather
+   than forced into automation. Worth re-running that runbook once in a
+   more stable environment (real docker-compose, or a VM) before fully
+   trusting the 3-node quorum behavior in production.
