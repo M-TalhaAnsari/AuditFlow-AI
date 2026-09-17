@@ -31,6 +31,8 @@ from core.http_handlers import register_exception_handlers
 from schemas.auth import CurrentUser
 from schemas.session import AskResponse
 
+from prometheus_fastapi_instrumentator import Instrumentator
+
 setup_logging()
 
 pipeline = Sessions()
@@ -46,6 +48,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="AuditFlow", lifespan=lifespan)
 register_exception_handlers(app)
+Instrumentator().instrument(app).expose(app, endpoint="/metrics")
 app.include_router(auth_router)
 
 _cors_origins_raw = os.environ.get("CORS_ALLOWED_ORIGINS", "")

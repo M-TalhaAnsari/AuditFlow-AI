@@ -10,6 +10,7 @@ from dataclasses import dataclass, asdict, field
 from typing import Optional
 
 from src.auditflow.orchestration.redis_client import get_primary
+from core.metrics import SESSION_LOCK_WAIT_SECONDS, SESSION_LOCK_TIMEOUTS
 
 SESSION_TTL_SECONDS = 3600
 LOCK_TIMEOUT_SECONDS = 10
@@ -63,8 +64,10 @@ class SessionStore:
             timeout=LOCK_TIMEOUT_SECONDS,
             blocking_timeout=5,
         )
-        acquired = lock.acquire()
+        with SESSION_LOCK_WAIT_SECONDS.time():
+            acquired = lock.acquire()
         if not acquired:
+            SESSION_LOCK_TIMEOUTS.inc()
             raise TimeoutError(f"Could not acquire session lock for {username}")
         try:
             yield
