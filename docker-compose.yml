@@ -22,6 +22,8 @@ services:
         condition: service_started
     networks:
       - verirag-network
+
+
   redis-primary:
     image: redis:7-alpine
     command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
@@ -95,6 +97,34 @@ services:
         condition: service_healthy
     networks:
       - verirag-network
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports: ["9090:9090"]
+
+  grafana:
+    image: grafana/grafana:latest
+    ports: ["3000:3000"]
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana-data:/var/lib/grafana
+
+  redis-exporter:
+    image: oliver006/redis_exporter
+    environment:
+      - REDIS_ADDR=redis://redis:6379
+    ports: ["9121:9121"]
+
+  postgres-exporter:
+    image: quay.io/prometheuscommunity/postgres-exporter
+    environment:
+      - DATA_SOURCE_NAME=postgresql://user:pass@postgres:5432/auditflow?sslmode=disable
+    ports: ["9187:9187"]
+
+volumes:
+  grafana-data:
 
 networks:
   verirag-network:
