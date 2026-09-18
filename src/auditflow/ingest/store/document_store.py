@@ -35,6 +35,7 @@ from psycopg2.pool import SimpleConnectionPool
 
 from schemas.errors import IngestionError
 from src.auditflow.ingest.models import ChunkRecord, DocumentRecord
+from core.metrics import PG_POOL_IN_USE, PG_POOL_MAX
 
 _pool: SimpleConnectionPool | None = None
 
@@ -44,6 +45,8 @@ def init_pool(min_conn: int = 1, max_conn: int = 8, dsn: str | None = None):
     if _pool is None:
         try:
             _pool = SimpleConnectionPool(min_conn, max_conn, dsn or os.environ["DATABASE_URL"])
+            PG_POOL_MAX.set(max_conn)
+            PG_POOL_IN_USE.set(0)
         except (psycopg2.Error, KeyError) as exc:
             raise IngestionError("Failed to initialize Postgres connection pool") from exc
     return _pool
@@ -53,6 +56,7 @@ def init_pool(min_conn: int = 1, max_conn: int = 8, dsn: str | None = None):
 def _cursor():
     pool = init_pool()
     conn = pool.getconn()
+    PG_POOL_IN_USE.inc()
     try:
         with conn:
             with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
@@ -62,6 +66,7 @@ def _cursor():
                     raise IngestionError("Postgres query failed", detail={"pg_error": str(exc)}) from exc
     finally:
         pool.putconn(conn)
+        PG_POOL_IN_USE.dec()
 
 
 def apply_schema(schema_path: str = "src/auditflow/ingest/store/schema.sql"):

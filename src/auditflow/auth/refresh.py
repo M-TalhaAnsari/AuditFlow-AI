@@ -12,6 +12,7 @@ from datetime import datetime, timedelta, timezone
 from schemas.errors import AuthenticationError
 from src.auditflow.auth.security import generate_refresh_token
 from src.auditflow.ingest.store import document_store
+from core.metrics import REFRESH_TOKEN_REUSE_TOTAL
 
 REFRESH_TOKEN_EXPIRY = timedelta(days=7)
 
@@ -78,6 +79,7 @@ def rotate_refresh_token(raw_token: str) -> tuple[str, IssuedRefreshToken]:
                 """,
                 (now, username),
             )
+            REFRESH_TOKEN_REUSE_TOTAL.inc()
             raise AuthenticationError("Refresh token reuse detected; all sessions revoked, please log in again")
 
         if expires_at < now:

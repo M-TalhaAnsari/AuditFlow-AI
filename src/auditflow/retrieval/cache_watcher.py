@@ -8,6 +8,12 @@ import asyncio
 import contextlib
 
 from core.logging_config import logger
+from core.metrics import (
+    CACHE_RELOAD_FAILURES,
+    CACHE_RELOAD_TOTAL,
+    INDEX_VERSION_CURRENT,
+    INDEX_VERSION_LOADED,
+)
 from src.auditflow.orchestration.redis_client import get_primary
 
 INDEX_VERSION_KEY = "index:version"
@@ -37,8 +43,10 @@ async def watch_index_version(reload_callbacks: list) -> None:
     while True:
         try:
             current = _get_current_version()
+            INDEX_VERSION_CURRENT.set(current)
             if _last_seen_version is None:
                 _last_seen_version = current
+                INDEX_VERSION_LOADED.set(current)
             elif current > _last_seen_version:
                 logger.info(
                     "index:version advanced %s -> %s, reloading caches",
@@ -47,7 +55,10 @@ async def watch_index_version(reload_callbacks: list) -> None:
                 for callback in reload_callbacks:
                     await asyncio.to_thread(callback)
                 _last_seen_version = current
+                INDEX_VERSION_LOADED.set(current)
+                CACHE_RELOAD_TOTAL.inc()
         except Exception:
+            CACHE_RELOAD_FAILURES.inc()
             logger.exception("index-version watch iteration failed, will retry next interval")
 
         await asyncio.sleep(POLL_INTERVAL_SECONDS)

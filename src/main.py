@@ -17,6 +17,7 @@ if root_dir not in sys.path:
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, field_validator
+from prometheus_fastapi_instrumentator import Instrumentator
 from redis.exceptions import ConnectionError as RedisConnectionError
 
 from src.auditflow.orchestration.pipeline import Sessions
@@ -30,8 +31,6 @@ from core.logging_config import logger, setup_logging
 from core.http_handlers import register_exception_handlers
 from schemas.auth import CurrentUser
 from schemas.session import AskResponse
-
-from prometheus_fastapi_instrumentator import Instrumentator
 
 setup_logging()
 
@@ -48,8 +47,14 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="AuditFlow", lifespan=lifespan)
 register_exception_handlers(app)
-Instrumentator().instrument(app).expose(app, endpoint="/metrics")
 app.include_router(auth_router)
+
+# Exposes /metrics: request latency histograms + status-code counters per
+# route out of the box. Custom metrics (session lock waits, cache staleness,
+# pool saturation, token-reuse events) live in core/metrics.py and are
+# registered on the same default REGISTRY, so they show up on the same
+# /metrics endpoint automatically -- no separate wiring needed.
+Instrumentator().instrument(app).expose(app, endpoint="/metrics")
 
 _cors_origins_raw = os.environ.get("CORS_ALLOWED_ORIGINS", "")
 _cors_origins = [o.strip() for o in _cors_origins_raw.split(",") if o.strip()]
