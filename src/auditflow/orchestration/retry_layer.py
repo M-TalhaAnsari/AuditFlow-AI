@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import re
+
 from src.auditflow.retrieval.retrieve import get_all_chunks
 from schemas.errors import RetrievalError
 from schemas.generation import GenerationResult
@@ -27,10 +29,22 @@ REFORMULATION_TEMPLATE = {
 
 
 def reformulate_query(question: str) -> str | None:
-    """Returns None if no known pattern matches."""
+    """Returns None if no known pattern matches.
+
+    QA FIX: previously used `if trigger in ques`, a raw substring check --
+    "signed" matched inside "designed", "parties" matched inside
+    "counterparties", etc. Now matches on word boundaries (`\\b`), so a
+    trigger only fires when it appears as a whole word (or, for
+    multi-word triggers like "effective date", as a whole phrase).
+    Confirmed against the two cases that previously misfired:
+    "specially designed" no longer triggers "signed", and "counterparties"
+    no longer triggers "parties" (harmless before, but for the wrong
+    reason -- word-boundary matching is correct regardless of whether a
+    given false positive happened to be benign).
+    """
     ques = question.lower()
     for trigger, real_phrasing in REFORMULATION_TEMPLATE.items():
-        if trigger in ques:
+        if re.search(rf"\b{re.escape(trigger)}\b", ques):
             return real_phrasing
     return None
 

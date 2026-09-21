@@ -28,16 +28,21 @@ CREATE TABLE IF NOT EXISTS chunks (
 
 CREATE INDEX IF NOT EXISTS idx_chunks_document_id ON chunks(document_id);
 
--- Needed for gen_random_uuid() below on Postgres < 13 (core since PG13,
--- but this keeps the schema portable to older instances). Harmless no-op
--- if already available.
-CREATE EXTENSION IF NOT EXISTS pgcrypto;
-
-CREATE TABLE IF NOT EXISTS users (
-    user_id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    username        TEXT UNIQUE NOT NULL,
-    password_hash   TEXT NOT NULL,
-    role            TEXT NOT NULL CHECK (role IN ('viewer', 'employee', 'ceo', 'admin')),
-    is_active       BOOLEAN NOT NULL DEFAULT TRUE,
-    created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
-);
+-- QA FIX: this file previously also created a `users` table here, with a
+-- DIFFERENT column set (user_id UUID primary key) than the one Alembic's
+-- 0001_add_users_table migration creates (username as primary key, no
+-- user_id at all). Nothing in this codebase reads user_id -- it was
+-- unused. Worse: because apply_schema() (this file) uses
+-- CREATE TABLE IF NOT EXISTS but Alembic's op.create_table does not, the
+-- natural setup order (ingest documents first via build_index.py, run
+-- migrations later) made `alembic upgrade head` fail outright with
+-- DuplicateTable. Confirmed against a real Postgres database; see
+-- tests/integration/test_schema_migration_ordering.py.
+--
+-- 0001_add_users_table.py's own docstring already says "documents/chunks
+-- were created earlier via schema.sql... intentionally left alone here"
+-- -- i.e. Alembic was always meant to be the sole owner of `users` going
+-- forward. This file removes the stale duplicate rather than
+-- special-casing the order elsewhere. `users` now belongs to Alembic
+-- only (0001_add_users_table, plus 0004_add_role_check_constraint for
+-- the role CHECK this file used to provide).

@@ -39,29 +39,37 @@ def test_reformulate_query_is_case_insensitive():
     assert reformulate_query("GOVERNING LAW of this contract") is not None
 
 
-def test_QA_FINDING_substring_match_false_positive_on_unrelated_word():
-    """reformulate_query does `if trigger in ques` -- a raw substring
-    check against the lowercased question, not a word-boundary check.
-    "signed" is a trigger key. "designed" contains "signed" as a
-    substring ("de|signed|"). So a question about e.g. a "specially
-    designed" clause reformulates as if the user asked about signing,
-    which is very likely to hurt the retry rather than help it -- the
-    reformulation feeds a wrong phrase into a widened, re-scored search.
+def test_QA_FIX_real_trigger_still_matches_as_a_whole_word():
+    """Confirms the word-boundary fix didn't overcorrect into missing
+    legitimate matches -- "signed" as an actual whole word must still
+    fire, including right up against punctuation."""
+    assert reformulate_query("When was this contract signed?") == "made and entered into as of"
 
-    This asserts CURRENT (bug) behavior. Fix: match on word boundaries
-    (e.g. `re.search(rf"\\b{trigger}\\b", ques)`) rather than plain `in`.
+
+def test_QA_FIX_multiword_trigger_still_matches():
+    assert reformulate_query("What is the effective date here?") == "dated as of"
+
+
+def test_QA_FIX_no_false_positive_on_unrelated_word_containing_a_trigger():
+    """Previously: reformulate_query did `if trigger in ques` -- a raw
+    substring check. "signed" is a trigger key, and "designed" contains
+    "signed" as a substring ("de|signed|"), so a question about e.g. a
+    "specially designed" clause used to reformulate as if the user asked
+    about signing -- feeding the wrong phrase into a widened, re-scored
+    search. Fixed with a word-boundary regex. This asserts the FIXED
+    behavior: no trigger fires here anymore.
     """
     result = reformulate_query("Is the equipment specially designed for this use?")
-    assert result == "made and entered into as of"  # the "signed" trigger firing
+    assert result is None
 
 
-def test_QA_FINDING_substring_match_false_positive_parties_in_counterparties():
-    """Same class of bug via a different trigger: "parties" is a trigger
-    key, and "counterparties" contains it as a substring. Coincidentally
-    harmless here since both triggers map to related legal phrasing, but
-    it's the same unguarded `in` check, not a deliberate synonym list."""
+def test_QA_FIX_no_false_positive_parties_inside_counterparties():
+    """Same bug class, different trigger: "parties" no longer matches
+    inside "counterparties". This particular false positive happened to
+    map to a related, harmless phrase before the fix -- but that was
+    luck, not correctness, and the fix applies uniformly."""
     result = reformulate_query("How are counterparties defined in this deal?")
-    assert result == "by and between"
+    assert result is None
 
 
 def test_reformulate_query_first_matching_trigger_wins_by_dict_order():
