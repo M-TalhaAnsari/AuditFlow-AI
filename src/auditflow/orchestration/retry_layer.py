@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 from src.auditflow.retrieval.retrieve import get_all_chunks
@@ -48,15 +47,29 @@ def get_scoped_context(
     top_k: int = 5,
     fallback_score_threshold: float = -4.0,
     include_preamble: bool = True,
+    prefetched_context: RetrievalContext | None = None,
 ) -> RetrievalContext | None:
     """Retrieval scoped to one confirmed document. top_k is widened by the
     caller on retry. Raises RetrievalError if the underlying retrieval call
     itself fails (index/embedding error) -- returns None only when
-    retrieval succeeded but this document simply has no matching chunks."""
-    try:
-        full_context: RetrievalContext = full_context_fn(question)
-    except Exception as exc:  # noqa: BLE001 -- narrow at the retrieve.py boundary
-        raise RetrievalError(f"Retrieval failed for question: {question!r}") from exc
+    retrieval succeeded but this document simply has no matching chunks.
+
+    prefetched_context: when the caller already has a RetrievalContext for
+    `question` (e.g. Sessions._generate_and_verify already ran full
+    retrieval once to determine consistency/top_contract), pass it here to
+    skip a second, redundant full_context_fn(question) call -- that call
+    re-runs the entire BM25+FAISS+cross-encoder-rerank pipeline, which is
+    the single most expensive step in the request. Only meaningful on the
+    first pass; the retry pass always needs a fresh call since it searches
+    with a different (reformulated) query prefetched_context can't cover.
+    """
+    if prefetched_context is not None:
+        full_context = prefetched_context
+    else:
+        try:
+            full_context = full_context_fn(question)
+        except Exception as exc:  # noqa: BLE001 -- narrow at the retrieve.py boundary
+            raise RetrievalError(f"Retrieval failed for question: {question!r}") from exc
 
     matching = [c for c in full_context.chunks if c.document_id == document_id]
     scoped_chunks: list[ChunkMatch] = matching[:top_k]
@@ -97,8 +110,12 @@ def generate_with_bounded_retry(
     document_id: str,
     generate_fn,
     full_context_fn,
+    prefetched_context: RetrievalContext | None = None,
 ) -> GenerationResult | None:
-    scoped = get_scoped_context(question, document_id, full_context_fn, top_k=5)
+    scoped = get_scoped_context(
+        question, document_id, full_context_fn, top_k=5,
+        prefetched_context=prefetched_context,
+    )
     if scoped is None:
         return None
     result: GenerationResult = generate_fn(question, scoped.chunks)

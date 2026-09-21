@@ -23,12 +23,19 @@ else:
     from src.auditflow.generation.generate_groq import generate_answer_groq as generate_answer
 
 
-def answer_with_retry(question: str, document_id: str) -> GenerationResult | None:
-    """Thin wrapper binding the retry layer to this pipeline's functions."""
+def answer_with_retry(
+    question: str,
+    document_id: str,
+    prefetched_context=None,
+) -> GenerationResult | None:
+    """Thin wrapper binding the retry layer to this pipeline's functions.
+
+    """
     return generate_with_bounded_retry(
         question, document_id,
         generate_fn=generate_answer,
         full_context_fn=get_verification_context,
+        prefetched_context=prefetched_context,
     )
 
 
@@ -134,7 +141,7 @@ class Sessions:
         if consistency.is_confident:
             state.active_contract = consistency.top_contract
             state.pending_question = None
-            return self._generate_and_verify(question, consistency, context.chunks)
+            return self._generate_and_verify(question, context)
 
         return self._handle_low_confidence(question, consistency, state)
 
@@ -196,18 +203,28 @@ class Sessions:
         logger.info("Found %s, but not confident it answers the question.", consistency.top_contract)
         return AskResponse.low_relevance(consistency.top_contract)
 
-    def _generate_and_verify(self, question: str, consistency, chunks) -> AskResponse:
+    def _generate_and_verify(self, question: str, context) -> AskResponse:
+        consistency = context.consistency
         logger.info(
             "[CONFIDENT] top_document=%s concentration=%.2f avg_score=%.3f",
             consistency.top_contract, consistency.concentration, consistency.avg_top_score,
         )
         top_doc = consistency.top_contract
-        scoped_chunks = [c for c in chunks if c.document_id == top_doc][:5]
 
         try:
-            result: GenerationResult = generate_answer(question, scoped_chunks)
+            result: GenerationResult | None = answer_with_retry(
+                question, top_doc, prefetched_context=context,
+            )
         except Exception as exc:  # noqa: BLE001 -- narrow boundary to generate.py
             raise GenerationError(f"Generation failed for document {top_doc}") from exc
+
+        if result is None:
+            # get_scoped_context found no chunks for top_doc even though
+            # consistency.top_contract named it -- should not happen in
+            # practice (top_contract is derived from these same chunks),
+            # but treat it as low-relevance rather than crashing.
+            logger.warning("No scoped chunks found for confident top_contract=%s", top_doc)
+            return AskResponse.low_relevance(top_doc)
 
         verified_claims = _verify(result.claims, self.chunk_lookup)
         _log_claims(verified_claims)

@@ -71,6 +71,27 @@ def rotate_refresh_token(raw_token: str) -> tuple[str, IssuedRefreshToken]:
         username, expires_at, revoked_at = row["username"], row["expires_at"], row["revoked_at"]
 
         if revoked_at is not None:
+            reuse_detected = True
+        elif expires_at < now:
+            raise AuthenticationError("Refresh token expired, please log in again")
+        else:
+            cur.execute(
+                "UPDATE refresh_tokens SET revoked_at = %s WHERE token_hash = %s",
+                (now, token_hash),
+            )
+
+            new_raw_token = generate_refresh_token()
+            new_expires_at = now + REFRESH_TOKEN_EXPIRY
+            cur.execute(
+                """
+                INSERT INTO refresh_tokens (username, token_hash, issued_at, expires_at)
+                VALUES (%s, %s, %s, %s)
+                """,
+                (username, _hash(new_raw_token), now, new_expires_at),
+            )
+            reuse_detected = False
+    if reuse_detected:
+        with document_store._cursor() as cur:
             cur.execute(
                 """
                 UPDATE refresh_tokens
@@ -79,25 +100,8 @@ def rotate_refresh_token(raw_token: str) -> tuple[str, IssuedRefreshToken]:
                 """,
                 (now, username),
             )
-            REFRESH_TOKEN_REUSE_TOTAL.inc()
-            raise AuthenticationError("Refresh token reuse detected; all sessions revoked, please log in again")
-
-        if expires_at < now:
-            raise AuthenticationError("Refresh token expired, please log in again")
-        cur.execute(
-            "UPDATE refresh_tokens SET revoked_at = %s WHERE token_hash = %s",
-            (now, token_hash),
-        )
-
-        new_raw_token = generate_refresh_token()
-        new_expires_at = now + REFRESH_TOKEN_EXPIRY
-        cur.execute(
-            """
-            INSERT INTO refresh_tokens (username, token_hash, issued_at, expires_at)
-            VALUES (%s, %s, %s, %s)
-            """,
-            (username, _hash(new_raw_token), now, new_expires_at),
-        )
+        REFRESH_TOKEN_REUSE_TOTAL.inc()
+        raise AuthenticationError("Refresh token reuse detected; all sessions revoked, please log in again")
 
     return username, IssuedRefreshToken(raw_token=new_raw_token, expires_at=new_expires_at)
 
