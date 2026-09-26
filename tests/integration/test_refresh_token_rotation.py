@@ -1,15 +1,9 @@
 """
 tests/integration/test_refresh_token_rotation.py
 
-Runs against a real Postgres (see conftest.py: either TEST_DATABASE_URL
-or testcontainers), migrated with the real alembic revisions -- not a
-hand-rolled schema. refresh_tokens has no FK to users, so tests create
-tokens for arbitrary usernames without needing a real user row.
 """
-import time
-from datetime import datetime, timedelta, timezone
 
-import psycopg2.extras
+from datetime import datetime, timedelta, timezone
 import pytest
 
 from schemas.errors import AuthenticationError
