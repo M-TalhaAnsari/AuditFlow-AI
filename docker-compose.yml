@@ -59,7 +59,7 @@ services:
     ports:
       - "26379:26379"
     volumes:
-      - "./sentinel.conf:/etc/sentinel.conf"
+      - "./sentinel-1.conf:/etc/sentinel.conf"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
@@ -74,7 +74,7 @@ services:
     ports:
       - "26380:26379"
     volumes:
-      - "./sentinel.conf:/etc/sentinel.conf"
+      - "./sentinel-2.conf:/etc/sentinel.conf"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
@@ -89,7 +89,7 @@ services:
     ports:
       - "26381:26379"
     volumes:
-      - "./sentinel.conf:/etc/sentinel.conf"
+      - "./sentinel-3.conf:/etc/sentinel.conf"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:

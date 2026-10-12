@@ -5,7 +5,16 @@ src/auditflow/orchestration/history_queue.py
 from __future__ import annotations
 
 from rq import Queue
-from rq.retry import Retry
+try:
+    from rq.retry import Retry
+except ImportError:
+    try:
+        from rq.utils import Retry
+    except ImportError:
+        # Fallback dummy class if rq version completely lacks it
+        class Retry:
+            def __init__(self, *args, **kwargs):
+                pass
 
 from src.auditflow.orchestration.redis_client import get_primary
 from schemas.session import AskResponse
