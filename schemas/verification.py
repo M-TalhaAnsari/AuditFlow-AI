@@ -4,6 +4,7 @@ Pydantic schemas for the LLM-as-judge verification step (verify.py).
 from __future__ import annotations
 
 from enum import Enum
+from typing import Literal
 
 from pydantic import BaseModel
 
@@ -35,10 +36,15 @@ class VerifiedClaim(BaseModel):
         return VERDICT_BADGE[self.verdict]
 
 
+JudgeVerdictValue = Literal[Verdict.SUPPORTED, Verdict.PARTIAL, Verdict.UNSUPPORTED]
+
+
 class JudgeVerdict(BaseModel):
     """Raw shape of what the Groq judge call itself returns -- just
     verdict + reason. NO_ANSWER is intentionally excluded: that verdict is
     only ever assigned by the pre-LLM short-circuit in verify.py (claim
-    had no source_chunk_id to begin with), never requested from the judge."""
-    verdict: Verdict
+    had no source_chunk_id to begin with), never requested from the judge.
+    Enforced by the Literal below: a judge reply of NO_ANSWER fails
+    validation, gets retried, and finally fails safe to UNSUPPORTED."""
+    verdict: JudgeVerdictValue
     reason: str
