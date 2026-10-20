@@ -1,3 +1,4 @@
+
 services:
   fastapi:
     build:
@@ -22,7 +23,6 @@ services:
         condition: service_started
     networks:
       - verirag-network
-
 
   redis-primary:
     image: redis:7-alpine
@@ -55,11 +55,16 @@ services:
 
   sentinel-1:
     image: redis:7-alpine
-    command: redis-sentinel /etc/sentinel.conf
+    command: >
+      sh -c 'if [ ! -f /data/sentinel.conf ]; then
+      cp /etc/sentinel-template.conf /data/sentinel.conf;
+      fi;
+      exec redis-sentinel /data/sentinel.conf'
     ports:
       - "26379:26379"
     volumes:
-      - "./sentinel-1.conf:/etc/sentinel.conf"
+      - "./sentinel-1.conf:/etc/sentinel-template.conf:ro"
+      - "sentinel1-data:/data"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
@@ -70,11 +75,16 @@ services:
 
   sentinel-2:
     image: redis:7-alpine
-    command: redis-sentinel /etc/sentinel.conf
+    command: >
+      sh -c 'if [ ! -f /data/sentinel.conf ]; then
+      cp /etc/sentinel-template.conf /data/sentinel.conf;
+      fi;
+      exec redis-sentinel /data/sentinel.conf'
     ports:
       - "26380:26379"
     volumes:
-      - "./sentinel-2.conf:/etc/sentinel.conf"
+      - "./sentinel-2.conf:/etc/sentinel-template.conf:ro"
+      - "sentinel2-data:/data"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
@@ -85,11 +95,16 @@ services:
 
   sentinel-3:
     image: redis:7-alpine
-    command: redis-sentinel /etc/sentinel.conf
+    command: >
+      sh -c 'if [ ! -f /data/sentinel.conf ]; then
+      cp /etc/sentinel-template.conf /data/sentinel.conf;
+      fi;
+      exec redis-sentinel /data/sentinel.conf'
     ports:
       - "26381:26379"
     volumes:
-      - "./sentinel-3.conf:/etc/sentinel.conf"
+      - "./sentinel-3.conf:/etc/sentinel-template.conf:ro"
+      - "sentinel3-data:/data"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
@@ -97,34 +112,50 @@ services:
         condition: service_healthy
     networks:
       - verirag-network
+
   prometheus:
     image: prom/prometheus:latest
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    ports: ["9090:9090"]
+    ports:
+      - "9090:9090"
+    networks:
+      - verirag-network
 
   grafana:
     image: grafana/grafana:latest
-    ports: ["3000:3000"]
+    ports:
+      - "3000:3000"
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
     volumes:
       - grafana-data:/var/lib/grafana
+    networks:
+      - verirag-network
 
   redis-exporter:
     image: oliver006/redis_exporter
     environment:
-      - REDIS_ADDR=redis://redis:6379
-    ports: ["9121:9121"]
+      - REDIS_ADDR=redis://redis-primary:6379
+    ports:
+      - "9121:9121"
+    networks:
+      - verirag-network
 
   postgres-exporter:
     image: quay.io/prometheuscommunity/postgres-exporter
     environment:
       - DATA_SOURCE_NAME=postgresql://user:pass@postgres:5432/auditflow?sslmode=disable
-    ports: ["9187:9187"]
+    ports:
+      - "9187:9187"
+    networks:
+      - verirag-network
 
 volumes:
   grafana-data:
+  sentinel1-data:
+  sentinel2-data:
+  sentinel3-data:
 
 networks:
   verirag-network:
