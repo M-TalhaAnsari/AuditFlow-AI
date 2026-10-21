@@ -1,0 +1,14 @@
+# Test/dev tooling on top of the runtime deps. Install with:
+#   pip install -r requirements-dev.txt
+-r requirements.txt
+
+pytest==9.1.1
+# unit tier: fake Redis; redis-py locks use Lua EVALSHA, so fakeredis needs lupa
+fakeredis==2.38.0
+lupa==2.8
+# integration tier: real Postgres via TEST_DATABASE_URL, else testcontainers
+testcontainers[postgres]==4.15.0
+alembic==1.20.0
+# SQLAlchemy is pinned in requirements.txt; tests/integration/conftest.py
+# also needs psycopg v3 in addition to psycopg2-binary
+psycopg[binary]==3.3.6

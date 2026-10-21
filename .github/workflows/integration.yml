@@ -1,14 +1,76 @@
 # .github/workflows/integration.yml
-name: integration-tests
+name: tests
 on: [push, pull_request]
+
 jobs:
-  integration:
+  unit-and-integration:
+    runs-on: ubuntu-latest
+    services:
+      # Disposable Postgres. NEVER point TEST_DATABASE_URL at a real
+      # database: the integration tier TRUNCATEs tables after every test.
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: auditflow_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/auditflow_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
+      - run: pip install -r requirements-dev.txt
+      # unit needs no Redis daemon (fakeredis); integration uses the Postgres above
+      - run: pytest tests/unit tests/integration -v --junitxml=results/integration.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: integration-results
+          path: results/integration.xml
+
+  redis-tiers:
+    # concurrency: real Redis + Sentinel on localhost:26379 (master 6390).
+    # failover: self-contained, spawns its own cluster on 6501/6502/26501.
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with: { python-version: '3.12' }
-      - run: pip install -r requirements.txt testcontainers[postgres]
-      - run: pytest tests/integration/ -v --junitxml=results/integration.xml
-      - uses: actions/upload-artifact@v4
-        with: { name: integration-results, path: results/integration.xml }
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
+      - run: pip install -r requirements-dev.txt
+      - name: Install redis-server
+        run: sudo apt-get update && sudo apt-get install -y redis-server
+      - name: Start master (6390) and Sentinel (26379) for tests/concurrency
+        run: |
+          redis-server --port 6390 --daemonize yes
+          cat > "$RUNNER_TEMP/sentinel.conf" <<EOF
+          port 26379
+          sentinel monitor auditflow-redis 127.0.0.1 6390 1
+          sentinel down-after-milliseconds auditflow-redis 2000
+          sentinel failover-timeout auditflow-redis 10000
+          EOF
+          redis-server "$RUNNER_TEMP/sentinel.conf" --sentinel --daemonize yes
+          for i in $(seq 1 20); do
+            redis-cli -p 26379 sentinel master auditflow-redis >/dev/null 2>&1 && break
+            sleep 0.5
+          done
+          redis-cli -p 26379 sentinel master auditflow-redis | head -4
+      - run: pytest tests/concurrency tests/failover -v
+        env:
+          SENTINEL_HOSTS: localhost:26379
