@@ -48,6 +48,14 @@ PG_POOL_MAX = Gauge(
     "auditflow_pg_pool_connections_max",
     "Configured max_conn size of the Postgres pool",
 )
+PG_POOL_WAIT_SECONDS = Histogram(
+    "auditflow_pg_pool_wait_seconds",
+    "Time spent waiting for a free Postgres connection slot (queueing, not query time)",
+)
+PG_POOL_TIMEOUTS = Counter(
+    "auditflow_pg_pool_timeouts_total",
+    "Times a caller gave up waiting for a Postgres connection (pool too small or queries too slow)",
+)
 
 # refresh.py -- Phase 2 refresh-token theft detection
 REFRESH_TOKEN_REUSE_TOTAL = Counter(

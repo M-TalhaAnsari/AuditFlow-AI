@@ -26,47 +26,117 @@ CHANGED vs original:
   by Stage 2's refresh-token rotation) is NOT included here -- that's
   real work for when you actually build Stage 2, not added speculatively.
 """
+import logging
 import os
+import select
+import threading
+import time
 from contextlib import contextmanager
 
 import psycopg2
 import psycopg2.extras
-from psycopg2.pool import SimpleConnectionPool
+from psycopg2.pool import ThreadedConnectionPool
 
-from schemas.errors import IngestionError
+from schemas.errors import IngestionError, UpstreamTimeoutError
 from src.auditflow.ingest.models import ChunkRecord, DocumentRecord
-from core.metrics import PG_POOL_IN_USE, PG_POOL_MAX
+from core.metrics import PG_POOL_IN_USE, PG_POOL_MAX, PG_POOL_TIMEOUTS, PG_POOL_WAIT_SECONDS
 
-_pool: SimpleConnectionPool | None = None
+logger = logging.getLogger("auditflow")
+
+# How long a caller waits for a free connection before giving up (seconds).
+PG_POOL_ACQUIRE_TIMEOUT = float(os.environ.get("PG_POOL_ACQUIRE_TIMEOUT_SECONDS", "10"))
+PG_POOL_MAX_CONN = int(os.environ.get("PG_POOL_MAX_CONN", "8"))
+
+_pool: ThreadedConnectionPool | None = None
+# One slot per allowed connection. psycopg2's pools never block: SimpleConnectionPool
+# is not thread-safe and does NOT enforce max_conn when connects overlap (measured:
+# 40 threads on max_conn=8 opened 28 server connections); ThreadedConnectionPool
+# enforces the cap but raises PoolError immediately when full. This semaphore is
+# what makes callers queue instead, so the cap holds AND requests wait, not fail.
+_pool_slots: threading.BoundedSemaphore | None = None
+_pool_init_lock = threading.Lock()
 
 
-def init_pool(min_conn: int = 1, max_conn: int = 8, dsn: str | None = None):
-    global _pool
+def init_pool(min_conn: int | None = None, max_conn: int | None = None, dsn: str | None = None):
+    """min_conn defaults to max_conn on purpose. psycopg2's pools close any
+    returned connection once min_conn are idle, so with the old min_conn=1
+    every request beyond the first concurrent one opened (and then threw away)
+    a brand-new Postgres connection: measured 3,000 -> ~100 calls/s as soon as
+    concurrency passed min_conn. Keeping max_conn connections open removes that
+    cliff (flat ~5,000 calls/s up to max_conn threads). Stale connections are
+    handled at checkout, see _checkout()."""
+    global _pool, _pool_slots
     if _pool is None:
-        try:
-            _pool = SimpleConnectionPool(min_conn, max_conn, dsn or os.environ["DATABASE_URL"])
-            PG_POOL_MAX.set(max_conn)
-            PG_POOL_IN_USE.set(0)
-        except (psycopg2.Error, KeyError) as exc:
-            raise IngestionError("Failed to initialize Postgres connection pool") from exc
+        with _pool_init_lock:
+            if _pool is None:  # re-check: another thread may have won the race
+                max_conn = max_conn if max_conn is not None else PG_POOL_MAX_CONN
+                min_conn = min_conn if min_conn is not None else max_conn
+                try:
+                    pool = ThreadedConnectionPool(min_conn, max_conn, dsn or os.environ["DATABASE_URL"])
+                except (psycopg2.Error, KeyError) as exc:
+                    raise IngestionError("Failed to initialize Postgres connection pool") from exc
+                _pool_slots = threading.BoundedSemaphore(max_conn)
+                PG_POOL_MAX.set(max_conn)
+                PG_POOL_IN_USE.set(0)
+                _pool = pool  # published last, after the slots exist
     return _pool
+
+
+def _is_stale(conn) -> bool:
+    """True if an IDLE pooled connection is no longer usable. psycopg2's own
+    conn.closed flag stays 0 after the server drops a connection (idle timeout,
+    failover, proxy restart, pg_terminate_backend) -- the next query then fails
+    with OperationalError. But a healthy idle connection never has bytes waiting
+    on its socket, while a dropped one is readable (EOF / error message), so a
+    zero-timeout select() spots it with no extra round trip."""
+    if conn.closed:
+        return True
+    try:
+        readable, _, _ = select.select([conn], [], [], 0)
+    except (OSError, ValueError):
+        return True
+    return bool(readable)
+
+
+def _checkout(pool):
+    """getconn() that never hands out a dead idle connection. Discards stale
+    ones (closing them) until it gets a live one; once the pool has no idle
+    connections left, getconn() opens a fresh one, which is live by definition."""
+    while True:
+        conn = pool.getconn()
+        if not _is_stale(conn):
+            return conn
+        logger.warning("[document_store] discarding stale pooled Postgres connection")
+        pool.putconn(conn, close=True)
 
 
 @contextmanager
 def _cursor():
     pool = init_pool()
-    conn = pool.getconn()
-    PG_POOL_IN_USE.inc()
+    slots = _pool_slots
+    started = time.monotonic()
+    if not slots.acquire(timeout=PG_POOL_ACQUIRE_TIMEOUT):
+        PG_POOL_TIMEOUTS.inc()
+        raise UpstreamTimeoutError(
+            "Timed out waiting for a free Postgres connection",
+            detail={"waited_seconds": round(time.monotonic() - started, 3)},
+        )
+    PG_POOL_WAIT_SECONDS.observe(time.monotonic() - started)
     try:
-        with conn:
-            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
-                try:
-                    yield cur
-                except psycopg2.Error as exc:
-                    raise IngestionError("Postgres query failed", detail={"pg_error": str(exc)}) from exc
+        conn = _checkout(pool)
+        PG_POOL_IN_USE.inc()
+        try:
+            with conn:
+                with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                    try:
+                        yield cur
+                    except psycopg2.Error as exc:
+                        raise IngestionError("Postgres query failed", detail={"pg_error": str(exc)}) from exc
+        finally:
+            PG_POOL_IN_USE.dec()
+            pool.putconn(conn)
     finally:
-        pool.putconn(conn)
-        PG_POOL_IN_USE.dec()
+        slots.release()  # always, or one failure permanently shrinks the pool
 
 
 def apply_schema(schema_path: str = "src/auditflow/ingest/store/schema.sql"):
