@@ -116,9 +116,10 @@ services:
   prometheus:
     image: prom/prometheus:latest
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    ports:
-      - "9090:9090"
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports: ["9090:9090"]
+    depends_on:
+      - fastapi
     networks:
       - verirag-network
 
@@ -127,9 +128,13 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
     volumes:
       - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      - prometheus
     networks:
       - verirag-network
 
@@ -137,17 +142,22 @@ services:
     image: oliver006/redis_exporter
     environment:
       - REDIS_ADDR=redis://redis-primary:6379
-    ports:
-      - "9121:9121"
+    ports: ["9121:9121"]
+    depends_on:
+      redis-primary:
+        condition: service_healthy
     networks:
       - verirag-network
 
+  # Opt-in: only for scraping the real (Neon) database. Needs a read-only
+  # monitoring role; put its DSN in .env as POSTGRES_EXPORTER_DSN, e.g.
+  # postgresql://USER:PW@HOST/DB?sslmode=require
   postgres-exporter:
     image: quay.io/prometheuscommunity/postgres-exporter
+    profiles: ["postgres-exporter"]
     environment:
-      - DATA_SOURCE_NAME=postgresql://user:pass@postgres:5432/auditflow?sslmode=disable
-    ports:
-      - "9187:9187"
+      - DATA_SOURCE_NAME=${POSTGRES_EXPORTER_DSN:-}
+    ports: ["9187:9187"]
     networks:
       - verirag-network
 

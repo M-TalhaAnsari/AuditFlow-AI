@@ -2,12 +2,27 @@ global:
   scrape_interval: 15s
 
 scrape_configs:
-  - job_name: auditflow-backend
+  - job_name: prometheus
     static_configs:
-      - targets: ["backend:8000"]   # scrapes /metrics from Step 1+2
+      - targets: ["localhost:9090"]
+
+  # FastAPI app: instrumentator HTTP metrics + core/metrics.py custom metrics,
+  # both served from /metrics on the same default registry. The compose
+  # service is named "fastapi" (not "backend").
+  - job_name: auditflow-backend
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["fastapi:8000"]
+
   - job_name: redis
     static_configs:
       - targets: ["redis-exporter:9121"]
-  - job_name: postgres
-    static_configs:
-      - targets: ["postgres-exporter:9187"]
+
+  # Postgres is Neon (not in this compose file). To scrape it, start the
+  # exporter with `docker compose --profile postgres-exporter up` after
+  # setting POSTGRES_EXPORTER_DSN in .env, then uncomment this job.
+  # Pool saturation is already covered by the app's own
+  # auditflow_pg_pool_* metrics without this.
+  # - job_name: postgres
+  #   static_configs:
+  #     - targets: ["postgres-exporter:9187"]

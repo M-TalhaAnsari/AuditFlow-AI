@@ -37,3 +37,6 @@ Thumbs.db
 audit_report.json
 *.png
 models/*
+
+# provisioned Grafana dashboards must be tracked
+!grafana/dashboards/*.json
