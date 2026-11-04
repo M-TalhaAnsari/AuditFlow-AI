@@ -1,0 +1,235 @@
+From 49cc58d229b1d1ece5c528ee3cb2a57b435d026d Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Wed, 21 Oct 2026 07:53:38 +0500
+Subject: [PATCH] Add missing runtime deps, requirements-dev.txt, and a real CI
+ workflow
+
+- requirements.txt: add prometheus-client, prometheus-fastapi-instrumentator
+  and rq. src/main.py imports the first at module top and history_queue
+  imports rq, so the Docker image (which installs only requirements.txt)
+  would crash on startup with ModuleNotFoundError.
+- requirements-dev.txt: pytest, fakeredis+lupa, testcontainers, alembic,
+  psycopg[binary]; includes requirements.txt.
+- Remove root test_unit_pipeline_matching.py: a strict subset of
+  tests/unit/test_pipeline_matching.py (5 fewer tests) that depended on a
+  fixture not defined for it, so it never ran.
+- CI: replace the integration-only workflow. Job 1 runs unit + integration
+  against a postgres:16 service via TEST_DATABASE_URL. Job 2 installs
+  redis-server, starts a master (6390) + Sentinel (26379), and runs the
+  concurrency and failover tiers. Both installed from requirements-dev.txt.
+
+Verified locally with the same commands: 73 unit + 18 integration + 6
+concurrency + 5 failover = 102 passed.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01EgSuF1U5kDij8YZySminES
+---
+ .github/workflows/integration.yml | 74 ++++++++++++++++++++++++++++---
+ requirements-dev.txt              | 14 ++++++
+ requirements.txt                  |  5 ++-
+ test_unit_pipeline_matching.py    | 69 ----------------------------
+ 4 files changed, 86 insertions(+), 76 deletions(-)
+ create mode 100644 requirements-dev.txt
+ delete mode 100644 test_unit_pipeline_matching.py
+
+diff --git a/.github/workflows/integration.yml b/.github/workflows/integration.yml
+index 910ad57..47f7dd8 100644
+--- a/.github/workflows/integration.yml
++++ b/.github/workflows/integration.yml
+@@ -1,14 +1,76 @@
+ # .github/workflows/integration.yml
+-name: integration-tests
++name: tests
+ on: [push, pull_request]
++
+ jobs:
+-  integration:
++  unit-and-integration:
+     runs-on: ubuntu-latest
++    services:
++      # Disposable Postgres. NEVER point TEST_DATABASE_URL at a real
++      # database: the integration tier TRUNCATEs tables after every test.
++      postgres:
++        image: postgres:16
++        env:
++          POSTGRES_USER: postgres
++          POSTGRES_PASSWORD: postgres
++          POSTGRES_DB: auditflow_test
++        ports: ["5432:5432"]
++        options: >-
++          --health-cmd "pg_isready -U postgres"
++          --health-interval 5s
++          --health-timeout 5s
++          --health-retries 10
++    env:
++      TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/auditflow_test
+     steps:
+       - uses: actions/checkout@v4
+       - uses: actions/setup-python@v5
+-        with: { python-version: '3.12' }
+-      - run: pip install -r requirements.txt testcontainers[postgres]
+-      - run: pytest tests/integration/ -v --junitxml=results/integration.xml
++        with:
++          python-version: "3.12"
++          cache: pip
++          cache-dependency-path: |
++            requirements.txt
++            requirements-dev.txt
++      - run: pip install -r requirements-dev.txt
++      # unit needs no Redis daemon (fakeredis); integration uses the Postgres above
++      - run: pytest tests/unit tests/integration -v --junitxml=results/integration.xml
+       - uses: actions/upload-artifact@v4
+-        with: { name: integration-results, path: results/integration.xml }
+\ No newline at end of file
++        if: always()
++        with:
++          name: integration-results
++          path: results/integration.xml
++
++  redis-tiers:
++    # concurrency: real Redis + Sentinel on localhost:26379 (master 6390).
++    # failover: self-contained, spawns its own cluster on 6501/6502/26501.
++    runs-on: ubuntu-latest
++    steps:
++      - uses: actions/checkout@v4
++      - uses: actions/setup-python@v5
++        with:
++          python-version: "3.12"
++          cache: pip
++          cache-dependency-path: |
++            requirements.txt
++            requirements-dev.txt
++      - run: pip install -r requirements-dev.txt
++      - name: Install redis-server
++        run: sudo apt-get update && sudo apt-get install -y redis-server
++      - name: Start master (6390) and Sentinel (26379) for tests/concurrency
++        run: |
++          redis-server --port 6390 --daemonize yes
++          cat > "$RUNNER_TEMP/sentinel.conf" <<EOF
++          port 26379
++          sentinel monitor auditflow-redis 127.0.0.1 6390 1
++          sentinel down-after-milliseconds auditflow-redis 2000
++          sentinel failover-timeout auditflow-redis 10000
++          EOF
++          redis-server "$RUNNER_TEMP/sentinel.conf" --sentinel --daemonize yes
++          for i in $(seq 1 20); do
++            redis-cli -p 26379 sentinel master auditflow-redis >/dev/null 2>&1 && break
++            sleep 0.5
++          done
++          redis-cli -p 26379 sentinel master auditflow-redis | head -4
++      - run: pytest tests/concurrency tests/failover -v
++        env:
++          SENTINEL_HOSTS: localhost:26379
+diff --git a/requirements-dev.txt b/requirements-dev.txt
+new file mode 100644
+index 0000000..5525e8b
+--- /dev/null
++++ b/requirements-dev.txt
+@@ -0,0 +1,14 @@
++# Test/dev tooling on top of the runtime deps. Install with:
++#   pip install -r requirements-dev.txt
++-r requirements.txt
++
++pytest==9.1.1
++# unit tier: fake Redis; redis-py locks use Lua EVALSHA, so fakeredis needs lupa
++fakeredis==2.38.0
++lupa==2.8
++# integration tier: real Postgres via TEST_DATABASE_URL, else testcontainers
++testcontainers[postgres]==4.15.0
++alembic==1.20.0
++# SQLAlchemy is pinned in requirements.txt; tests/integration/conftest.py
++# also needs psycopg v3 in addition to psycopg2-binary
++psycopg[binary]==3.3.6
+diff --git a/requirements.txt b/requirements.txt
+index c249618..19f669a 100644
+--- a/requirements.txt
++++ b/requirements.txt
+@@ -20,4 +20,7 @@ rank_bm25==0.2.2
+ redis==8.1.0
+ SQLAlchemy==2.0.52
+ transformers==4.57.6
+-faiss-cpu
+\ No newline at end of file
++faiss-cpu
++prometheus-client==0.26.0
++prometheus-fastapi-instrumentator==8.1.0
++rq==2.12.0
+diff --git a/test_unit_pipeline_matching.py b/test_unit_pipeline_matching.py
+deleted file mode 100644
+index f4f82c8..0000000
+--- a/test_unit_pipeline_matching.py
++++ /dev/null
+@@ -1,69 +0,0 @@
+-from src.auditflow.orchestration.pipeline import Sessions
+-
+-
+-def test_matches_on_filing_company_name(sample_identities):
+-    result = Sessions._mentions_different_contract(
+-        "What does the Pfizer contract say about minimum order quantity?",
+-        sample_identities,
+-    )
+-    assert result == "pfizer-inc-manufacturing-and-supply-agreement"
+-
+-
+-def test_matches_on_counterparty_name_not_just_filing_company(sample_identities):
+-    """
+-    This is the exact case that was missed in the original eval: a
+-    question naming ONLY the counterparty (Companion Healthcare), never
+-    the filing company (Ehave), used to fail to match at all.
+-    """
+-    result = Sessions._mentions_different_contract(
+-        "What does the Companion Healthcare agreement say about licensing?",
+-        sample_identities,
+-    )
+-    assert result == "ehave-inc-license-and-reseller-agreement"
+-
+-
+-def test_does_not_match_active_contract_against_itself(sample_identities):
+-    result = Sessions._mentions_different_contract(
+-        "What does the Pfizer contract say about minimum order quantity?",
+-        sample_identities,
+-        active_contract="pfizer-inc-manufacturing-and-supply-agreement",
+-    )
+-    assert result != "pfizer-inc-manufacturing-and-supply-agreement"
+-
+-
+-def test_no_match_returns_none(sample_identities):
+-    result = Sessions._mentions_different_contract(
+-        "What is the capital of France?",
+-        sample_identities,
+-    )
+-    assert result is None
+-
+-
+-def test_KNOWN_GAP_historical_name_not_in_metadata_does_not_match(sample_identities):
+-    """
+-    Documents this project's real, still-open gap: identity extraction
+-    pulled "Invasix Ltd." from the contract text, but the SEC filename
+-    (and how a user might colloquially refer to the company) says
+-    "Inmode". _mentions_different_contract only checks company_name /
+-    counterparty_name, not raw_title -- so a question naming "Inmode"
+-    currently does NOT match, even though the document is really about
+-    Inmode (formerly Invasix).
+-
+-    This test is intentionally asserting the CURRENT (gap) behavior, not
+-    the desired one -- if you fix this (e.g. by also checking raw_title),
+-    this test should be updated to assert the match succeeds instead.
+-    """
+-    result = Sessions._mentions_different_contract(
+-        "What is the governing law of the Inmode manufacturing agreement?",
+-        sample_identities,
+-    )
+-    assert result is None  # <-- currently fails to match; see docstring
+-
+-
+-def test_matches_invasix_the_actual_extracted_name(sample_identities):
+-    """The name identity extraction DID capture should match correctly."""
+-    result = Sessions._mentions_different_contract(
+-        "What is the governing law of the Invasix manufacturing agreement?",
+-        sample_identities,
+-    )
+-    assert result == "invasix-ltd-turn-key-manufacturing-agreement"
+\ No newline at end of file
+-- 
+2.43.0
+
