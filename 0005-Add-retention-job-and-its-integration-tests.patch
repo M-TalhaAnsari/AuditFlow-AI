@@ -1,0 +1,435 @@
+From b66b4816b35da9e78acc9fee9907fda9bb578ec0 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Thu, 22 Oct 2026 07:49:48 +0500
+Subject: [PATCH] Add retention job and its integration tests
+
+src/auditflow/orchestration/retention.py was already in the working tree
+(untracked, never committed, no tests); it is committed here unmodified.
+It implements the policy in architecture.md "Phase 3+4":
+
+  conversation_turns: viewer 7 days, employee/ceo/admin 30 days, by the
+                      user's current role (unknown user -> viewer window)
+  audit_log:          90 days for everyone, independent of the turns row
+
+Day counts are overridable with RETENTION_VIEWER_DAYS / RETENTION_STAFF_DAYS /
+RETENTION_AUDIT_DAYS (invalid values raise instead of silently defaulting).
+Deletes run in batches, one short transaction each. Idempotent; --dry-run only
+counts. Run: python -m src.auditflow.orchestration.retention [--dry-run],
+schedulable from cron or RQ (purge_expired() takes no required arguments).
+
+tests/integration/test_retention.py (27 tests, real Postgres) seeds rows at
+exact ages and covers: viewer vs staff windows at the same age, window
+boundaries, unknown users, role changes between runs, audit_log's independent
+90-day rule, dry-run == real run, idempotency, batching edge cases (including
+the exact-multiple case), env overrides and validation, and the CLI. Each
+policy-bearing line of retention.py was mutated and a test failed every time.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01EgSuF1U5kDij8YZySminES
+---
+ src/auditflow/orchestration/retention.py | 177 +++++++++++++++++++
+ tests/integration/test_retention.py      | 208 +++++++++++++++++++++++
+ 2 files changed, 385 insertions(+)
+ create mode 100644 src/auditflow/orchestration/retention.py
+ create mode 100644 tests/integration/test_retention.py
+
+diff --git a/src/auditflow/orchestration/retention.py b/src/auditflow/orchestration/retention.py
+new file mode 100644
+index 0000000..20b41cf
+--- /dev/null
++++ b/src/auditflow/orchestration/retention.py
+@@ -0,0 +1,177 @@
++"""
++src/auditflow/orchestration/retention.py
++
++Retention job for the two history tables written by history_worker.py
++(policy from architecture.md, "Phase 3+4"):
++
++  conversation_turns  user-facing history, by the user's CURRENT role:
++                        viewer              -> 7 days
++                        employee/ceo/admin  -> 30 days
++  audit_log           compliance record, 90 days for everyone, regardless of
++                      role (independent of conversation_turns: an audit_log row
++                      outlives the same event's conversation_turns row)
++
++Overridable per deployment (positive whole days):
++  RETENTION_VIEWER_DAYS (7), RETENTION_STAFF_DAYS (30), RETENTION_AUDIT_DAYS (90)
++
++Decisions worth knowing:
++- Role is looked up at purge time. A user promoted viewer -> employee keeps
++  their older turns longer; a demoted one loses them sooner.
++- A turn whose user no longer exists in `users` is treated as a viewer (the
++  shortest window): no known role is no reason to keep personal text longer.
++- Deletes run in batches, one short transaction each, so a large backlog never
++  holds a long lock or one giant transaction against the live tables.
++
++Run it (idempotent, safe to repeat; --dry-run only counts):
++
++    python -m src.auditflow.orchestration.retention [--dry-run]
++
++Schedule it with cron, e.g. daily at 03:15:
++
++    15 3 * * *  cd /app && python -m src.auditflow.orchestration.retention
++
++purge_expired() takes no required arguments, so it can equally be enqueued or
++scheduled through RQ later without changing this module.
++"""
++from __future__ import annotations
++
++import argparse
++import logging
++import os
++
++from src.auditflow.ingest.store import document_store
++
++logger = logging.getLogger("auditflow")
++
++DEFAULT_BATCH_SIZE = 1000
++
++
++def _days_from_env(name: str, default: int) -> int:
++    raw = os.environ.get(name)
++    if raw is None or raw.strip() == "":
++        return default
++    try:
++        return _validate_days(name, int(raw))
++    except ValueError as exc:
++        raise ValueError(f"{name} must be a positive whole number of days, got {raw!r}") from exc
++
++
++def _validate_days(name: str, value: int) -> int:
++    if isinstance(value, bool) or not isinstance(value, int) or value < 1:
++        raise ValueError(f"{name} must be a positive whole number of days, got {value!r}")
++    return value
++
++
++# Rows eligible for deletion in conversation_turns. Shared by the count (dry run)
++# and delete statements so they can never disagree about what "expired" means.
++_EXPIRED_TURNS_WHERE = """
++    ct.created_at < now() - (
++        CASE COALESCE((SELECT u.role FROM users u WHERE u.username = ct.username), 'viewer')
++            WHEN 'viewer' THEN %(viewer_days)s
++            ELSE %(staff_days)s
++        END * interval '1 day'
++    )
++"""
++
++
++def _count_expired(cur, table: str, params: dict) -> int:
++    if table == "conversation_turns":
++        cur.execute(f"SELECT count(*) AS n FROM conversation_turns ct WHERE {_EXPIRED_TURNS_WHERE}", params)
++    else:
++        cur.execute(
++            "SELECT count(*) AS n FROM audit_log WHERE created_at < now() - %(audit_days)s * interval '1 day'",
++            params,
++        )
++    return cur.fetchone()["n"]
++
++
++def _delete_batch(table: str, params: dict) -> int:
++    with document_store._cursor() as cur:
++        if table == "conversation_turns":
++            cur.execute(
++                f"""
++                DELETE FROM conversation_turns WHERE id IN (
++                    SELECT ct.id FROM conversation_turns ct
++                    WHERE {_EXPIRED_TURNS_WHERE}
++                    ORDER BY ct.id LIMIT %(batch)s
++                )
++                """,
++                params,
++            )
++        else:
++            cur.execute(
++                """
++                DELETE FROM audit_log WHERE id IN (
++                    SELECT id FROM audit_log
++                    WHERE created_at < now() - %(audit_days)s * interval '1 day'
++                    ORDER BY id LIMIT %(batch)s
++                )
++                """,
++                params,
++            )
++        return cur.rowcount
++
++
++def purge_expired(
++    *,
++    viewer_days: int | None = None,
++    staff_days: int | None = None,
++    audit_days: int | None = None,
++    batch_size: int = DEFAULT_BATCH_SIZE,
++    dry_run: bool = False,
++) -> dict[str, int]:
++    """Delete (or with dry_run, just count) expired rows. Returns
++    {"conversation_turns": n, "audit_log": n}. Any day count not passed
++    explicitly comes from the environment, then the documented default."""
++    params = {
++        "viewer_days": _validate_days("viewer_days", viewer_days) if viewer_days is not None
++        else _days_from_env("RETENTION_VIEWER_DAYS", 7),
++        "staff_days": _validate_days("staff_days", staff_days) if staff_days is not None
++        else _days_from_env("RETENTION_STAFF_DAYS", 30),
++        "audit_days": _validate_days("audit_days", audit_days) if audit_days is not None
++        else _days_from_env("RETENTION_AUDIT_DAYS", 90),
++        "batch": batch_size,
++    }
++    if isinstance(batch_size, bool) or not isinstance(batch_size, int) or batch_size < 1:
++        raise ValueError(f"batch_size must be a positive whole number, got {batch_size!r}")
++
++    result: dict[str, int] = {}
++    for table in ("conversation_turns", "audit_log"):
++        if dry_run:
++            with document_store._cursor() as cur:
++                result[table] = _count_expired(cur, table, params)
++            continue
++        total = 0
++        while True:
++            deleted = _delete_batch(table, params)
++            total += deleted
++            if deleted < params["batch"]:
++                break
++        result[table] = total
++
++    logger.info(
++        "[retention] %s conversation_turns=%d audit_log=%d (viewer=%dd staff=%dd audit=%dd)",
++        "would delete" if dry_run else "deleted", result["conversation_turns"], result["audit_log"],
++        params["viewer_days"], params["staff_days"], params["audit_days"],
++    )
++    return result
++
++
++def main(argv: list[str] | None = None) -> int:
++    parser = argparse.ArgumentParser(description="Purge expired conversation_turns and audit_log rows.")
++    parser.add_argument("--dry-run", action="store_true", help="only count what would be deleted")
++    parser.add_argument("--batch-size", type=int, default=DEFAULT_BATCH_SIZE)
++    args = parser.parse_args(argv)
++
++    from core.logging_config import setup_logging
++
++    setup_logging()
++    document_store.init_pool(max_conn=1)  # one sequential job needs one connection
++    result = purge_expired(batch_size=args.batch_size, dry_run=args.dry_run)
++    verb = "would delete" if args.dry_run else "deleted"
++    print(f"{verb}: conversation_turns={result['conversation_turns']} audit_log={result['audit_log']}")
++    return 0
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+diff --git a/tests/integration/test_retention.py b/tests/integration/test_retention.py
+new file mode 100644
+index 0000000..58b38fd
+--- /dev/null
++++ b/tests/integration/test_retention.py
+@@ -0,0 +1,208 @@
++"""
++tests/integration/test_retention.py
++
++retention.purge_expired() against a REAL Postgres. Policy under test (from
++architecture.md, "Phase 3+4"):
++
++  conversation_turns : viewer 7 days, employee/ceo/admin 30 days (by the
++                       user's CURRENT role)
++  audit_log          : 90 days for everyone, independent of role and of the
++                       matching conversation_turns row
++
++Rows are seeded with raw SQL at exact ages so the tests don't lean on the
++code under test.
++"""
++import psycopg2
++import pytest
++
++from src.auditflow.orchestration import retention
++from src.auditflow.orchestration.retention import purge_expired
++
++
++@pytest.fixture
++def db(database_url):
++    conn = psycopg2.connect(database_url)
++    conn.autocommit = True
++    yield conn
++    conn.close()
++
++
++def _user(db, username, role):
++    with db.cursor() as cur:
++        cur.execute(
++            "INSERT INTO users (username, password_hash, role) VALUES (%s, 'x', %s) "
++            "ON CONFLICT (username) DO UPDATE SET role = EXCLUDED.role",
++            (username, role),
++        )
++
++
++def _turn(db, username, age, table="conversation_turns"):
++    """Insert one row aged `age` (a Postgres interval string, e.g. '8 days')."""
++    with db.cursor() as cur:
++        cur.execute(
++            f"INSERT INTO {table} (username, question, response_status, created_at) "
++            "VALUES (%s, 'q', 'answered', now() - %s::interval) RETURNING id",
++            (username, age),
++        )
++        return cur.fetchone()[0]
++
++
++def _ids(db, table):
++    with db.cursor() as cur:
++        cur.execute(f"SELECT id FROM {table}")
++        return {r[0] for r in cur.fetchall()}
++
++
++def test_viewer_and_staff_roles_have_different_windows_at_the_same_age(db):
++    _user(db, "vera", "viewer")
++    _user(db, "emma", "employee")
++    _user(db, "carl", "ceo")
++    _user(db, "adam", "admin")
++    v_old, e_old = _turn(db, "vera", "8 days"), _turn(db, "emma", "8 days")
++    c_old, a_old = _turn(db, "carl", "29 days"), _turn(db, "adam", "29 days")
++    v_new = _turn(db, "vera", "6 days")
++    e_gone, c_gone, a_gone = _turn(db, "emma", "31 days"), _turn(db, "carl", "31 days"), _turn(db, "adam", "31 days")
++
++    result = purge_expired()
++
++    assert _ids(db, "conversation_turns") == {e_old, c_old, a_old, v_new}
++    assert result["conversation_turns"] == 4  # v_old (8d viewer) + the three 31-day staff rows
++    assert not ({v_old, e_gone, c_gone, a_gone} & _ids(db, "conversation_turns"))
++
++
++def test_window_boundary_just_inside_kept_just_outside_deleted(db):
++    _user(db, "vera", "viewer")
++    inside = _turn(db, "vera", "6 days 23 hours")
++    outside = _turn(db, "vera", "7 days 1 hour")
++    purge_expired()
++    assert _ids(db, "conversation_turns") == {inside}
++    assert outside not in _ids(db, "conversation_turns")
++
++
++def test_unknown_user_is_treated_as_viewer(db):
++    # no users row at all: no known role is no reason to keep text longer
++    old, fresh = _turn(db, "ghost", "8 days"), _turn(db, "ghost", "6 days")
++    purge_expired()
++    assert _ids(db, "conversation_turns") == {fresh}
++    assert old not in _ids(db, "conversation_turns")
++
++
++def test_role_is_looked_up_at_purge_time(db):
++    _user(db, "pat", "viewer")
++    t = _turn(db, "pat", "10 days")
++    _user(db, "pat", "employee")  # promoted before the purge runs
++    purge_expired()
++    assert t in _ids(db, "conversation_turns")
++
++    _user(db, "pat", "viewer")  # demoted: the same 10-day-old turn is now past its window
++    purge_expired()
++    assert t not in _ids(db, "conversation_turns")
++
++
++def test_audit_log_is_fixed_90_days_for_every_role_and_independent_of_turns(db):
++    _user(db, "vera", "viewer")
++    _user(db, "emma", "employee")
++    keep = [_turn(db, u, "89 days", "audit_log") for u in ("vera", "emma", "ghost")]
++    drop = [_turn(db, u, "91 days", "audit_log") for u in ("vera", "emma", "ghost")]
++    # same event aged 8 days: viewer's turn expires, its audit row must survive
++    expired_turn = _turn(db, "vera", "8 days")
++    surviving_audit = _turn(db, "vera", "8 days", "audit_log")
++
++    result = purge_expired()
++
++    assert _ids(db, "audit_log") == set(keep) | {surviving_audit}
++    assert not (set(drop) & _ids(db, "audit_log"))
++    assert expired_turn not in _ids(db, "conversation_turns")
++    assert result["audit_log"] == 3
++
++
++def test_dry_run_counts_but_deletes_nothing_and_matches_the_real_run(db):
++    _user(db, "vera", "viewer")
++    for _ in range(3):
++        _turn(db, "vera", "10 days")
++        _turn(db, "vera", "100 days", "audit_log")
++    _turn(db, "vera", "1 day")
++
++    before = (_ids(db, "conversation_turns"), _ids(db, "audit_log"))
++    dry = purge_expired(dry_run=True)
++    assert (_ids(db, "conversation_turns"), _ids(db, "audit_log")) == before
++    assert dry == {"conversation_turns": 3, "audit_log": 3}
++
++    assert purge_expired() == dry
++
++
++def test_second_run_is_a_no_op(db):
++    _user(db, "vera", "viewer")
++    _turn(db, "vera", "10 days")
++    _turn(db, "vera", "100 days", "audit_log")
++    assert purge_expired() == {"conversation_turns": 1, "audit_log": 1}
++    assert purge_expired() == {"conversation_turns": 0, "audit_log": 0}
++
++
++@pytest.mark.parametrize("n_rows,batch", [(350, 100), (300, 100), (1, 100), (0, 100), (7, 1)])
++def test_batched_delete_removes_everything_for_any_row_count(db, n_rows, batch):
++    # 300/100 is the exact-multiple edge: the last batch is full, so one more
++    # (empty) pass is needed to see that it is done.
++    _user(db, "vera", "viewer")
++    with db.cursor() as cur:
++        cur.execute(
++            "INSERT INTO conversation_turns (username, question, response_status, created_at) "
++            "SELECT 'vera', 'q', 'answered', now() - interval '10 days' FROM generate_series(1, %s)",
++            (n_rows,),
++        )
++    keep = _turn(db, "vera", "1 day")
++    result = purge_expired(batch_size=batch)
++    assert result["conversation_turns"] == n_rows
++    assert _ids(db, "conversation_turns") == {keep}
++
++
++def test_env_overrides_apply_and_explicit_arguments_beat_env(db, monkeypatch):
++    _user(db, "vera", "viewer")
++    _user(db, "emma", "employee")
++    v3, e3 = _turn(db, "vera", "3 days"), _turn(db, "emma", "3 days")
++    monkeypatch.setenv("RETENTION_VIEWER_DAYS", "2")
++    monkeypatch.setenv("RETENTION_STAFF_DAYS", "2")
++    assert purge_expired(dry_run=True)["conversation_turns"] == 2  # both are 3 days old, window is now 2
++
++    # explicit argument wins over the env var
++    purge_expired(viewer_days=5)
++    assert v3 in _ids(db, "conversation_turns")  # 3 days < explicit 5-day viewer window
++    assert e3 not in _ids(db, "conversation_turns")  # staff still uses env (2 days)
++
++
++@pytest.mark.parametrize("bad", ["0", "-1", "abc", "7.5", " 3x "])
++def test_invalid_env_value_is_rejected_loudly_not_silently_defaulted(monkeypatch, bad):
++    monkeypatch.setenv("RETENTION_VIEWER_DAYS", bad)
++    with pytest.raises(ValueError, match="RETENTION_VIEWER_DAYS"):
++        purge_expired(dry_run=True)
++
++
++def test_blank_env_value_falls_back_to_the_default(monkeypatch):
++    monkeypatch.setenv("RETENTION_VIEWER_DAYS", "  ")
++    assert retention._days_from_env("RETENTION_VIEWER_DAYS", 7) == 7
++
++
++@pytest.mark.parametrize("kwargs", [
++    {"viewer_days": 0}, {"staff_days": -3}, {"audit_days": True}, {"viewer_days": 2.5},
++    {"batch_size": 0}, {"batch_size": True},
++])
++def test_invalid_explicit_arguments_are_rejected(kwargs):
++    with pytest.raises(ValueError):
++        purge_expired(dry_run=True, **kwargs)
++
++
++def test_cli_dry_run_prints_counts_and_deletes_nothing(db, capsys):
++    _user(db, "vera", "viewer")
++    _turn(db, "vera", "10 days")
++    assert retention.main(["--dry-run"]) == 0
++    assert "would delete: conversation_turns=1 audit_log=0" in capsys.readouterr().out
++    assert len(_ids(db, "conversation_turns")) == 1
++
++
++def test_cli_real_run_deletes_and_reports(db, capsys):
++    _user(db, "vera", "viewer")
++    _turn(db, "vera", "10 days")
++    _turn(db, "vera", "100 days", "audit_log")
++    assert retention.main([]) == 0
++    assert "deleted: conversation_turns=1 audit_log=1" in capsys.readouterr().out
++    assert _ids(db, "conversation_turns") == set() and _ids(db, "audit_log") == set()
+-- 
+2.43.0
+

@@ -1,0 +1,638 @@
+From 1a28e39f1a825297746244a3d19b56702ea40a05 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Wed, 21 Oct 2026 15:01:07 +0500
+Subject: [PATCH] Fix Postgres pool: enforce max_conn, queue with timeout, stop
+ connection churn
+
+Load-testing the pool (max_conn=8) against real Postgres found four problems
+in document_store._cursor(), all fixed here:
+
+1. max_conn was not enforced. SimpleConnectionPool is documented as not
+   thread-safe and checks its cap before a connect finishes, so overlapping
+   connects overshoot: 40 threads opened 28 server connections, 100 threads
+   opened 39. FastAPI runs these sync routes on a threadpool.
+   ThreadedConnectionPool enforces the cap but raises PoolError instantly
+   when full (96 of 120 requests failed at 40 threads). Now: a
+   ThreadedConnectionPool plus a BoundedSemaphore(max_conn), so callers queue
+   up to PG_POOL_ACQUIRE_TIMEOUT_SECONDS (default 10) and then get
+   UpstreamTimeoutError (504, retryable). Slots are released on every path.
+2. min_conn=1 made every concurrent request open and discard a fresh Postgres
+   connection (psycopg2 closes returned connections beyond min_conn idle):
+   3,000 -> ~100 calls/s once concurrency passed min_conn. min_conn now
+   defaults to max_conn (flat ~5,000 calls/s). max_conn is configurable via
+   PG_POOL_MAX_CONN (default 8).
+3. Persistent connections the server drops (idle timeout, failover, proxy
+   restart) surfaced as OperationalError because psycopg2's conn.closed stays
+   0. Checkout now discards dead idle connections via a zero-timeout select().
+4. init_pool() raced on first use (check-then-set), able to create several
+   pools. Now double-checked under a lock.
+
+New metrics: auditflow_pg_pool_wait_seconds, auditflow_pg_pool_timeouts_total.
+
+Adds tests/integration/test_pg_pool.py (7 tests, each verified to fail when
+its fix is reverted) and tests/load/pg_pool_load.py (refuses to run unless the
+DB name contains "test" or "load").
+
+Load results, login DB work, 64 concurrent, 2 vCPU sandbox:
+- 0 ms RTT: 1,200-1,660 logins/s at every pool size (was 40-50/s for pool>=4).
+- 30 ms RTT: 31 / 63 / 125 / 244 logins/s at pool 2 / 4 / 8 / 16 (= pool /
+  64 ms hold time), zero errors, peak server connections == pool size.
+- bcrypt verify is ~320 ms CPU per login: ~6 logins/s on 2 cores, far below
+  what max_conn=8 can serve, so the pool is not the login bottleneck.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01EgSuF1U5kDij8YZySminES
+---
+ core/metrics.py                              |   8 +
+ src/auditflow/ingest/store/document_store.py | 118 +++++++--
+ tests/integration/test_pg_pool.py            | 245 +++++++++++++++++++
+ tests/load/pg_pool_load.py                   | 160 ++++++++++++
+ 4 files changed, 507 insertions(+), 24 deletions(-)
+ create mode 100644 tests/integration/test_pg_pool.py
+ create mode 100644 tests/load/pg_pool_load.py
+
+diff --git a/core/metrics.py b/core/metrics.py
+index 7a4db08..ee4b2fd 100644
+--- a/core/metrics.py
++++ b/core/metrics.py
+@@ -48,6 +48,14 @@ PG_POOL_MAX = Gauge(
+     "auditflow_pg_pool_connections_max",
+     "Configured max_conn size of the Postgres pool",
+ )
++PG_POOL_WAIT_SECONDS = Histogram(
++    "auditflow_pg_pool_wait_seconds",
++    "Time spent waiting for a free Postgres connection slot (queueing, not query time)",
++)
++PG_POOL_TIMEOUTS = Counter(
++    "auditflow_pg_pool_timeouts_total",
++    "Times a caller gave up waiting for a Postgres connection (pool too small or queries too slow)",
++)
+ 
+ # refresh.py -- Phase 2 refresh-token theft detection
+ REFRESH_TOKEN_REUSE_TOTAL = Counter(
+diff --git a/src/auditflow/ingest/store/document_store.py b/src/auditflow/ingest/store/document_store.py
+index 879f79c..7f12d3f 100644
+--- a/src/auditflow/ingest/store/document_store.py
++++ b/src/auditflow/ingest/store/document_store.py
+@@ -26,47 +26,117 @@ CHANGED vs original:
+   by Stage 2's refresh-token rotation) is NOT included here -- that's
+   real work for when you actually build Stage 2, not added speculatively.
+ """
++import logging
+ import os
++import select
++import threading
++import time
+ from contextlib import contextmanager
+ 
+ import psycopg2
+ import psycopg2.extras
+-from psycopg2.pool import SimpleConnectionPool
++from psycopg2.pool import ThreadedConnectionPool
+ 
+-from schemas.errors import IngestionError
++from schemas.errors import IngestionError, UpstreamTimeoutError
+ from src.auditflow.ingest.models import ChunkRecord, DocumentRecord
+-from core.metrics import PG_POOL_IN_USE, PG_POOL_MAX
++from core.metrics import PG_POOL_IN_USE, PG_POOL_MAX, PG_POOL_TIMEOUTS, PG_POOL_WAIT_SECONDS
++
++logger = logging.getLogger("auditflow")
++
++# How long a caller waits for a free connection before giving up (seconds).
++PG_POOL_ACQUIRE_TIMEOUT = float(os.environ.get("PG_POOL_ACQUIRE_TIMEOUT_SECONDS", "10"))
++PG_POOL_MAX_CONN = int(os.environ.get("PG_POOL_MAX_CONN", "8"))
++
++_pool: ThreadedConnectionPool | None = None
++# One slot per allowed connection. psycopg2's pools never block: SimpleConnectionPool
++# is not thread-safe and does NOT enforce max_conn when connects overlap (measured:
++# 40 threads on max_conn=8 opened 28 server connections); ThreadedConnectionPool
++# enforces the cap but raises PoolError immediately when full. This semaphore is
++# what makes callers queue instead, so the cap holds AND requests wait, not fail.
++_pool_slots: threading.BoundedSemaphore | None = None
++_pool_init_lock = threading.Lock()
++
++
++def init_pool(min_conn: int | None = None, max_conn: int | None = None, dsn: str | None = None):
++    """min_conn defaults to max_conn on purpose. psycopg2's pools close any
++    returned connection once min_conn are idle, so with the old min_conn=1
++    every request beyond the first concurrent one opened (and then threw away)
++    a brand-new Postgres connection: measured 3,000 -> ~100 calls/s as soon as
++    concurrency passed min_conn. Keeping max_conn connections open removes that
++    cliff (flat ~5,000 calls/s up to max_conn threads). Stale connections are
++    handled at checkout, see _checkout()."""
++    global _pool, _pool_slots
++    if _pool is None:
++        with _pool_init_lock:
++            if _pool is None:  # re-check: another thread may have won the race
++                max_conn = max_conn if max_conn is not None else PG_POOL_MAX_CONN
++                min_conn = min_conn if min_conn is not None else max_conn
++                try:
++                    pool = ThreadedConnectionPool(min_conn, max_conn, dsn or os.environ["DATABASE_URL"])
++                except (psycopg2.Error, KeyError) as exc:
++                    raise IngestionError("Failed to initialize Postgres connection pool") from exc
++                _pool_slots = threading.BoundedSemaphore(max_conn)
++                PG_POOL_MAX.set(max_conn)
++                PG_POOL_IN_USE.set(0)
++                _pool = pool  # published last, after the slots exist
++    return _pool
+ 
+-_pool: SimpleConnectionPool | None = None
+ 
++def _is_stale(conn) -> bool:
++    """True if an IDLE pooled connection is no longer usable. psycopg2's own
++    conn.closed flag stays 0 after the server drops a connection (idle timeout,
++    failover, proxy restart, pg_terminate_backend) -- the next query then fails
++    with OperationalError. But a healthy idle connection never has bytes waiting
++    on its socket, while a dropped one is readable (EOF / error message), so a
++    zero-timeout select() spots it with no extra round trip."""
++    if conn.closed:
++        return True
++    try:
++        readable, _, _ = select.select([conn], [], [], 0)
++    except (OSError, ValueError):
++        return True
++    return bool(readable)
+ 
+-def init_pool(min_conn: int = 1, max_conn: int = 8, dsn: str | None = None):
+-    global _pool
+-    if _pool is None:
+-        try:
+-            _pool = SimpleConnectionPool(min_conn, max_conn, dsn or os.environ["DATABASE_URL"])
+-            PG_POOL_MAX.set(max_conn)
+-            PG_POOL_IN_USE.set(0)
+-        except (psycopg2.Error, KeyError) as exc:
+-            raise IngestionError("Failed to initialize Postgres connection pool") from exc
+-    return _pool
++
++def _checkout(pool):
++    """getconn() that never hands out a dead idle connection. Discards stale
++    ones (closing them) until it gets a live one; once the pool has no idle
++    connections left, getconn() opens a fresh one, which is live by definition."""
++    while True:
++        conn = pool.getconn()
++        if not _is_stale(conn):
++            return conn
++        logger.warning("[document_store] discarding stale pooled Postgres connection")
++        pool.putconn(conn, close=True)
+ 
+ 
+ @contextmanager
+ def _cursor():
+     pool = init_pool()
+-    conn = pool.getconn()
+-    PG_POOL_IN_USE.inc()
++    slots = _pool_slots
++    started = time.monotonic()
++    if not slots.acquire(timeout=PG_POOL_ACQUIRE_TIMEOUT):
++        PG_POOL_TIMEOUTS.inc()
++        raise UpstreamTimeoutError(
++            "Timed out waiting for a free Postgres connection",
++            detail={"waited_seconds": round(time.monotonic() - started, 3)},
++        )
++    PG_POOL_WAIT_SECONDS.observe(time.monotonic() - started)
+     try:
+-        with conn:
+-            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+-                try:
+-                    yield cur
+-                except psycopg2.Error as exc:
+-                    raise IngestionError("Postgres query failed", detail={"pg_error": str(exc)}) from exc
++        conn = _checkout(pool)
++        PG_POOL_IN_USE.inc()
++        try:
++            with conn:
++                with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
++                    try:
++                        yield cur
++                    except psycopg2.Error as exc:
++                        raise IngestionError("Postgres query failed", detail={"pg_error": str(exc)}) from exc
++        finally:
++            PG_POOL_IN_USE.dec()
++            pool.putconn(conn)
+     finally:
+-        pool.putconn(conn)
+-        PG_POOL_IN_USE.dec()
++        slots.release()  # always, or one failure permanently shrinks the pool
+ 
+ 
+ def apply_schema(schema_path: str = "src/auditflow/ingest/store/schema.sql"):
+diff --git a/tests/integration/test_pg_pool.py b/tests/integration/test_pg_pool.py
+new file mode 100644
+index 0000000..c0a8280
+--- /dev/null
++++ b/tests/integration/test_pg_pool.py
+@@ -0,0 +1,245 @@
++"""
++tests/integration/test_pg_pool.py
++
++The Postgres pool in document_store._cursor() against a REAL Postgres.
++
++Why this exists (measured, not assumed): the pool used to be psycopg2's
++SimpleConnectionPool, which is documented as unsafe across threads and does
++NOT enforce max_conn when connects overlap -- 40 threads on max_conn=8
++opened 28 server connections, 100 threads opened 39 (against a managed
++Postgres with a connection limit, a burst would exhaust it). Swapping in
++ThreadedConnectionPool alone enforces the cap but raises PoolError the
++instant the pool is full: 96 of 120 requests failed at 40 threads. The
++contract pinned here is "never more than max_conn server connections, and
++callers WAIT (bounded) instead of failing".
++
++Two more measured problems are pinned below: with min_conn=1 (the old default)
++psycopg2 closes every returned connection beyond the first idle one, so each
++concurrent request opened a fresh Postgres connection (3,000 -> ~100 calls/s
++once concurrency passed min_conn); and persistent connections that the server
++dropped used to surface as OperationalError on the next request.
++"""
++import threading
++import time
++
++import psycopg2
++import pytest
++from prometheus_client import REGISTRY
++
++from schemas.errors import IngestionError, UpstreamTimeoutError
++from src.auditflow.ingest.store import document_store as ds
++
++APP_NAME = "pooltest"
++
++
++def _with_app_name(url: str) -> str:
++    return url + ("&" if "?" in url else "?") + f"application_name={APP_NAME}"
++
++
++@pytest.fixture
++def fresh_pool(database_url):
++    """Factory: replaces the module-global pool with a small, isolated one
++    whose server connections are tagged so they can be counted exactly."""
++    saved = (ds._pool, ds._pool_slots, ds.PG_POOL_ACQUIRE_TIMEOUT)
++
++    def make(max_conn: int, timeout: float = 5.0):
++        ds._pool = None
++        ds._pool_slots = None
++        ds.PG_POOL_ACQUIRE_TIMEOUT = timeout
++        return ds.init_pool(max_conn=max_conn, dsn=_with_app_name(database_url))
++
++    yield make
++
++    if ds._pool is not None:
++        ds._pool.closeall()
++    ds._pool, ds._pool_slots, ds.PG_POOL_ACQUIRE_TIMEOUT = saved
++
++
++def _server_conns(monitor) -> int:
++    with monitor.cursor() as cur:
++        cur.execute("SELECT count(*) FROM pg_stat_activity WHERE application_name = %s", (APP_NAME,))
++        return cur.fetchone()[0]
++
++
++def _sample(name: str) -> float:
++    return REGISTRY.get_sample_value(name) or 0.0
++
++
++def test_server_connections_never_exceed_max_conn_and_no_request_fails(fresh_pool, database_url):
++    max_conn = 3
++    fresh_pool(max_conn)
++    monitor = psycopg2.connect(database_url)
++    monitor.autocommit = True
++
++    peak, stop = [0], threading.Event()
++
++    def watch():
++        while not stop.is_set():
++            peak[0] = max(peak[0], _server_conns(monitor))
++            time.sleep(0.002)
++
++    results, lock = [], threading.Lock()
++
++    def work():
++        try:
++            with ds._cursor() as cur:
++                cur.execute("SELECT pg_sleep(0.03)")
++            outcome = "ok"
++        except Exception as exc:  # noqa: BLE001 -- recording any failure type
++            outcome = type(exc).__name__
++        with lock:
++            results.append(outcome)
++
++    watcher = threading.Thread(target=watch)
++    watcher.start()
++    workers = [threading.Thread(target=work) for _ in range(24)]
++    for t in workers:
++        t.start()
++    for t in workers:
++        t.join()
++    stop.set()
++    watcher.join()
++    monitor.close()
++
++    assert results.count("ok") == 24, results
++    assert peak[0] <= max_conn, f"saw {peak[0]} server connections with max_conn={max_conn}"
++    assert peak[0] >= 2, "test did not generate real concurrency"
++
++
++def test_timeout_raises_upstream_timeout_then_pool_recovers(fresh_pool):
++    fresh_pool(max_conn=2, timeout=0.3)
++    release, entered = threading.Event(), threading.Barrier(3)
++
++    def hold():
++        with ds._cursor():
++            entered.wait(timeout=5)
++            release.wait(timeout=5)
++
++    holders = [threading.Thread(target=hold) for _ in range(2)]
++    for t in holders:
++        t.start()
++    entered.wait(timeout=5)  # both slots are now held
++
++    before = _sample("auditflow_pg_pool_timeouts_total")
++    started = time.monotonic()
++    with pytest.raises(UpstreamTimeoutError) as excinfo:
++        with ds._cursor():
++            pytest.fail("should not have obtained a connection")
++    assert 0.25 <= time.monotonic() - started < 3
++    assert excinfo.value.http_status == 504
++    assert _sample("auditflow_pg_pool_timeouts_total") == before + 1
++
++    release.set()
++    for t in holders:
++        t.join()
++    # no slot leaked by the timeout path: the pool is fully usable again
++    with ds._cursor() as cur:
++        cur.execute("SELECT 1 AS one")
++        assert cur.fetchone()["one"] == 1
++    assert ds._pool_slots._value == 2
++
++
++def test_slot_released_when_query_fails(fresh_pool):
++    # max_conn=1: any leaked slot would make the next call time out.
++    fresh_pool(max_conn=1, timeout=1.0)
++    for _ in range(5):
++        with pytest.raises(IngestionError):
++            with ds._cursor() as cur:
++                cur.execute("SELECT 1/0")
++    with ds._cursor() as cur:
++        cur.execute("SELECT 1 AS one")
++        assert cur.fetchone()["one"] == 1
++    assert ds._pool_slots._value == 1
++
++
++def test_slot_released_when_getconn_fails(fresh_pool):
++    pool = fresh_pool(max_conn=1, timeout=1.0)
++    real_getconn = pool.getconn
++
++    def broken(*a, **kw):
++        raise psycopg2.OperationalError("simulated connection failure")
++
++    pool.getconn = broken
++    for _ in range(3):
++        with pytest.raises(psycopg2.OperationalError):
++            with ds._cursor():
++                pass
++    pool.getconn = real_getconn
++    with ds._cursor() as cur:
++        cur.execute("SELECT 1 AS one")
++        assert cur.fetchone()["one"] == 1
++
++
++def test_concurrent_first_use_creates_exactly_one_pool(database_url):
++    saved = (ds._pool, ds._pool_slots)
++    ds._pool = None
++    ds._pool_slots = None
++    try:
++        barrier, seen = threading.Barrier(12), []
++
++        def go():
++            barrier.wait(timeout=5)
++            seen.append((id(ds.init_pool(max_conn=4, dsn=database_url)), id(ds._pool_slots)))
++
++        threads = [threading.Thread(target=go) for _ in range(12)]
++        for t in threads:
++            t.start()
++        for t in threads:
++            t.join()
++        assert len(seen) == 12
++        assert len({pool_id for pool_id, _ in seen}) == 1, "multiple pools were created (leaked connections)"
++        assert len({slots_id for _, slots_id in seen}) == 1
++    finally:
++        if ds._pool is not None:
++            ds._pool.closeall()
++        ds._pool, ds._pool_slots = saved
++
++
++def test_connections_are_kept_and_reused_not_reopened_per_request(fresh_pool):
++    """Regression for the min_conn=1 churn: under a concurrent burst the pool
++    must keep serving from a stable set of server connections. With churn every
++    call opens a new backend, so the number of DISTINCT backend pids seen would
++    be close to the number of calls instead of <= max_conn."""
++    max_conn = 4
++    fresh_pool(max_conn)
++    pids, lock = set(), threading.Lock()
++
++    def work():
++        for _ in range(10):
++            with ds._cursor() as cur:
++                cur.execute("SELECT pg_backend_pid() AS pid")
++                with lock:
++                    pids.add(cur.fetchone()["pid"])
++
++    threads = [threading.Thread(target=work) for _ in range(12)]
++    for t in threads:
++        t.start()
++    for t in threads:
++        t.join()
++    assert len(pids) <= max_conn, f"{len(pids)} distinct backends for 120 calls -> connections are being churned"
++
++
++def test_dead_idle_connection_is_replaced_transparently(fresh_pool, database_url):
++    """The server can drop idle pooled connections at any time (idle timeout,
++    failover, proxy restart). psycopg2's conn.closed stays 0, so without the
++    checkout check the next request raised OperationalError."""
++    fresh_pool(max_conn=2)
++    with ds._cursor() as cur:  # warm: pool now holds live idle connections
++        cur.execute("SELECT 1")
++
++    killer = psycopg2.connect(database_url)
++    killer.autocommit = True
++    with killer.cursor() as cur:
++        cur.execute(
++            "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE application_name = %s",
++            (APP_NAME,),
++        )
++        assert cur.rowcount >= 1, "test did not actually kill any pooled connection"
++    killer.close()
++    time.sleep(0.2)  # let the socket close reach the client
++
++    # every idle connection is dead; all of these must still succeed
++    for _ in range(4):
++        with ds._cursor() as cur:
++            cur.execute("SELECT 1 AS one")
++            assert cur.fetchone()["one"] == 1
+diff --git a/tests/load/pg_pool_load.py b/tests/load/pg_pool_load.py
+new file mode 100644
+index 0000000..928899c
+--- /dev/null
++++ b/tests/load/pg_pool_load.py
+@@ -0,0 +1,160 @@
++"""
++tests/load/pg_pool_load.py
++
++Load test for the Postgres connection pool in document_store._cursor().
++Not collected by pytest (no test_ prefix). Run from the repo root against a
++DISPOSABLE database that already has the alembic migrations applied:
++
++    export DATABASE_URL=postgresql://USER:PW@localhost:5432/auditflow_load
++    python tests/load/pg_pool_load.py --pool-sizes 4,8,16 --concurrency 64 --rtt-ms 0,30
++
++Workload = the DB half of /auth/login, using the real functions:
++get_user_by_username() then issue_refresh_token() (two short transactions,
++connection released between them, as in routes.py). bcrypt is deliberately
++excluded -- it burns CPU without holding a connection, so it limits login
++throughput independently of the pool (see the bcrypt line in the output).
++
++--rtt-ms adds a sleep before every statement, emulating the network round
++trip to a remote Postgres (e.g. Neon) while the connection is checked out:
++that hold time, not server CPU, is what sizes a pool (Little's law:
++connections needed = requests/s x seconds each holds a connection).
++
++Refuses to run unless the database name contains "test" or "load": the
++workload writes refresh_tokens rows (cleaned up at the end).
++"""
++import argparse
++import os
++import statistics
++import sys
++import threading
++import time
++from pathlib import Path
++from urllib.parse import urlparse
++
++sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
++os.environ.setdefault("AUTH_SECRET_KEY", "load-test-only-not-a-real-secret")  # security.py reads it at import
++
++import psycopg2  # noqa: E402
++import psycopg2.extras  # noqa: E402
++from prometheus_client import REGISTRY  # noqa: E402
++
++from src.auditflow.auth.refresh import issue_refresh_token  # noqa: E402
++from src.auditflow.auth.security import hash_password, verify_password  # noqa: E402
++from src.auditflow.ingest.store import document_store as ds  # noqa: E402
++
++USER = "loadtest-user"
++
++
++def _sample(name):
++    return REGISTRY.get_sample_value(name) or 0.0
++
++
++def _install_rtt(rtt_s: float):
++    original = psycopg2.extras.RealDictCursor.execute
++
++    def execute(self, *a, **kw):
++        if rtt_s:
++            time.sleep(rtt_s)
++        return original(self, *a, **kw)
++
++    psycopg2.extras.RealDictCursor.execute = execute
++    return lambda: setattr(psycopg2.extras.RealDictCursor, "execute", original)
++
++
++def run_once(pool_size: int, concurrency: int, duration: float, rtt_ms: float, dsn: str) -> dict:
++    ds._pool, ds._pool_slots = None, None
++    ds.init_pool(max_conn=pool_size, dsn=dsn)
++    restore = _install_rtt(rtt_ms / 1000)
++    ds.PG_POOL_ACQUIRE_TIMEOUT = 30.0
++    timeouts0 = _sample("auditflow_pg_pool_timeouts_total")
++    stop, lock = time.monotonic() + duration, threading.Lock()
++    lat, errors = [], []
++
++    def worker():
++        while time.monotonic() < stop:
++            t = time.monotonic()
++            try:
++                ds.get_user_by_username(USER)
++                issue_refresh_token(USER)
++                with lock:
++                    lat.append(time.monotonic() - t)
++            except Exception as exc:  # noqa: BLE001
++                with lock:
++                    errors.append(type(exc).__name__)
++
++    mon = psycopg2.connect(dsn)
++    mon.autocommit = True
++    peak, mstop = [0], threading.Event()
++
++    def watch():
++        cur = mon.cursor()
++        while not mstop.is_set():
++            cur.execute("SELECT count(*) FROM pg_stat_activity WHERE datname = current_database() AND pid <> pg_backend_pid()")
++            peak[0] = max(peak[0], cur.fetchone()[0])
++            time.sleep(0.01)
++
++    wt = threading.Thread(target=watch)
++    wt.start()
++    started = time.monotonic()
++    threads = [threading.Thread(target=worker) for _ in range(concurrency)]
++    for t in threads:
++        t.start()
++    for t in threads:
++        t.join()
++    elapsed = time.monotonic() - started
++    mstop.set()
++    wt.join()
++    mon.close()
++    restore()
++    ds._pool.closeall()
++    lat.sort()
++    pct = lambda p: lat[min(len(lat) - 1, int(len(lat) * p))] * 1000 if lat else float("nan")  # noqa: E731
++    return {
++        "logins_per_s": len(lat) / elapsed, "p50": pct(0.50), "p95": pct(0.95), "p99": pct(0.99),
++        "errors": len(errors), "timeouts": _sample("auditflow_pg_pool_timeouts_total") - timeouts0,
++        "peak_server_conns": peak[0],
++    }
++
++
++def main():
++    ap = argparse.ArgumentParser()
++    ap.add_argument("--pool-sizes", default="4,8,16")
++    ap.add_argument("--concurrency", type=int, default=64, help="simultaneous in-flight logins")
++    ap.add_argument("--duration", type=float, default=5.0)
++    ap.add_argument("--rtt-ms", default="0,30", help="comma list of simulated per-statement round trips")
++    args = ap.parse_args()
++
++    dsn = os.environ["DATABASE_URL"]
++    dbname = urlparse(dsn).path.lstrip("/")
++    if not any(w in dbname.lower() for w in ("test", "load")):
++        sys.exit(f"refusing to run against database {dbname!r}: name must contain 'test' or 'load'")
++
++    ds._pool, ds._pool_slots = None, None
++    ds.init_pool(1, 2, dsn=dsn)
++    pw_hash = hash_password("pw-12345678")
++    ds.upsert_user(USER, pw_hash, "employee")
++    t = time.monotonic()
++    for _ in range(3):
++        verify_password("pw-12345678", pw_hash)
++    bcrypt_ms = (time.monotonic() - t) / 3 * 1000
++    ds._pool.closeall()
++    print(f"bcrypt verify_password: {bcrypt_ms:.0f} ms CPU per login, {os.cpu_count()} cpu(s) "
++          f"-> CPU-bound ceiling ~{(os.cpu_count() or 1) * 1000 / bcrypt_ms:.0f} logins/s (no DB involved)\n")
++
++    print(f"{'rtt_ms':>6} {'pool':>4} {'conc':>4} | {'login/s':>8} {'p50ms':>7} {'p95ms':>7} {'p99ms':>7} | "
++          f"{'errors':>6} {'timeouts':>8} {'peak_srv_conns':>14}")
++    for rtt in [float(x) for x in args.rtt_ms.split(",")]:
++        for size in [int(x) for x in args.pool_sizes.split(",")]:
++            r = run_once(size, args.concurrency, args.duration, rtt, dsn)
++            print(f"{rtt:>6.0f} {size:>4} {args.concurrency:>4} | {r['logins_per_s']:>8.1f} {r['p50']:>7.0f} "
++                  f"{r['p95']:>7.0f} {r['p99']:>7.0f} | {r['errors']:>6} {r['timeouts']:>8.0f} {r['peak_server_conns']:>14}")
++
++    ds._pool, ds._pool_slots = None, None
++    ds.init_pool(1, 2, dsn=dsn)
++    ds.execute("DELETE FROM refresh_tokens WHERE username = %s", (USER,))
++    ds.execute("DELETE FROM users WHERE username = %s", (USER,))
++    ds._pool.closeall()
++
++
++if __name__ == "__main__":
++    main()
+-- 
+2.43.0
+
